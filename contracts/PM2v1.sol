@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.13;
 
 contract SafeMath {
 	
@@ -24,7 +24,7 @@ contract Owned {
     address public newOwner;
     event OwnershipTransferred(address indexed _from, address indexed _to);
 
-    function Owned() {
+    function Owned() public {
         owner = msg.sender;
     }
 
@@ -33,11 +33,11 @@ contract Owned {
         _;
     }
 
-    function transferOwnership(address _newOwner) onlyOwner {
+    function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
  
-    function acceptOwnership() {
+    function acceptOwnership() public {
         if (msg.sender == newOwner) {
             OwnershipTransferred(owner, newOwner);
             owner = newOwner;
@@ -50,6 +50,7 @@ contract Developer{
 	struct _Developer {
 		bool confirmation;
 		uint info;
+		uint8 status;
 	}
 	
 	struct Vote {
@@ -60,18 +61,19 @@ contract Developer{
 	mapping (address => _Developer) public developers;
 	mapping (address => mapping (address => Vote)) public votesDeveloper;
 	
-	function registrationDeveloper (uint _info){
+	function registrationDeveloper (uint _info) public {
 		developers[msg.sender]=_Developer({
 			confirmation: false,
-			info: _info
+			info: _info,
+			status: 1
 		});
 		RegistrationDeveloper(msg.sender,_info);	
 	}
 	
-	function voting(address _developer,uint vote){
-		require(vote<=5);
+	function voting(address _developer,uint vote) public {
+		assert(vote<=5);
 		Vote storage sender = votesDeveloper[_developer][msg.sender];
-        require(!sender.voted);
+        assert(!sender.voted);
         sender.voted = true;
 		sender.vote=vote;
 	}
@@ -79,7 +81,8 @@ contract Developer{
 }
 
 contract Application is Developer,SafeMath{
-	event RegistrationApplication(uint8 category, uint countAppOfCategory, bool free, uint256 value, address indexed developer, string nameApp);
+	event RegistrationApplication(uint8 category, uint countAppOfCategory, bool free, uint256 value, address indexed developer, string nameApp, string hashIpfs);
+	event changeHashIpfsEvent(uint8 category, uint idApp, string hashIpfs);
 	struct _Application {
 		uint8 status;
 		uint8 category;
@@ -88,23 +91,32 @@ contract Application is Developer,SafeMath{
 		uint256 value;
 		address developer;
 		string nameApp; 
+		string hashIpfs;
 	}
 	
 	mapping (uint => uint) public countAppOfCategory; 
 	mapping (uint => mapping (uint => _Application)) public applications;
-	function registrationApplication (uint8 _category, bool _free,uint256 _value, string _nameApp){
-		require(developers[msg.sender].confirmation==true);
+	function registrationApplication (uint8 _category, bool _free,uint256 _value, string _nameApp, string _hashIpfs) public {
+		assert(developers[msg.sender].confirmation==true);
 		countAppOfCategory[_category] = add(countAppOfCategory[_category],1); 
 		applications[_category][countAppOfCategory[_category]]=_Application({
-			status: 0,
+			status: 1,
 			category: _category,
 			free: _free,
 			confirmation: false,
 			value: _value,
 			developer: msg.sender,
-			nameApp: _nameApp
+			nameApp: _nameApp,
+			hashIpfs: _hashIpfs
 		});
-		RegistrationApplication(_category,countAppOfCategory[_category],_free,_value,msg.sender,_nameApp);
+		RegistrationApplication(_category, countAppOfCategory[_category], _free, _value, msg.sender, _nameApp, _hashIpfs );
+	}
+	
+	function changeHashIpfs(uint _idApp, uint8 _category, string _hashIpfs) public {
+		assert(developers[msg.sender].confirmation==true);
+		assert(applications[_category][_idApp].confirmation==true);
+		applications[_category][_idApp].hashIpfs =_hashIpfs;
+		changeHashIpfsEvent(_category, _idApp, _hashIpfs);
 	}
 }
 
@@ -119,40 +131,51 @@ contract User is Application{
 	struct Purchase {
 		bool confirmation;
 	}
-	//User[] public users;
-
+	uint256 public commission;
+	mapping (address => uint256) public developerRevenue;
 	mapping (address => _User) public users;
 	mapping (address => mapping (uint =>  mapping (uint => Purchase))) public purchases;
-	function registrationUser (uint _info){
+	function registrationUser (uint _info) public {
 		users[msg.sender] = _User({
-			status: 0,
+			status: 1,
 			confirmation: false,
 			info: _info
 		});
 		RegistrationUser(msg.sender,_info);	
 	}
 	
-	function buyApp (uint _idApp, uint _category) payable {
-		require(applications[_category][_idApp].value == msg.value);
+	function buyApp (uint _idApp, uint _category) public payable {
+		assert(applications[_category][_idApp].value == msg.value);
+		//assert(users[_user].status>0 && users[_user].status<=1);
 		purchases[msg.sender][_category][_idApp].confirmation = true;
+		uint sum = sub(msg.value,div(msg.value,10));
+		developerRevenue[applications[_category][_idApp].developer] = add(developerRevenue[applications[_category][_idApp].developer],sum);
+		commission = add(commission,sub(msg.value,sum));
 	}
 }
 
 contract PlayMarket is User,Owned{
-	
-	function confirmationDeveloper(address _developer, bool _value) onlyOwner {
+
+	function confirmationDeveloper(address _developer, bool _value) public onlyOwner {
+		assert(developers[_developer].status>0 && developers[_developer].status<=1);
 		developers[_developer].confirmation = _value;
 	}
 
-	function confirmationApplication(uint _application,uint _category, bool _value) onlyOwner{
+	function confirmationApplication(uint _application,uint _category, bool _value) public onlyOwner{
+		assert(applications[_category][_application].status>0 && applications[_category][_application].status<=1);
 		applications[_category][_application].confirmation = _value;
 	}
 	
-	function confirmationUser(address _user, bool _value) onlyOwner{
+	function confirmationUser(address _user, bool _value) public onlyOwner{
+		assert(users[_user].status>0 && users[_user].status<=1);
 		users[_user].confirmation = _value;
 	}
 	
-	function collect() onlyOwner {
-		require(owner.call.value(this.balance)(0));
+	function collect() public onlyOwner {
+		owner.transfer(commission);
+	}
+	
+	function collectDeveloper() public {
+		msg.sender.transfer(developerRevenue[msg.sender]);
 	}
 }
