@@ -4,6 +4,10 @@ import '/src/common/ownership/Ownable.sol';
 import '/src/common/ownership/Ownable.sol';
 import '/src/PM2/User.sol';
 
+
+/**
+ * @title PlayMarket contract - basic contract PM2
+ */
 contract PlayMarket is User, Ownable, SafeMath{
 
 	function confirmationDeveloper(address _developer, bool _value) public onlyOwner {
