@@ -4,6 +4,10 @@ import '/src/common/ownership/Ownable.sol';
 import '/src/common/ownership/Ownable.sol';
 import '/src/PM2/Application.sol';
 
+
+/**
+ * @title User contract - basic contract for working with users
+ */
 contract User is Application, Ownable, SafeMath{
 	event RegistrationUser(address indexed user, uint info);	
 	struct _User {
