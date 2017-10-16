@@ -4,6 +4,10 @@ import '/src/common/ownership/Ownable.sol';
 import '/src/common/ownership/Ownable.sol';
 import '/src/PM2/Developer.sol';
 
+
+/**
+ * @title Application contract - basic contract for working with applications
+ */
 contract Application is Developer, Ownable, SafeMath{
 	event RegistrationApplication(uint8 category, uint countAppOfCategory, bool free, uint256 value, address indexed developer, string nameApp, string hashIpfs);
 	event changeHashIpfsEvent(uint8 category, uint idApp, string hashIpfs);
