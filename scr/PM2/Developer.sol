@@ -3,6 +3,10 @@ pragma solidity ^0.4.15;
 import '/src/common/ownership/Ownable.sol';
 import '/src/common/SafeMath.sol';
 
+
+/**
+ * @title Developer contract - basic contract for working with developers
+ */
 contract Developer is Ownable, SafeMath {
 	event RegistrationDeveloper(address indexed developer, uint info);	
 	struct _Developer {
