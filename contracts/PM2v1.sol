@@ -1,51 +1,96 @@
-pragma solidity ^0.4.13;
+pragma solidity ^0.4.15;
 
+ /**
+ * @title SafeMath
+ * @dev Math operations with safety checks that throw on error
+ */
 contract SafeMath {
-	
-    function sub(uint256 x, uint256 y) constant internal returns (uint256 z) {
-        assert((z = x - y) <= x);
-    }
 
-    function add(uint256 x, uint256 y) constant internal returns (uint256 z) {
-        assert((z = x + y) >= x);
-    }
+  function sub(uint256 x, uint256 y) internal constant returns (uint256) {
+    uint256 z = x - y;
+    assert(z <= x);
+    return z;
+  }
+
+  function add(uint256 x, uint256 y) internal constant returns (uint256) {
+    uint256 z = x + y;
+    assert(z >= x);
+    return z;
+  }
 	
-	function div(uint256 x, uint256 y) constant internal returns (uint256 z) {
-        z = x / y;
-    }
+  function div(uint256 x, uint256 y) internal constant returns (uint256) {
+    uint256 z = x / y;
+    return z;
+  }
 	
-	function min(uint256 x, uint256 y) constant internal returns (uint256 z) {
-        z = x <= y ? x : y;
-    }
+  function mul(uint256 x, uint256 y) internal constant returns (uint256) {
+    uint256 z = x * y;
+    assert(x == 0 || z / x == y);
+    return z;
+  }
+
+  function min(uint256 x, uint256 y) internal constant returns (uint256) {
+    uint256 z = x <= y ? x : y;
+    return z;
+  }
+
+  function max(uint256 x, uint256 y) internal constant returns (uint256) {
+    uint256 z = x >= y ? x : y;
+    return z;
+  }
 }
 
-contract Owned {
-    address public owner;
-    address public newOwner;
-    event OwnershipTransferred(address indexed _from, address indexed _to);
+/**
+ * @title Ownable contract - base contract with an owner
+ */
+contract Ownable {
+  
+  address public owner;
+  address public newOwner;
 
-    function Owned() public {
-        owner = msg.sender;
-    }
+  event OwnershipTransferred(address indexed _from, address indexed _to);
+  
+  /**
+   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+   * account.
+   */
+  function Ownable() public {
+    owner = msg.sender;
+  }
 
-    modifier onlyOwner {
-        assert (msg.sender == owner);
-        _;
-    }
+  /**
+   * @dev Throws if called by any account other than the owner.
+   */
+  modifier onlyOwner() {
+    assert(msg.sender == owner);
+    _;
+  }
 
-    function transferOwnership(address _newOwner) public onlyOwner {
-        newOwner = _newOwner;
+  /**
+   * @dev Allows the current owner to transfer control of the contract to a newOwner.
+   * @param _newOwner The address to transfer ownership to.
+   */
+  function transferOwnership(address _newOwner) public onlyOwner {
+    assert(_newOwner != address(0));      
+    newOwner = _newOwner;
+  }
+
+  /**
+   * @dev Accept transferOwnership.
+   */
+  function acceptOwnership() public {
+    if (msg.sender == newOwner) {
+      OwnershipTransferred(owner, newOwner);
+      owner = newOwner;
     }
- 
-    function acceptOwnership() public {
-        if (msg.sender == newOwner) {
-            OwnershipTransferred(owner, newOwner);
-            owner = newOwner;
-        }
-    }
+  }
 }
 
-contract Developer{
+
+/**
+ * @title Developer contract - basic contract for working with developers
+ */
+contract Developer is Ownable, SafeMath{
 	event RegistrationDeveloper(address indexed developer, uint info);	
 	struct _Developer {
 		bool confirmation;
@@ -80,7 +125,11 @@ contract Developer{
 	
 }
 
-contract Application is Developer,SafeMath{
+
+/**
+ * @title Application contract - basic contract for working with applications
+ */
+contract Application is Developer, Ownable, SafeMath{
 	event RegistrationApplication(uint8 category, uint countAppOfCategory, bool free, uint256 value, address indexed developer, string nameApp, string hashIpfs);
 	event changeHashIpfsEvent(uint8 category, uint idApp, string hashIpfs);
 	struct _Application {
@@ -120,7 +169,10 @@ contract Application is Developer,SafeMath{
 	}
 }
 
-contract User is Application{
+/**
+ * @title User contract - basic contract for working with users
+ */
+contract User is Application, Ownable, SafeMath{
 	event RegistrationUser(address indexed user, uint info);	
 	struct _User {
 		uint8 status;
@@ -154,7 +206,11 @@ contract User is Application{
 	}
 }
 
-contract PlayMarket is User,Owned{
+
+/**
+ * @title PlayMarket contract - basic contract PM2
+ */
+contract PlayMarket is User, Ownable, SafeMath{
 
 	function confirmationDeveloper(address _developer, bool _value) public onlyOwner {
 		assert(developers[_developer].status>0 && developers[_developer].status<=1);
