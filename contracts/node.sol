@@ -90,6 +90,7 @@ contract Ownable {
  * @title Agent contract - base contract with an agent
  */
 contract Agent is Ownable {
+  
   address public adrAgent;
   
   function Agent() public {
@@ -119,26 +120,26 @@ contract Node is Agent, SafeMath {
     bytes32 Y;
     uint256 deposit;
     bool isSet;
-	}
+  }
   
-	mapping (address => uint256) public nodeRevenue;
-	mapping (address => _Node) public nodes;
+  mapping (address => uint256) public nodeRevenue;
+  mapping (address => _Node) public nodes;
 	
- 	function buyApp(address _adrNode, uint _value, uint _proc) public onlyAgent {
-		require(nodes[_adrNode].confirmation == true);
+  function buyApp(address _adrNode, uint _value, uint _proc) public onlyAgent {
+    require(nodes[_adrNode].confirmation == true);
     nodeRevenue[_adrNode] = add(nodeRevenue[_adrNode],div(mul(_value,_proc),100));
-	}
+  }
 
   function registrationNode (address _adrNode, bytes32 _IP, bytes32 _X, bytes32 _Y, uint256 _deposit) public onlyAgent {
-		nodes[_adrNode] = _Node({
+    nodes[_adrNode] = _Node({
       confirmation: false,
       IP: _IP,
       X: _X,
       Y: _Y,
       deposit: _deposit,
       isSet: true
-		});
-	}
+    });
+  }
   
   function getDeposit(address _adrNode) public constant onlyAgent returns (uint256) {
     return nodes[_adrNode].deposit;
@@ -155,11 +156,11 @@ contract Node is Agent, SafeMath {
   }
   
   function collectNode(address _adrNode) public onlyAgent{
-		nodeRevenue[_adrNode] = 0;
-	}
+    nodeRevenue[_adrNode] = 0;
+  }
   
   function confirmationNode(address _node, bool _value) public onlyAgent{
-		assert(nodes[_node].isSet);
+    assert(nodes[_node].isSet);
     nodes[_node].confirmation = _value;
-	}
+  }
 }
