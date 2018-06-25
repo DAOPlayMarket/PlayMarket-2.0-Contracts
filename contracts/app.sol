@@ -114,12 +114,12 @@ contract Agent is Ownable {
 contract Application is Agent, SafeMath {
 	
   struct _Application {
-		address developer;
-		string hash;
+    address developer;
+    string hash;
     string hashTag;
     uint256 value;
     bool publish;
-	}
+  }
 
   struct _ApplicationICO {
     address adr;
@@ -127,14 +127,13 @@ contract Application is Agent, SafeMath {
     string hashTag;
   }
 
-	_Application[] public applications;
-  //_ApplicationICO[] public applicationsICO;
+  _Application[] public applications;
   mapping (uint => _ApplicationICO) public applicationsICO;
   mapping (address => mapping (uint =>  bool)) public purchases;
   mapping (address => uint256) public developerRevenue;
   
-	function registrationApplication (string _hash, string _hashTag, bool _publish, uint256 _value, address _dev) public onlyAgent returns (uint256) {
-		applications.push(_Application({
+  function registrationApplication(string _hash, string _hashTag, bool _publish, uint256 _value, address _dev) public onlyAgent returns (uint256) {
+    applications.push(_Application({
       developer: _dev,
       hash: _hash,
       hashTag: _hashTag,
@@ -142,32 +141,32 @@ contract Application is Agent, SafeMath {
       publish: _publish
     }));
     return applications.length-1;
-	}
+  }
   
   function registrationApplicationICO (uint _idApp, address _addr, string _hash, string _hashTag, address _dev) public onlyAgent {
     require(checkDeveloper(_idApp,_dev));
     applicationsICO[_idApp].adr =_addr;
     applicationsICO[_idApp].hash =_hash;
     applicationsICO[_idApp].hashTag =_hashTag;
-	}
+  }
 	
-	function changeHash (uint _idApp,  string _hash, string _hashTag, address _dev) public onlyAgent {
-		require(checkDeveloper(_idApp,_dev));
+  function changeHash (uint _idApp,  string _hash, string _hashTag, address _dev) public onlyAgent {
+    require(checkDeveloper(_idApp,_dev));
     applications[_idApp].hash =_hash;
     applications[_idApp].hashTag =_hashTag;
-	}
+  }
   
   function changePublish (uint _idApp, bool _publish, address _dev) public onlyAgent {
-		require(checkDeveloper(_idApp,_dev));
+    require(checkDeveloper(_idApp,_dev));
     applications[_idApp].publish =_publish;
-	}
+  }
   
   function changeIcoInfo (uint _idApp, address _addr, string _hash, string _hashTag, address _dev) public onlyAgent {
-		require(checkDeveloper(_idApp,_dev));
+    require(checkDeveloper(_idApp,_dev));
     applicationsICO[_idApp].adr =_addr;
     applicationsICO[_idApp].hash =_hash;
     applicationsICO[_idApp].hashTag =_hashTag;
-	}
+  }
   
   function checkDeveloper(uint _idApp, address _dev) private constant returns (bool success) {
       require(applications[_idApp].developer == _dev);
@@ -184,14 +183,14 @@ contract Application is Agent, SafeMath {
   }
 
   function buyApp (uint _idApp, address _user, address _dev, uint _value, uint _proc) public onlyAgent {
-		require(checkSum(_idApp,_value));
+    require(checkSum(_idApp,_value));
     purchases[_user][_idApp] = true;
-		developerRevenue[_dev] = add(developerRevenue[_dev],div(mul(_value,_proc),100));
-	}
+    developerRevenue[_dev] = add(developerRevenue[_dev],div(mul(_value,_proc),100));
+  }
 
   function collectDeveloper(address _dev) public onlyAgent{
-		developerRevenue[_dev] = 0;
-	}
+    developerRevenue[_dev] = 0;
+  }
   
   function checkBuy(uint _idApp, address _user) public constant returns (bool success) {
       return purchases[_user][_idApp];
