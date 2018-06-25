@@ -129,7 +129,7 @@ contract Developer is Agent, SafeMath{
       info: _info,
       name: _name,
       isSet: true
-		});
+    });
   }
 	
   function changeAoutoConfirm(bool _autoConfirm ) public onlyOwner {
@@ -375,24 +375,24 @@ contract PlayMarket is Ownable {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changeHash(_idApp, _hash, _hashTag, msg.sender);
     changeHashEvent(_idApp, _hash, _hashTag);
-	}
+  }
   
   function changeIcoInfo(uint _idApp, address _addr, string _hash, string _hashTag) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
-		adrApplicationContract.changeIcoInfo( _idApp, _addr, _hash, _hashTag, msg.sender);
+    adrApplicationContract.changeIcoInfo( _idApp, _addr, _hash, _hashTag, msg.sender);
     changeIcoInfoEvent(_idApp, _addr, _hash, _hashTag);
-	}
+  }
   
   function changePublish (uint _idApp, bool _publish) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changePublish(_idApp, _publish, msg.sender);
-		changePublishEvent(_idApp, _publish);
-	}
+    changePublishEvent(_idApp, _publish);
+  }
   
   function registrationDeveloper(bytes32 _info, bytes32 _name) public {
     adrDeveloperContract.registrationDeveloper(msg.sender, _info, _name);
     registrationDeveloperEvent(msg.sender, _info, _name);	
-	}
+  }
 	
 
   function registrationNode(bytes32 _IP, bytes32 _X, bytes32 _Y) public payable {
@@ -400,7 +400,7 @@ contract PlayMarket is Ownable {
     require(adrNodeContract.getDeposit(msg.sender) == 0);
     adrNodeContract.registrationNode(msg.sender, _IP, _X, _Y, msg.value);
     registrationNodeEvent(msg.sender, false, _IP, _X, _Y, msg.value);	
-	}
+  }
   
   function makeDeposit() public payable {
     adrNodeContract.makeDeposit(msg.sender, msg.value);
