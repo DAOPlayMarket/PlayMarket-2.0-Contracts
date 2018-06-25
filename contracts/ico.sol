@@ -264,7 +264,6 @@ contract StandartTokenPMT is StandardToken, Ownable {
     totalSupply_ = _initialSupply;
     exchangeRateAddress = _exchangeRateAddress;
     
-    //15% - DAO, 45% - распределение, 40% - разработчику(по частям забирает)
     balances[_DAOPlayMarket] = safeDiv(safeMul(totalSupply_,15),100);
     emit Transfer(0x0, _DAOPlayMarket, balances[_DAOPlayMarket]);
     
