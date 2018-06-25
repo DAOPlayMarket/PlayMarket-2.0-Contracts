@@ -34,7 +34,6 @@ contract User is Application, Ownable, SafeMath{
 	
 	function buyApp (uint _idApp, uint _category) public payable {
 		assert(applications[_category][_idApp].value == msg.value);
-		//assert(users[_user].status>0 && users[_user].status<=1);
 		purchases[msg.sender][_category][_idApp].confirmation = true;
 		uint sum = sub(msg.value,div(msg.value,10));
 		developerRevenue[applications[_category][_idApp].developer] = add(developerRevenue[applications[_category][_idApp].developer],sum);
