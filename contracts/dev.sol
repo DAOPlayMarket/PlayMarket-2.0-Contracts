@@ -112,37 +112,37 @@ contract Agent is Ownable {
  * @title Developer contract - basic contract for working with developers
  */
 contract Developer is Agent, SafeMath{
-  struct _Developer {
-		bool confirmation;
-    bytes32 name;
-		bytes32 info;
-    bool isSet;
-	}
-
-
-	mapping (address => _Developer) public developers;
-	bool autoConfirm = true;
   
-	function registrationDeveloper (address _adrDev, bytes32 _info, bytes32 _name) public onlyAgent {
-		developers[_adrDev]=_Developer({
-			confirmation: autoConfirm,
-			info: _info,
+  struct _Developer {
+    bool confirmation;
+    bytes32 name;
+    bytes32 info;
+    bool isSet;
+  }
+
+  mapping (address => _Developer) public developers;
+  bool autoConfirm = true;
+  
+  function registrationDeveloper (address _adrDev, bytes32 _info, bytes32 _name) public onlyAgent {
+    developers[_adrDev]=_Developer({
+      confirmation: autoConfirm,
+      info: _info,
       name: _name,
       isSet: true
-		});
-	}
+    });
+  }
 	
-	function changeAoutoConfirm(bool _autoConfirm ) public onlyOwner {
-		autoConfirm = _autoConfirm;
-	}
+  function changeAoutoConfirm(bool _autoConfirm ) public onlyOwner {
+    autoConfirm = _autoConfirm;
+  }
   
   function checkConfirmation (address _addrDev) public constant onlyAgent returns (bool success) {
-      require(developers[_addrDev].confirmation == true);
-      return true;
+    require(developers[_addrDev].confirmation == true);
+    return true;
   }
   
   function confirmationDeveloper(address _developer, bool _value) public onlyAgent {
-		assert(developers[_developer].isSet);
-		developers[_developer].confirmation = _value;
-	}
+    assert(developers[_developer].isSet);
+    developers[_developer].confirmation = _value;
+  }
 }

@@ -8,13 +8,13 @@ contract SafeMath {
   function safeSub(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x - y;
     assert(z <= x);
-	  return z;
+    return z;
   }
 
   function safeAdd(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x + y;
-	  assert(z >= x);
-	  return z;
+    assert(z >= x);
+    return z;
   }
 	
   function safeDiv(uint256 x, uint256 y) internal pure returns (uint256) {
@@ -92,15 +92,15 @@ contract Ownable {
 contract ERC20 {
 
   function totalSupply() public view  returns (uint256);
-	function balanceOf(address _owner) public view returns (uint256);
+  function balanceOf(address _owner) public view returns (uint256);
   function transfer(address _to, uint256 _value) public returns (bool success);
   
-	function allowance(address _owner, address _spender) public view returns (uint256);
+  function allowance(address _owner, address _spender) public view returns (uint256);
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
   function approve(address _spender, uint256 _value) public returns (bool success);
 	
   event Transfer(address indexed from, address indexed to, uint256 value);
-	event Approval(address indexed owner, address indexed spender, uint256 value);
+  event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 /**

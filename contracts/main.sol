@@ -112,39 +112,39 @@ contract Agent is Ownable {
  * @title Developer contract - basic contract for working with developers
  */
 contract Developer is Agent, SafeMath{
-  struct _Developer {
-		bool confirmation;
-    bytes32 name;
-		bytes32 info;
-    bool isSet;
-	}
-
-
-	mapping (address => _Developer) public developers;
-	bool autoConfirm = true;
   
-	function registrationDeveloper (address _adrDev, bytes32 _info, bytes32 _name) public onlyAgent {
-		developers[_adrDev]=_Developer({
-			confirmation: autoConfirm,
-			info: _info,
+  struct _Developer {
+    bool confirmation;
+    bytes32 name;
+    bytes32 info;
+    bool isSet;
+  }
+
+  mapping (address => _Developer) public developers;
+  bool autoConfirm = true;
+  
+  function registrationDeveloper (address _adrDev, bytes32 _info, bytes32 _name) public onlyAgent {
+    developers[_adrDev]=_Developer({
+      confirmation: autoConfirm,
+      info: _info,
       name: _name,
       isSet: true
 		});
-	}
+  }
 	
-	function changeAoutoConfirm(bool _autoConfirm ) public onlyOwner {
-		autoConfirm = _autoConfirm;
+  function changeAoutoConfirm(bool _autoConfirm ) public onlyOwner {
+    autoConfirm = _autoConfirm;
 	}
   
   function checkConfirmation (address _addrDev) public constant onlyAgent returns (bool success) {
-      require(developers[_addrDev].confirmation == true);
-      return true;
+    require(developers[_addrDev].confirmation == true);
+    return true;
   }
   
   function confirmationDeveloper(address _developer, bool _value) public onlyAgent {
-		assert(developers[_developer].isSet);
-		developers[_developer].confirmation = _value;
-	}
+    assert(developers[_developer].isSet);
+    developers[_developer].confirmation = _value;
+  }
 }
 
 
@@ -160,26 +160,26 @@ contract Node is Agent, SafeMath {
     bytes32 Y;
     uint256 deposit;
     bool isSet;
-	}
+  }
   
-	mapping (address => uint256) public nodeRevenue;
-	mapping (address => _Node) public nodes;
+  mapping (address => uint256) public nodeRevenue;
+  mapping (address => _Node) public nodes;
 	
- 	function buyApp(address _adrNode, uint _value, uint _proc) public onlyAgent {
-		require(nodes[_adrNode].confirmation == true);
+  function buyApp(address _adrNode, uint _value, uint _proc) public onlyAgent {
+    require(nodes[_adrNode].confirmation == true);
     nodeRevenue[_adrNode] = add(nodeRevenue[_adrNode],div(mul(_value,_proc),100));
-	}
+  }
 
   function registrationNode (address _adrNode, bytes32 _IP, bytes32 _X, bytes32 _Y, uint256 _deposit) public onlyAgent {
-		nodes[_adrNode] = _Node({
+    nodes[_adrNode] = _Node({
       confirmation: false,
       IP: _IP,
       X: _X,
       Y: _Y,
       deposit: _deposit,
       isSet: true
-		});
-	}
+    });
+  }
   
   function getDeposit(address _adrNode) public constant onlyAgent returns (uint256) {
     return nodes[_adrNode].deposit;
@@ -196,13 +196,13 @@ contract Node is Agent, SafeMath {
   }
   
   function collectNode(address _adrNode) public onlyAgent{
-		nodeRevenue[_adrNode] = 0;
+    nodeRevenue[_adrNode] = 0;
 	}
   
   function confirmationNode(address _node, bool _value) public onlyAgent{
-		assert(nodes[_node].isSet);
+    assert(nodes[_node].isSet);
     nodes[_node].confirmation = _value;
-	}
+  }
 }
 
 
@@ -212,12 +212,12 @@ contract Node is Agent, SafeMath {
 contract Application is Agent, SafeMath {
 	
   struct _Application {
-		address developer;
-		string hash;
+    address developer;
+    string hash;
     string hashTag;
     uint256 value;
     bool publish;
-	}
+  }
 
   struct _ApplicationICO {
     address adr;
@@ -225,14 +225,13 @@ contract Application is Agent, SafeMath {
     string hashTag;
   }
 
-	_Application[] public applications;
-  //_ApplicationICO[] public applicationsICO;
+  _Application[] public applications;
   mapping (uint => _ApplicationICO) public applicationsICO;
   mapping (address => mapping (uint =>  bool)) public purchases;
   mapping (address => uint256) public developerRevenue;
   
-	function registrationApplication (string _hash, string _hashTag, bool _publish, uint256 _value, address _dev) public onlyAgent returns (uint256) {
-		applications.push(_Application({
+  function registrationApplication (string _hash, string _hashTag, bool _publish, uint256 _value, address _dev) public onlyAgent returns (uint256) {
+    applications.push(_Application({
       developer: _dev,
       hash: _hash,
       hashTag: _hashTag,
@@ -240,36 +239,36 @@ contract Application is Agent, SafeMath {
       publish: _publish
     }));
     return applications.length-1;
-	}
+  }
   
   function registrationApplicationICO (uint _idApp, address _addr, string _hash, string _hashTag, address _dev) public onlyAgent {
     require(checkDeveloper(_idApp,_dev));
     applicationsICO[_idApp].adr =_addr;
     applicationsICO[_idApp].hash =_hash;
     applicationsICO[_idApp].hashTag =_hashTag;
-	}
+  }
 	
-	function changeHash (uint _idApp,  string _hash, string _hashTag, address _dev) public onlyAgent {
-		require(checkDeveloper(_idApp,_dev));
+  function changeHash (uint _idApp,  string _hash, string _hashTag, address _dev) public onlyAgent {
+    require(checkDeveloper(_idApp,_dev));
     applications[_idApp].hash =_hash;
     applications[_idApp].hashTag =_hashTag;
-	}
+  }
   
   function changePublish (uint _idApp, bool _publish, address _dev) public onlyAgent {
-		require(checkDeveloper(_idApp,_dev));
+    require(checkDeveloper(_idApp,_dev));
     applications[_idApp].publish =_publish;
-	}
+  }
   
   function changeIcoInfo (uint _idApp, address _addr, string _hash, string _hashTag, address _dev) public onlyAgent {
-		require(checkDeveloper(_idApp,_dev));
+    require(checkDeveloper(_idApp,_dev));
     applicationsICO[_idApp].adr =_addr;
     applicationsICO[_idApp].hash =_hash;
     applicationsICO[_idApp].hashTag =_hashTag;
-	}
+  }
   
   function checkDeveloper(uint _idApp, address _dev) private constant returns (bool success) {
-      require(applications[_idApp].developer == _dev);
-      return true;
+    require(applications[_idApp].developer == _dev);
+    return true;
   }
   
   function getDeveloper(uint _idApp) public onlyAgent constant  returns (address) {
@@ -277,22 +276,22 @@ contract Application is Agent, SafeMath {
   }
   
   function checkSum(uint _idApp, uint256 _value) private constant returns (bool success) {
-      require(applications[_idApp].value == _value);
-      return true;
+    require(applications[_idApp].value == _value);
+    return true;
   }
 
   function buyApp (uint _idApp, address _user, address _dev, uint _value, uint _proc) public onlyAgent {
-		require(checkSum(_idApp,_value));
+    require(checkSum(_idApp,_value));
     purchases[_user][_idApp] = true;
-		developerRevenue[_dev] = add(developerRevenue[_dev],div(mul(_value,_proc),100));
-	}
+    developerRevenue[_dev] = add(developerRevenue[_dev],div(mul(_value,_proc),100));
+  }
 
   function collectDeveloper(address _dev) public onlyAgent{
-		developerRevenue[_dev] = 0;
-	}
+    developerRevenue[_dev] = 0;
+  }
   
   function checkBuy(uint _idApp, address _user) public constant returns (bool success) {
-      return purchases[_user][_idApp];
+    return purchases[_user][_idApp];
   }
 }
 
@@ -420,38 +419,38 @@ contract PlayMarket is Ownable {
   function confirmationNode(address _node, bool _value) public onlyOwner {
     adrNodeContract.confirmationNode(_node,_value);
     confirmationNodeEvent(_node, _value);
-	}
+  }
   
   function confirmationDeveloper(address _developer, bool _value) public onlyOwner {
     adrDeveloperContract.confirmationDeveloper(_developer,_value);
     confirmationDeveloperEvent(_developer, _value);
-	}
+  }
 
-	function collectNode() public {
+  function collectNode() public {
     msg.sender.transfer(adrNodeContract.nodeRevenue(msg.sender));
     adrNodeContract.collectNode(msg.sender);
-	}
+  }
   
-	function collectDeveloper() public {
-		msg.sender.transfer(adrApplicationContract.developerRevenue(msg.sender));
+  function collectDeveloper() public {
+    msg.sender.transfer(adrApplicationContract.developerRevenue(msg.sender));
     adrApplicationContract.collectDeveloper(msg.sender);
-	}
+  }
   
- 	function setProcDev(uint256 _proc) public onlyOwner {
-		procDev = _proc;
-	}
+  function setProcDev(uint256 _proc) public onlyOwner {
+    procDev = _proc;
+  }
 
   function setProcNode(uint256 _proc) public onlyOwner {
-		procNode = _proc;
-	}
+    procNode = _proc;
+  }
   
   function setDeposit(uint256 _deposit) public onlyOwner {
-		deposit = _deposit;
-	}
+    deposit = _deposit;
+  }
   
   function sendWei(address adr, uint256 sum) public onlyOwner {
-		adr.transfer(sum);
-	}
+    adr.transfer(sum);
+  }
   
   function checkBuy(uint _idApp, address _user) public constant returns (bool success) {
       return adrApplicationContract.checkBuy(_idApp, _user);
