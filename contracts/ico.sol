@@ -343,8 +343,8 @@ contract StandartTokenPMT is StandardToken, Ownable {
   function getTokenDeveloper() public {
     require(getStage() == 3);
     require(msg.sender == developer);
-    uint timePassed = block.timestamp - (startsAt + 90 minutes);
-    uint countNow = safeDiv(timePassed,60 minutes);
+    uint timePassed = block.timestamp - (startsAt + 90 days);
+    uint countNow = safeDiv(timePassed,60 days);
     if(countNow > 10) {
       countNow = 10;
     }
@@ -360,11 +360,11 @@ contract StandartTokenPMT is StandardToken, Ownable {
    * @return uint current stage
    */
   function getStage() public constant returns (uint){
-    if((block.timestamp < (startsAt + 30 minutes)) && (tokensSold < 15*10**(6+decimals))){
+    if((block.timestamp < (startsAt + 30 days)) && (tokensSold < 15*10**(6+decimals))){
       return 0;
-    }else if ((block.timestamp < (startsAt + 60 minutes)) && (tokensSold < 30*10**(6+decimals))){
+    }else if ((block.timestamp < (startsAt + 60 days)) && (tokensSold < 30*10**(6+decimals))){
       return 1;
-    }else if ((block.timestamp < (startsAt + 90 minutes)) && (tokensSold < 45*10**(6+decimals))){
+    }else if ((block.timestamp < (startsAt + 90 days)) && (tokensSold < 45*10**(6+decimals))){
       return 2;
     }
     return 3;
