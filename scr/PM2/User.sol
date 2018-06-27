@@ -9,16 +9,18 @@ import '/src/PM2/Application.sol';
  * @title User contract - basic contract for working with users
  */
 contract User is Application, Ownable, SafeMath{
+	
 	event RegistrationUser(address indexed user, uint info);	
+	
 	struct _User {
 		uint8 status;
 		bool confirmation;
 		uint info;
 	}
-	
 	struct Purchase {
 		bool confirmation;
 	}
+	
 	uint256 public commission;
 	mapping (address => uint256) public developerRevenue;
 	mapping (address => _User) public users;
