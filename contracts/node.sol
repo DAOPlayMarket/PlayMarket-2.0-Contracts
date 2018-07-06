@@ -1,29 +1,28 @@
-pragma solidity ^0.4.18;
-
- /**
+pragma solidity ^0.4.21;
+/**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
 contract SafeMath {
 
-  function sub(uint256 x, uint256 y) internal pure returns (uint256) {
+  function safeSub(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x - y;
     assert(z <= x);
     return z;
   }
 
-  function add(uint256 x, uint256 y) internal pure returns (uint256) {
+  function safeAdd(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x + y;
     assert(z >= x);
     return z;
   }
 	
-  function div(uint256 x, uint256 y) internal pure returns (uint256) {
+  function safeDiv(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x / y;
     return z;
   }
 	
-  function mul(uint256 x, uint256 y) internal pure returns (uint256) {
+  function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x * y;
     assert(x == 0 || z / x == y);
     return z;
@@ -80,7 +79,7 @@ contract Ownable {
    */
   function acceptOwnership() public {
     if (msg.sender == newOwner) {
-      OwnershipTransferred(owner, newOwner);
+      emit OwnershipTransferred(owner, newOwner);
       owner = newOwner;
     }
   }
@@ -90,7 +89,6 @@ contract Ownable {
  * @title Agent contract - base contract with an agent
  */
 contract Agent is Ownable {
-  
   address public adrAgent;
   
   function Agent() public {
@@ -115,9 +113,8 @@ contract Node is Agent, SafeMath {
 	
   struct _Node {
     bool confirmation;
-    bytes32 IP;
-    bytes32 X;
-    bytes32 Y;
+    string hash;
+    string hashTag;
     uint256 deposit;
     bool isSet;
   }
@@ -125,42 +122,89 @@ contract Node is Agent, SafeMath {
   mapping (address => uint256) public nodeRevenue;
   mapping (address => _Node) public nodes;
 	
+  /**
+   * @dev 
+   * @param _adrNode The address of the node through which the transaction passes
+   * @param _value application fee
+   * @return _proc percentage payment to the node
+   */
   function buyApp(address _adrNode, uint _value, uint _proc) public onlyAgent {
     require(nodes[_adrNode].confirmation == true);
-    nodeRevenue[_adrNode] = add(nodeRevenue[_adrNode],div(mul(_value,_proc),100));
+    nodeRevenue[_adrNode] = safeAdd(nodeRevenue[_adrNode],safeDiv(safeMul(_value,_proc),100));
   }
 
-  function registrationNode (address _adrNode, bytes32 _IP, bytes32 _X, bytes32 _Y, uint256 _deposit) public onlyAgent {
+  /**
+   * @dev 
+   * @param _adrNode The address of the node 
+   * @param _hash hash
+   * @return _hashTag hashTag
+   * @return _deposit deposit
+   */
+  function registrationNode (address _adrNode, string _hash, string _hashTag, uint256 _deposit) public onlyAgent {
     nodes[_adrNode] = _Node({
       confirmation: false,
-      IP: _IP,
-      X: _X,
-      Y: _Y,
+      hash: _hash,
+      hashTag: _hashTag,
       deposit: _deposit,
       isSet: true
     });
   }
   
+  /**
+   * @dev 
+   * @param _adrNode The address of the node 
+   * @param _hash hash
+   * @return _hashTag hashTag
+   */
+  function changeNodeHash (address _adrNode, string _hash, string _hashTag) public onlyAgent {
+    assert(nodes[_adrNode].isSet);
+    nodes[_adrNode].hash = _hash;
+    nodes[_adrNode].hashTag = _hashTag;
+	}
+  
+  /**
+   * @dev 
+   * @param _adrNode The address of the node 
+   */
   function getDeposit(address _adrNode) public constant onlyAgent returns (uint256) {
     return nodes[_adrNode].deposit;
   }
   
+  /**
+   * @dev 
+   * @param _adrNode The address of the node 
+   * @param _value deposit amount
+   */
   function makeDeposit(address _adrNode, uint256 _value) public onlyAgent {
     require(_value > 0);
-    nodes[_adrNode].deposit = add(nodes[_adrNode].deposit, _value);
+    nodes[_adrNode].deposit = safeAdd(nodes[_adrNode].deposit, _value);
   }
   
+  /**
+   * @dev 
+   * @param _adrNode The address of the node 
+   * @param _value deposit amount
+   */
   function takeDeposit(address _adrNode, uint256 _value) public onlyAgent {
     require(nodes[_adrNode].deposit >= _value);
-    nodes[_adrNode].deposit = sub(nodes[_adrNode].deposit, _value);
+    nodes[_adrNode].deposit = safeSub(nodes[_adrNode].deposit, _value);
   }
   
+  /**
+   * @dev 
+   * @param _adrNode The address of the node 
+   */
   function collectNode(address _adrNode) public onlyAgent{
     nodeRevenue[_adrNode] = 0;
   }
   
-  function confirmationNode(address _node, bool _value) public onlyAgent{
-    assert(nodes[_node].isSet);
-    nodes[_node].confirmation = _value;
+  /**
+   * @dev 
+   * @param _adrNode The address of the node 
+   * @param _value value
+   */
+  function confirmationNode(address _adrNode, bool _value) public onlyAgent{
+    assert(nodes[_adrNode].isSet);
+    nodes[_adrNode].confirmation = _value;
   }
 }
