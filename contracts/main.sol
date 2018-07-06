@@ -449,7 +449,7 @@ contract PlayMarket is Ownable {
     msg.sender.transfer(amount);
   }
   
-	function collectDeveloper() public {
+  function collectDeveloper() public {
     uint256 amount = adrApplicationContract.developerRevenue(msg.sender);
     adrApplicationContract.collectDeveloper(msg.sender);
     msg.sender.transfer(amount);
