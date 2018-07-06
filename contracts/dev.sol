@@ -1,45 +1,4 @@
-pragma solidity ^0.4.18;
-
- /**
- * @title SafeMath
- * @dev Math operations with safety checks that throw on error
- */
-contract SafeMath {
-
-  function sub(uint256 x, uint256 y) internal pure returns (uint256) {
-    uint256 z = x - y;
-    assert(z <= x);
-    return z;
-  }
-
-  function add(uint256 x, uint256 y) internal pure returns (uint256) {
-    uint256 z = x + y;
-    assert(z >= x);
-    return z;
-  }
-	
-  function div(uint256 x, uint256 y) internal pure returns (uint256) {
-    uint256 z = x / y;
-    return z;
-  }
-	
-  function mul(uint256 x, uint256 y) internal pure returns (uint256) {
-    uint256 z = x * y;
-    assert(x == 0 || z / x == y);
-    return z;
-  }
-
-  function min(uint256 x, uint256 y) internal pure returns (uint256) {
-    uint256 z = x <= y ? x : y;
-    return z;
-  }
-
-  function max(uint256 x, uint256 y) internal pure returns (uint256) {
-    uint256 z = x >= y ? x : y;
-    return z;
-  }
-}
-
+pragma solidity ^0.4.21;
 
 /**
  * @title Ownable contract - base contract with an owner
@@ -81,7 +40,7 @@ contract Ownable {
    */
   function acceptOwnership() public {
     if (msg.sender == newOwner) {
-      OwnershipTransferred(owner, newOwner);
+      emit OwnershipTransferred(owner, newOwner);
       owner = newOwner;
     }
   }
@@ -111,7 +70,7 @@ contract Agent is Ownable {
 /**
  * @title Developer contract - basic contract for working with developers
  */
-contract Developer is Agent, SafeMath{
+contract Developer is Agent{
   
   struct _Developer {
     bool confirmation;
@@ -123,26 +82,45 @@ contract Developer is Agent, SafeMath{
   mapping (address => _Developer) public developers;
   bool autoConfirm = true;
   
-  function registrationDeveloper (address _adrDev, bytes32 _info, bytes32 _name) public onlyAgent {
+  /**
+   * @dev 
+   * @param _adrDev Developer address
+   * @param _name Developer name
+   * @param _info Additional Information
+   */
+  function registrationDeveloper(address _adrDev, bytes32 _name, bytes32 _info) public onlyAgent {
     developers[_adrDev]=_Developer({
       confirmation: autoConfirm,
-      info: _info,
       name: _name,
+      info: _info,
       isSet: true
     });
   }
 	
+  /**
+   * @dev 
+   * @param _autoConfirm autoConfirm
+   */
   function changeAoutoConfirm(bool _autoConfirm ) public onlyOwner {
     autoConfirm = _autoConfirm;
   }
   
-  function checkConfirmation (address _addrDev) public constant onlyAgent returns (bool success) {
-    require(developers[_addrDev].confirmation == true);
+  /**
+   * @dev 
+   * @param _adrDev Developer address
+   */
+  function checkConfirmation(address _adrDev) public constant onlyAgent returns (bool success) {
+    require(developers[_adrDev].confirmation == true);
     return true;
   }
   
-  function confirmationDeveloper(address _developer, bool _value) public onlyAgent {
-    assert(developers[_developer].isSet);
-    developers[_developer].confirmation = _value;
+  /**
+   * @dev 
+   * @param _adrDev Developer address
+   * @param _value value
+   */
+  function confirmationDeveloper(address _adrDev, bool _value) public onlyAgent {
+    assert(developers[_adrDev].isSet);
+    developers[_adrDev].confirmation = _value;
   }
 }
