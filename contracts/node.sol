@@ -118,7 +118,6 @@ contract Node is Agent, SafeMath {
     uint256 deposit;
     bool isSet;
   }
-  
   mapping (address => uint256) public nodeRevenue;
   mapping (address => _Node) public nodes;
 	
