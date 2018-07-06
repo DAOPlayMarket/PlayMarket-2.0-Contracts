@@ -126,7 +126,7 @@ contract Node is Agent, SafeMath {
    * @dev 
    * @param _adrNode The address of the node through which the transaction passes
    * @param _value application fee
-   * @return _proc percentage payment to the node
+   * @param _proc percentage payment to the node
    */
   function buyApp(address _adrNode, uint _value, uint _proc) public onlyAgent {
     require(nodes[_adrNode].confirmation == true);
@@ -137,8 +137,8 @@ contract Node is Agent, SafeMath {
    * @dev 
    * @param _adrNode The address of the node 
    * @param _hash hash
-   * @return _hashTag hashTag
-   * @return _deposit deposit
+   * @param _hashTag hashTag
+   * @param _deposit deposit
    */
   function registrationNode (address _adrNode, string _hash, string _hashTag, uint256 _deposit) public onlyAgent {
     nodes[_adrNode] = _Node({
@@ -154,7 +154,7 @@ contract Node is Agent, SafeMath {
    * @dev 
    * @param _adrNode The address of the node 
    * @param _hash hash
-   * @return _hashTag hashTag
+   * @param _hashTag hashTag
    */
   function changeNodeHash (address _adrNode, string _hash, string _hashTag) public onlyAgent {
     assert(nodes[_adrNode].isSet);
@@ -165,6 +165,7 @@ contract Node is Agent, SafeMath {
   /**
    * @dev 
    * @param _adrNode The address of the node 
+   * @return amount deposit
    */
   function getDeposit(address _adrNode) public constant onlyAgent returns (uint256) {
     return nodes[_adrNode].deposit;
