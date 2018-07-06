@@ -160,7 +160,7 @@ contract Node is Agent, SafeMath {
     assert(nodes[_adrNode].isSet);
     nodes[_adrNode].hash = _hash;
     nodes[_adrNode].hashTag = _hashTag;
-	}
+  }
   
   /**
    * @dev 
