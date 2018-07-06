@@ -89,6 +89,7 @@ contract Developer is Agent{
    * @param _info Additional Information
    */
   function registrationDeveloper(address _adrDev, bytes32 _name, bytes32 _info) public onlyAgent {
+    assert(!developers[_adrDev].isSet);
     developers[_adrDev]=_Developer({
       confirmation: autoConfirm,
       name: _name,
@@ -97,6 +98,18 @@ contract Developer is Agent{
     });
   }
 	
+  /**
+   * @dev 
+   * @param _adrDev Developer address
+   * @param _name Developer name
+   * @param _info Additional Information
+   */
+  function changeDeveloperInfo(address _adrDev, bytes32 _name, bytes32 _info) public onlyAgent {
+    assert(developers[_adrDev].isSet);
+    developers[_adrDev].name = _name;
+    developers[_adrDev].info = _info;
+  }
+  
   /**
    * @dev 
    * @param _autoConfirm autoConfirm

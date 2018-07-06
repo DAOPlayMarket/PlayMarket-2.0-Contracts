@@ -141,7 +141,7 @@ contract Node is Agent, SafeMath {
    * @param _hashTag hashTag
    * @param _deposit deposit
    */
-  function registrationNode (address _adrNode, string _hash, string _hashTag, uint256 _deposit) public onlyAgent {
+  function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit) public onlyAgent {
     nodes[_adrNode] = _Node({
       confirmation: false,
       hash: _hash,
@@ -157,7 +157,7 @@ contract Node is Agent, SafeMath {
    * @param _hash hash
    * @param _hashTag hashTag
    */
-  function changeNodeHash (address _adrNode, string _hash, string _hashTag) public onlyAgent {
+  function changeNodeHash(address _adrNode, string _hash, string _hashTag) public onlyAgent {
     assert(nodes[_adrNode].isSet);
     nodes[_adrNode].hash = _hash;
     nodes[_adrNode].hashTag = _hashTag;
