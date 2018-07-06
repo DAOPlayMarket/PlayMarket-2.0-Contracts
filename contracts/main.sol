@@ -280,6 +280,7 @@ contract Application{
  * @title PlayMarket contract - basic contract PM2
  */
 contract PlayMarket is Ownable {
+  
   Developer public adrDeveloperContract;
   Application public adrApplicationContract;
   Node public adrNodeContract;
