@@ -359,7 +359,7 @@ contract PlayMarket is Ownable {
     adrNodeContract.buyApp(_adrNode, msg.value, procNode);
     adrApplicationContract.buyApp(_idApp, msg.sender, adrDev, msg.value, procDev);
     emit buyAppEvent(_idApp, _adrNode, msg.value);
-	}
+  }
   
   function registrationApplication(string _hash, string _hashTag, bool _publish, uint256 _price) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
@@ -377,47 +377,47 @@ contract PlayMarket is Ownable {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changeHash(_idApp, _hash, _hashTag, msg.sender);
     emit changeHashEvent(_idApp, _hash, _hashTag);
-	}
+  }
   
   function changeIcoHash(uint _idApp, string _hash, string _hashTag) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
-		adrApplicationContract.changeIcoHash( _idApp, _hash, _hashTag, msg.sender);
+    adrApplicationContract.changeIcoHash( _idApp, _hash, _hashTag, msg.sender);
     emit changeIcoHashEvent(_idApp, _hash, _hashTag);
-	}
+  }
   
   function changePublish(uint _idApp, bool _publish) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changePublish(_idApp, _publish, msg.sender);
-		emit changePublishEvent(_idApp, _publish);
-	}
+    emit changePublishEvent(_idApp, _publish);
+  }
   
   function changePrice(uint _idApp, uint256 _price) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changePrice(_idApp, _price, msg.sender);
-		emit changePriceEvent(_idApp, _price);
+    emit changePriceEvent(_idApp, _price);
   }
   
   function changePublishOwner(uint _idApp, bool _publish, address _dev) public onlyOwner {
     adrApplicationContract.changePublish(_idApp, _publish, _dev);
-		emit changePublishEvent(_idApp, _publish);
-	}
+    emit changePublishEvent(_idApp, _publish);
+  }
   
   function registrationDeveloper(bytes32 _name, bytes32 _info) public {
     adrDeveloperContract.registrationDeveloper(msg.sender, _name,_info);
     emit registrationDeveloperEvent(msg.sender, _name, _info);	
-	}
+  }
 	
   function changeDeveloperInfo(bytes32 _name, bytes32 _info) public {
     adrDeveloperContract.changeDeveloperInfo(msg.sender, _name,_info);
     emit changeDeveloperInfoEvent(msg.sender, _name, _info);	
-	}
+  }
 
   function registrationNode( string _hash, string _hashTag) public payable {
     require(msg.value == deposit);
     require(adrNodeContract.getDeposit(msg.sender) == 0);
     adrNodeContract.registrationNode(msg.sender, _hash, _hashTag, msg.value);
     emit registrationNodeEvent(msg.sender, false, _hash, _hashTag, msg.value);	
-	}
+  }
   
   function makeDeposit() public payable {
     adrNodeContract.makeDeposit(msg.sender, msg.value);
@@ -436,18 +436,18 @@ contract PlayMarket is Ownable {
   function confirmationNode(address _node, bool _value) public onlyOwner {
     adrNodeContract.confirmationNode(_node,_value);
     emit confirmationNodeEvent(_node, _value);
-	}
+  }
   
   function confirmationDeveloper(address _developer, bool _value) public onlyOwner {
     adrDeveloperContract.confirmationDeveloper(_developer,_value);
     emit confirmationDeveloperEvent(_developer, _value);
-	}
+  }
 
-	function collectNode() public {
+  function collectNode() public {
     uint256 amount = adrNodeContract.nodeRevenue(msg.sender);
     adrNodeContract.collectNode(msg.sender);
     msg.sender.transfer(amount);
-	}
+  }
   
 	function collectDeveloper() public {
     uint256 amount = adrApplicationContract.developerRevenue(msg.sender);
@@ -455,21 +455,21 @@ contract PlayMarket is Ownable {
     msg.sender.transfer(amount);
 	}
   
- 	function setProcDev(uint256 _proc) public onlyOwner {
-		procDev = _proc;
-	}
+  function setProcDev(uint256 _proc) public onlyOwner {
+    procDev = _proc;
+  }
 
   function setProcNode(uint256 _proc) public onlyOwner {
-		procNode = _proc;
-	}
+    procNode = _proc;
+  }
   
   function setDeposit(uint256 _deposit) public onlyOwner {
-		deposit = _deposit;
-	}
+    deposit = _deposit;
+  }
   
   function sendWei(address adr, uint256 sum) public onlyOwner {
-		adr.transfer(sum);
-	}
+    adr.transfer(sum);
+  }
   
   function checkBuy(uint _idApp, address _user) public constant returns (bool success) {
       return adrApplicationContract.checkBuy(_idApp, _user);
