@@ -5,7 +5,6 @@ pragma solidity ^0.4.21;
  * @dev Math operations with safety checks that throw on error
  */
 contract SafeMath {
-
   function safeSub(uint256 x, uint256 y) internal pure returns (uint256) {
     uint256 z = x - y;
     assert(z <= x);
@@ -44,7 +43,6 @@ contract SafeMath {
  * @title Ownable contract - base contract with an owner
  */
 contract Ownable {
-  
   address public owner;
   address public newOwner;
 
@@ -104,14 +102,12 @@ contract Agent is Ownable {
   function setAgent(address _adrAgent) public onlyOwner{
     adrAgent = _adrAgent;
   }
-  
 }
 
 /**
  * @title Node contract - basic contract for working with nodes
  */
 contract Node is Agent, SafeMath {
-	
   struct _Node {
     bool confirmation;
     string hash;
