@@ -301,7 +301,7 @@ contract PlayMarket is Ownable {
   event changeHashEvent(uint idApp, string hash, string hashTag);
   event changePublishEvent(uint idApp, bool publish);
   event changePriceEvent(uint idApp, uint256 price);
-  event buyAppEvent(uint idApp, address indexed adrNode, uint256 price);
+  event buyAppEvent(address indexed user,uint idApp, address indexed adrNode, uint256 price);
   
   //Ico App events 
   event registrationApplicationICOEvent(uint idApp, string hash, string hashTag);
@@ -359,7 +359,7 @@ contract PlayMarket is Ownable {
     require(adrDeveloperContract.checkConfirmation(adrDev));
     adrNodeContract.buyApp(_adrNode, msg.value, procNode);
     adrApplicationContract.buyApp(_idApp, msg.sender, adrDev, msg.value, procDev);
-    emit buyAppEvent(_idApp, _adrNode, msg.value);
+    emit buyAppEvent(msg.sender, _idApp, _adrNode, msg.value);
   }
   
   function registrationApplication(string _hash, string _hashTag, bool _publish, uint256 _price) public {
