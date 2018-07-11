@@ -211,6 +211,7 @@ contract StandartTokenPMT is StandardToken, Ownable {
   uint public currentPeriod;
   bool public onceUse = false;
   bool public SoftCap;
+  uint public totalInUSD;
   /* The UNIX timestamp start date of the crowdsale */
   uint public startsAt;
   
@@ -262,6 +263,7 @@ contract StandartTokenPMT is StandardToken, Ownable {
     multisigWallet =_multisigWallet;
     startsAt = _startsAt;
     totalSupply_ = _initialSupply;
+    totalInUSD = _totalInUSD;
     exchangeRateAddress = _exchangeRateAddress;
     
     balances[_DAOPlayMarket] = safeDiv(safeMul(totalSupply_,15),100);
