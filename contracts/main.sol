@@ -281,6 +281,51 @@ contract Application{
 }
 
 /**
+ * @title IcoTokensPMT
+ * @dev 
+ */
+contract IcoTokensPMT {
+  
+  struct _contractAdd {
+    string name;
+    string symbol;
+    uint decimals;
+    address contractAddress;
+    uint256 totalInUSD;
+    bool release;
+  }
+
+  address public DAOPlayMarket;
+  address public exchangeRateAddress;
+  uint256 public initialSupply = 10000000000000000;
+  uint public decimals_ = 8; 
+  
+  mapping (address => mapping (uint =>  _contractAdd)) public contractAdd;
+  
+  /**
+   * @dev getTokensContract 
+   */
+  function getTokensContract(string _name, string _symbol, address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _idApp, address _adrDev) public; 
+  
+  /**
+   * @dev 
+   * @param _dev address developer
+   * @param _idApp id app
+   * @param _release release
+   * @return address
+   */
+  function setRelease(address _dev, uint _idApp, bool _release) public returns (address) ;
+  
+  /**
+   * @dev 
+   * @param _dev address developer
+   * @param _idApp id app
+   * @return address
+   */
+  function getAddress(address _dev, uint _idApp) public returns (address);
+}
+
+/**
  * @title PlayMarket contract - basic contract PM2
  */
 contract PlayMarket is Ownable {
@@ -288,7 +333,7 @@ contract PlayMarket is Ownable {
   Developer public adrDeveloperContract;
   Application public adrApplicationContract;
   Node public adrNodeContract;
-  address public adrICOContract;
+  IcoTokensPMT public adrICOContract;
   
   uint256 public procDev = 99;
   uint256 public procNode = 1;
@@ -326,6 +371,10 @@ contract PlayMarket is Ownable {
   //Reviews events
   event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex);
   
+  //ICO events 
+  event releaseICOEvent(address adrDev, uint idApp, bool release, address ICO);
+  event newContractEvent(string name, string symbol, address adrDev, uint idApp);
+  
   function PlayMarket(address _adrDeveloperContract, address _adrApplicationContract, address _adrNodeContract, address _adrICOContract) public {
     require(_adrDeveloperContract != address(0));
     require(_adrApplicationContract != address(0));
@@ -335,7 +384,7 @@ contract PlayMarket is Ownable {
     adrDeveloperContract = Developer(_adrDeveloperContract);
     adrApplicationContract = Application(_adrApplicationContract);
     adrNodeContract = Node(_adrNodeContract);
-    adrICOContract = _adrICOContract;
+    adrICOContract = IcoTokensPMT(_adrICOContract);
   }
   
   function setDeveloperAdr(address _adrDeveloperContract) public onlyOwner {
@@ -354,7 +403,7 @@ contract PlayMarket is Ownable {
   }
   
   function setICOAdr(address _adrICOContract) public onlyOwner {
-    adrICOContract = _adrICOContract;
+    adrICOContract = IcoTokensPMT(_adrICOContract);
     emit setICOAdrEvent(_adrICOContract);
   }
   
@@ -496,5 +545,17 @@ contract PlayMarket is Ownable {
   function pushFeedbackRating(uint idApp, uint vote, string description, bytes32 txIndex) public {
     require( vote > 0 && vote <= 5);
     emit newRating(msg.sender, idApp, vote, description, txIndex);
+  }
+  
+  function setRelease(address _adrDev, uint _idApp, bool _release ) public onlyOwner {
+    address newContract  = adrICOContract.setRelease(_adrDev, _idApp, _release);
+    emit releaseICOEvent(_adrDev, _idApp, _release, newContract);
+  }
+  
+  function getTokensContract(string _name, string _symbol, address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _idApp) public {
+    address adrDev = adrApplicationContract.getDeveloper(_idApp);
+    require(msg.sender == adrDev);
+    adrICOContract.getTokensContract(_name, _symbol,_multisigWallet, _startsAt, _totalInUSD, _idApp, msg.sender);
+    emit newContractEvent(_name, _symbol, msg.sender, _idApp);
   }
 }

@@ -209,6 +209,7 @@ contract StandartTokenPMT is StandardToken, Ownable {
   address public developer;
   uint public countUse;
   uint public currentPeriod;
+  uint public initialSupply_;
   bool public onceUse = false;
   bool public SoftCap;
   uint public totalInUSD;
@@ -263,6 +264,7 @@ contract StandartTokenPMT is StandardToken, Ownable {
     multisigWallet =_multisigWallet;
     startsAt = _startsAt;
     totalSupply_ = _initialSupply;
+    initialSupply_ = _initialSupply;
     totalInUSD = _totalInUSD;
     exchangeRateAddress = _exchangeRateAddress;
     
@@ -451,12 +453,31 @@ contract exchangeRateContract {
   uint public exchangeRate;
 }
 
+ /**
+ * @title Agent contract - base contract with an agent
+ */
+contract Agent is Ownable {
+  address public adrAgent;
+  
+  function Agent() public {
+    adrAgent = msg.sender;
+  }
+  
+  modifier onlyAgent() {
+    assert(msg.sender == adrAgent);
+    _;
+  }
+  
+  function setAgent(address _adrAgent) public onlyOwner{
+    adrAgent = _adrAgent;
+  }
+}
 
 /**
  * @title IcoTokensPMT
  * @dev 
  */
-contract IcoTokensPMT is Ownable,SafeMath{
+contract IcoTokensPMT is Agent, SafeMath{
   
   struct _contractAdd {
     string name;
@@ -473,8 +494,6 @@ contract IcoTokensPMT is Ownable,SafeMath{
   uint public decimals_ = 8; 
   
   mapping (address => mapping (uint =>  _contractAdd)) public contractAdd;
-  event newContract(uint256 totalSupply, uint decimals, string name, string symbol, address dev, uint idApp, address contractToken);
-  event releaseICO(address dev, uint idApp, bool release);
   
   function IcoTokensPMT (address _DAOPlayMarket, address _exchangeRateAddress ) public{
     DAOPlayMarket = _DAOPlayMarket;
@@ -483,19 +502,18 @@ contract IcoTokensPMT is Ownable,SafeMath{
   /**
    * @dev getTokensContract 
    */
-  function getTokensContract(string _name, string _symbol,address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _idApp) public {
-    require(contractAdd[msg.sender][_idApp].release == false);
-    StandartTokenPMT contractAddress = new StandartTokenPMT(initialSupply, decimals_, _name, _symbol, _multisigWallet, _startsAt, _totalInUSD, DAOPlayMarket, exchangeRateAddress, msg.sender);
-    contractAdd[msg.sender][_idApp].name = _name;
-    contractAdd[msg.sender][_idApp].symbol = _symbol;
-    contractAdd[msg.sender][_idApp].decimals = decimals_;
-    contractAdd[msg.sender][_idApp].contractAddress = address(contractAddress);
-    contractAdd[msg.sender][_idApp].totalInUSD = _totalInUSD;
-    contractAdd[msg.sender][_idApp].release = false;
+  function getTokensContract(string _name, string _symbol,address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _idApp, address _adrDev) public onlyAgent {
+    require(contractAdd[_adrDev][_idApp].release == false);
+    StandartTokenPMT contractAddress = new StandartTokenPMT(initialSupply, decimals_, _name, _symbol, _multisigWallet, _startsAt, _totalInUSD, DAOPlayMarket, exchangeRateAddress, _adrDev);
+    contractAdd[_adrDev][_idApp].name = _name;
+    contractAdd[_adrDev][_idApp].symbol = _symbol;
+    contractAdd[_adrDev][_idApp].decimals = decimals_;
+    contractAdd[_adrDev][_idApp].contractAddress = address(contractAddress);
+    contractAdd[_adrDev][_idApp].totalInUSD = _totalInUSD;
+    contractAdd[_adrDev][_idApp].release = false;
     
     uint amount = safeDiv(safeMul(initialSupply,85),100);
     contractAddress.mint(address(contractAddress), amount);
-    emit newContract(initialSupply, decimals_, _name, _symbol, msg.sender, _idApp, address(contractAddress) );
   }
 
   /**
@@ -530,10 +548,10 @@ contract IcoTokensPMT is Ownable,SafeMath{
    * @param _idApp id app
    * @param _release release
    */
-  function setRelease(address _dev, uint _idApp, bool _release ) public onlyOwner {
+  function setRelease(address _dev, uint _idApp, bool _release ) public onlyAgent returns (address){
+    require(contractAdd[_dev][_idApp].contractAddress != address(0));
     contractAdd[_dev][_idApp].release = _release;
-    emit releaseICO(_dev, _idApp, _release);
-    
+    return contractAdd[_dev][_idApp].contractAddress;
   }
-  
+ 
 }
