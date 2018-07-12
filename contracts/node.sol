@@ -113,6 +113,8 @@ contract Node is Agent, SafeMath {
     string hash;
     string hashTag;
     uint256 deposit;
+    string ip;
+    string coordinates;
     bool isSet;
   }
   
@@ -136,13 +138,17 @@ contract Node is Agent, SafeMath {
    * @param _hash hash
    * @param _hashTag hashTag
    * @param _deposit deposit
+   * @param _ip ip
+   * @param _coordinates coordinates
    */
-  function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit) public onlyAgent {
+  function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit, string _ip, string _coordinates) public onlyAgent {
     nodes[_adrNode] = _Node({
       confirmation: false,
       hash: _hash,
       hashTag: _hashTag,
       deposit: _deposit,
+      ip: _ip,
+      coordinates: _coordinates,
       isSet: true
     });
   }
@@ -152,11 +158,15 @@ contract Node is Agent, SafeMath {
    * @param _adrNode The address of the node 
    * @param _hash hash
    * @param _hashTag hashTag
+   * @param _ip ip
+   * @param _coordinates coordinates
    */
-  function changeNodeHash(address _adrNode, string _hash, string _hashTag) public onlyAgent {
+  function changeInfoNode(address _adrNode, string _hash, string _hashTag, string _ip, string _coordinates) public onlyAgent {
     assert(nodes[_adrNode].isSet);
     nodes[_adrNode].hash = _hash;
     nodes[_adrNode].hashTag = _hashTag;
+    nodes[_adrNode].ip = _ip;
+    nodes[_adrNode].coordinates = _coordinates;
   }
   
   /**

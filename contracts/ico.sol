@@ -439,7 +439,7 @@ contract StandartTokenPMT is StandardToken, Ownable {
     multisigWallet.transfer(_sum);
     emit collectWei(developer, _sum);
   }
-  
+
 }
 
 
@@ -463,6 +463,7 @@ contract IcoTokensPMT is Ownable,SafeMath{
     string symbol;
     uint decimals;
     address contractAddress;
+    uint256 totalInUSD;
     bool release;
   }
 
@@ -489,7 +490,9 @@ contract IcoTokensPMT is Ownable,SafeMath{
     contractAdd[msg.sender][_idApp].symbol = _symbol;
     contractAdd[msg.sender][_idApp].decimals = decimals_;
     contractAdd[msg.sender][_idApp].contractAddress = address(contractAddress);
+    contractAdd[msg.sender][_idApp].totalInUSD = _totalInUSD;
     contractAdd[msg.sender][_idApp].release = false;
+    
     uint amount = safeDiv(safeMul(initialSupply,85),100);
     contractAddress.mint(address(contractAddress), amount);
     emit newContract(initialSupply, decimals_, _name, _symbol, msg.sender, _idApp, address(contractAddress) );

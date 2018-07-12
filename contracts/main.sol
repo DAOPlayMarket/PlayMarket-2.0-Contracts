@@ -121,16 +121,20 @@ contract Node{
    * @param _hash hash
    * @param _hashTag hashTag
    * @param _deposit deposit
+   * @param _ip ip
+   * @param _coordinates coordinates
    */
-  function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit) public;
+  function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit, string _ip, string _coordinates) public;
   
   /**
    * @dev 
    * @param _adrNode The address of the node 
    * @param _hash hash
    * @param _hashTag hashTag
+   * @param _ip ip
+   * @param _coordinates coordinates
    */
-  function changeNodeHash(address _adrNode, string _hash, string _hashTag) public;
+  function changeInfoNode(address _adrNode, string _hash, string _hashTag, string _ip, string _coordinates) public;
   
   /**
    * @dev 
@@ -313,10 +317,11 @@ contract PlayMarket is Ownable {
   event confirmationDeveloperEvent(address adrDev, bool value);
   
   //Node events
-  event registrationNodeEvent(address indexed adrNode, bool confirmation, string hash, string hashTag, uint256 deposit);
+  event registrationNodeEvent(address indexed adrNode, bool confirmation, string hash, string hashTag, uint256 deposit, string ip, string coordinates);
   event confirmationNodeEvent(address adrNode, bool value);
   event makeDepositEvent(address indexed adrNode, uint256 deposit);
   event takeDepositEvent(address indexed adrNode, uint256 deposit);
+  event changeInfoNodeEvent(address adrNode, string hash, string hashTag, string ip, string coordinates);
   
   //Reviews events
   event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex);
@@ -413,11 +418,16 @@ contract PlayMarket is Ownable {
     emit changeDeveloperInfoEvent(msg.sender, _name, _info);	
   }
 
-  function registrationNode( string _hash, string _hashTag) public payable {
+  function registrationNode( string _hash, string _hashTag, string _ip, string _coordinates) public payable {
     require(msg.value == deposit);
     require(adrNodeContract.getDeposit(msg.sender) == 0);
-    adrNodeContract.registrationNode(msg.sender, _hash, _hashTag, msg.value);
-    emit registrationNodeEvent(msg.sender, false, _hash, _hashTag, msg.value);	
+    adrNodeContract.registrationNode(msg.sender, _hash, _hashTag, msg.value, _ip, _coordinates);
+    emit registrationNodeEvent(msg.sender, false, _hash, _hashTag, msg.value, _ip, _coordinates);	
+  }
+  
+  function changeInfoNode(string _hash, string _hashTag, string _ip, string _coordinates) public {
+    adrNodeContract.changeInfoNode(msg.sender, _hash, _hashTag, _ip, _coordinates);
+    emit changeInfoNodeEvent(msg.sender, _hash, _hashTag, _ip, _coordinates);	
   }
   
   function makeDeposit() public payable {
