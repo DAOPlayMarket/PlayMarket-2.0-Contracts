@@ -155,3 +155,45 @@ changeIcoHashEvent
 ```bash
 event changeIcoHashEvent(uint idApp, string hash, string hashTag);
 ```
+
+
+## Methods for Developer
+
+### registrationDeveloper
+Adding information about developer. Public information.
+#### Parameters
+1. Bytes32 - developer name
+2. Bytes32 - additional Information
+
+```bash
+function registrationDeveloper(bytes32 _name, bytes32 _info) public;
+```
+#### Event
+registrationDeveloperEvent
+1. developer - developer address
+2. name - developer name
+3. info - additional Information
+
+```bash
+event registrationDeveloperEvent(address indexed developer, bytes32 name, bytes32 info);
+```
+
+### changeDeveloperInfo
+Change information about developer. Public information.
+#### Parameters
+1. Bytes32 - developer name
+2. Bytes32 - additional Information
+
+```bash
+function changeDeveloperInfo(bytes32 _name, bytes32 _info) public;
+```
+#### Event
+changeDeveloperInfoEvent
+1. developer - developer address
+2. name - developer name
+3. info - additional Information
+
+```bash
+event changeDeveloperInfoEvent(address indexed developer, bytes32 name, bytes32 info);
+```
+
