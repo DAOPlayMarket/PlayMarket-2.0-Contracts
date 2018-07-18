@@ -203,6 +203,7 @@ event changeDeveloperInfoEvent(address indexed developer, bytes32 name, bytes32 
 
 ### pushFeedbackRating
 Add a new review about the app or respond to a review about the app. The block number is calculated as the time of the new response.
+We do not store the data in the contract, but generate the event. This allows you to make feedback as cheap as possible. The event generation costs 8 wei for 1 byte, and data storage in the contract 20,000 wei for 32 bytes
 #### Parameters
 1. Uint256 - application identifier in the system
 2. Uint256 - feedback rating (1 to 5)
