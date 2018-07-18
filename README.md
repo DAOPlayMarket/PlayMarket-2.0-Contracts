@@ -112,3 +112,46 @@ buyAppEvent
 ```bash
 event buyAppEvent(address indexed user, address indexed developer, uint idApp, address indexed adrNode, uint256 price);
 ```
+
+
+## Methods for App ICO
+
+### registrationApplicationICO
+Adding information about the ICO app. Public information.
+#### Parameters
+1. Uint256 - application identifier in the system
+2. String - hash ICO application
+3. String - hashtag ICO repository (currently IPFS)
+
+```bash
+function registrationApplicationICO(uint _idApp, string _hash, string _hashTag) public;
+```
+#### Event
+registrationApplicationICOEvent
+1. idApp - application identifier in the system
+2. hash - hash ICO application
+3. hashTag - hashtag ICO repository (currently IPFS)
+
+```bash
+event registrationApplicationICOEvent(uint idApp, string hash, string hashTag);
+```
+
+### changeIcoHash
+Change information about the ICO app. Public Information.
+#### Parameters
+1. Uint256 - application identifier in the system
+2. String - hash ICO application
+3. String - hashtag ICO repository (currently IPFS)
+
+```bash
+function changeIcoHash(uint _idApp, string _hash, string _hashTag) publicж
+```
+#### Event
+changeIcoHashEvent
+1. idApp - application identifier in the system
+2. hash - hash ICO application
+3. hashTag - hashtag ICO repository (currently IPFS)
+
+```bash
+event changeIcoHashEvent(uint idApp, string hash, string hashTag);
+```
