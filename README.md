@@ -197,3 +197,29 @@ changeDeveloperInfoEvent
 event changeDeveloperInfoEvent(address indexed developer, bytes32 name, bytes32 info);
 ```
 
+
+## Methods for working with app reviews
+
+### pushFeedbackRating
+Add a new review about the app or respond to a review about the app. The block number is calculated as the time of the new response.
+#### Parameters
+1. Uint256 - application identifier in the system
+2. Uint256 - feedback rating (1 to 5)
+3. String - review of the app
+4. Bytes32 - TX transactions if this is a response to a specific feedback about the application
+
+```bash
+function pushFeedbackRating(uint idApp, uint vote, string description, bytes32 txIndex) public;
+```
+#### Event
+newRating
+1. voter - user address who left feedback
+2. idApp - application identifier in the system
+3. vote - feedback rating (1 to 5)
+4. description - review of the app
+5. txIndex - TX transactions if this is a response to a specific feedback about the application
+
+```bash
+event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex);
+  
+```
