@@ -317,7 +317,7 @@ contract IcoTokensPMT {
   function setRelease(address _dev, uint _idApp, bool _release) public returns (address) ;
   
   /**
-   * @dev 
+   * @dev deprecated
    * @param _dev address developer
    * @param _idApp id app
    * @return address
@@ -535,18 +535,6 @@ contract PlayMarket is Ownable {
       return adrApplicationContract.checkBuy(_idApp, _user);
   }
   
-  /**
-   * @dev We do not store the data in the contract, but generate the event. This allows you to make feedback as cheap as possible. The event generation costs 8 wei for 1 byte, and data storage in the contract 20,000 wei for 32 bytes
-   * @param idApp voice application identifier
-   * @param vote voter rating
-   * @param description voted opinion
-   * @param txIndex identifier for the answer
-   */
-  function pushFeedbackRating(uint idApp, uint vote, string description, bytes32 txIndex) public {
-    require( vote > 0 && vote <= 5);
-    emit newRating(msg.sender, idApp, vote, description, txIndex);
-  }
-  
   function setRelease(address _adrDev, uint _idApp, bool _release ) public onlyOwner {
     address newContract  = adrICOContract.setRelease(_adrDev, _idApp, _release);
     emit releaseICOEvent(_adrDev, _idApp, _release, newContract);
@@ -557,5 +545,17 @@ contract PlayMarket is Ownable {
     require(msg.sender == adrDev);
     adrICOContract.getTokensContract(_name, _symbol,_multisigWallet, _startsAt, _totalInUSD, _idApp, msg.sender);
     emit newContractEvent(_name, _symbol, msg.sender, _idApp);
+  }
+  
+   /**
+   * @dev We do not store the data in the contract, but generate the event. This allows you to make feedback as cheap as possible. The event generation costs 8 wei for 1 byte, and data storage in the contract 20,000 wei for 32 bytes
+   * @param idApp voice application identifier
+   * @param vote voter rating
+   * @param description voted opinion
+   * @param txIndex identifier for the answer
+   */
+  function pushFeedbackRating(uint idApp, uint vote, string description, bytes32 txIndex) public {
+    require( vote > 0 && vote <= 5);
+    emit newRating(msg.sender, idApp, vote, description, txIndex);
   }
 }
