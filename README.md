@@ -226,3 +226,87 @@ newRating
 event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex);
   
 ```
+
+## Methods for Node
+
+### registrationNode
+Adding information about node. Public information. It is necessary to transfer the primary fee for registration.
+#### Parameters
+1. String - hash Node
+2. String - hashtag repository (currently IPFS)
+3. String - host IP Address
+4. String - coordinates of the node, to find the nearest location
+
+```bash
+function registrationNode( string _hash, string _hashTag, string _ip, string _coordinates) public payable;
+```
+#### Event
+registrationNodeEvent
+1. adrNode - node address
+2. confirmation - confirmation of registration
+3. hash - hash Node
+4. hashTag - hashtag repository (currently IPFS)
+5. deposit - amount of deposit
+6. ip - host IP Address
+7. coordinates - coordinates of the node, to find the nearest location
+
+```bash
+event registrationNodeEvent(address indexed adrNode, bool confirmation, string hash, string hashTag, uint256 deposit, string ip, string coordinates);
+```
+
+### makeDeposit
+Send a deposit.
+#### Parameters
+Without parameters
+
+```bash
+function makeDeposit() public payable;
+```
+#### Event
+makeDepositEvent
+1. adrNode - node address
+2. deposit - amount of deposit
+
+```bash
+event makeDepositEvent(address indexed adrNode, uint256 deposit);
+```
+
+### takeDeposit
+Make a deposit refund
+#### Parameters
+Without parameters
+
+```bash
+function takeDeposit() public;
+```
+#### Event
+takeDepositEvent
+1. adrNode - node address
+2. deposit - amount of deposit
+
+```bash
+event takeDepositEvent(address indexed adrNode, uint256 deposit);
+```
+
+### changeInfoNode
+Change information about node. Public information.
+#### Parameters
+1. String - hash Node
+2. String - hashtag repository (currently IPFS)
+3. String - host IP Address
+4. String - coordinates of the node, to find the nearest location
+
+```bash
+function changeInfoNode(string _hash, string _hashTag, string _ip, string _coordinates) public;
+```
+#### Event
+changeInfoNodeEvent
+1. adrNode - node address
+2. hash - hash Node
+3. hashTag - hashtag repository (currently IPFS)
+4. ip - host IP Address
+5. coordinates - coordinates of the node, to find the nearest location
+
+```bash
+event changeInfoNodeEvent(address adrNode, string hash, string hashTag, string ip, string coordinates);
+```
