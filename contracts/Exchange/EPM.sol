@@ -119,7 +119,7 @@ contract PEX is SafeMath, Ownable {
   event Withdraw(address token, address user, uint amount, uint balance);
   event Order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user);
   event Cancel(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s);
-  event Trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address get, address give);
+  event Trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address get, address give, bytes32 hash);
   
   modifier onlyAdmin {
     assert(msg.sender == owner || msg.sender == admin);
@@ -220,7 +220,7 @@ contract PEX is SafeMath, Ownable {
     )) revert();
     tradeBalances(tokenBuy, amountBuy, tokenSell, amountSell, user, amount);
     orders[user][hash] = safeSub(orders[user][hash], amount);
-    emit Trade(tokenBuy, amount, tokenSell, amountSell * amount / amountBuy, user, msg.sender);
+    emit Trade(tokenBuy, amount, tokenSell, amountSell * amount / amountBuy, user, msg.sender, hash);
   }
 
   function tradeBalances(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address user, uint amount) private {
