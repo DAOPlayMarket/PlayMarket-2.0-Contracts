@@ -254,7 +254,11 @@ contract PEX is SafeMath, Ownable {
       (orders[user][hash]>0 || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
       block.timestamp <= expires
     )) return 0;
-    return orders[user][hash];
+    
+    uint available1 = orders[user][hash];
+    uint available2 = safeMul(tokens[tokenSell][user], amountBuy) / amountSell;
+    if (available1<available2) return available1;
+    return available2;
   }
 
   function amountFilled(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user) public constant returns(uint) {
