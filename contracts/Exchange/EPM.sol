@@ -113,8 +113,7 @@ contract PEX is SafeMath, Ownable {
   uint public feeTake; 
 
   mapping (address => mapping (address => uint)) public tokens; 
-  mapping (address => mapping (bytes32 => bool)) public orders; 
-  mapping (address => mapping (bytes32 => uint)) public orderFills; 
+  mapping (address => mapping (bytes32 => uint)) public orders; 
 
   event Deposit(address token, address user, uint amount, uint balance);
   event Withdraw(address token, address user, uint amount, uint balance);
@@ -206,29 +205,27 @@ contract PEX is SafeMath, Ownable {
   }
   
   function order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce) public {
-    bytes32 hash = sha256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce);
-    orders[msg.sender][hash] = true;
+    bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender);
+    orders[msg.sender][hash] = amountBuy;
     emit Order(tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender);
   }
   
   function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) public {
     //amount is in amountBuy terms
-    bytes32 hash = sha256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce);
+    bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user);
     if (!(
-      (orders[user][hash] || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
-      block.number <= expires &&
-      safeAdd(orderFills[user][hash], amount) <= amountBuy
+      (orders[user][hash]>0 || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
+      block.timestamp <= expires &&
+      safeSub(orders[user][hash], amount) >= 0
     )) revert();
     tradeBalances(tokenBuy, amountBuy, tokenSell, amountSell, user, amount);
-    orderFills[user][hash] = safeAdd(orderFills[user][hash], amount);
+    orders[user][hash] = safeSub(orders[user][hash], amount);
     emit Trade(tokenBuy, amount, tokenSell, amountSell * amount / amountBuy, user, msg.sender);
   }
 
   function tradeBalances(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address user, uint amount) private {
-    //uint feeMakeXfer = safeMul(amount, feeMake) / (1 ether);
-    //uint feeTakeXfer = safeMul(amount, feeTake) / (1 ether);
-    uint feeMakeXfer = 0;
-    uint feeTakeXfer = 0;
+    uint feeMakeXfer = safeMul(amount, feeMake) / (10**18);
+    uint feeTakeXfer = safeMul(amount, feeTake) / (10**18);
     tokens[tokenBuy][msg.sender] = safeSub(tokens[tokenBuy][msg.sender], safeAdd(amount, feeTakeXfer));
     tokens[tokenBuy][user] = safeAdd(tokens[tokenBuy][user], safeSub(amount, feeMakeXfer));
     tokens[tokenBuy][feeAccount] = safeAdd(tokens[tokenBuy][feeAccount], safeAdd(feeMakeXfer, feeTakeXfer));
@@ -237,9 +234,9 @@ contract PEX is SafeMath, Ownable {
   }
   
   function cancelOrder(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) public {
-    bytes32 hash = sha256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce);
-    if (!(orders[msg.sender][hash] || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == msg.sender)) revert();
-    orderFills[msg.sender][hash] = amountBuy;
+    bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender);
+    if (!(orders[msg.sender][hash]>0 || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == msg.sender)) revert();
+    orders[msg.sender][hash] = 0;
     emit Cancel(tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender, v, r, s);
   }
   
@@ -252,20 +249,17 @@ contract PEX is SafeMath, Ownable {
   }
 
   function availableVolume(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) public constant returns(uint) {
-    bytes32 hash = sha256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce);
+    bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user);
     if (!(
-      (orders[user][hash] || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
-      block.number <= expires
+      (orders[user][hash]>0 || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
+      block.timestamp <= expires
     )) return 0;
-    uint available1 = safeSub(amountBuy, orderFills[user][hash]);
-    uint available2 = safeMul(tokens[tokenSell][user], amountBuy) / amountSell;
-    if (available1<available2) return available1;
-    return available2;
+    return orders[user][hash];
   }
 
   function amountFilled(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user) public constant returns(uint) {
-    bytes32 hash = sha256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce);
-    return orderFills[user][hash];
+    bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user);
+    return orders[user][hash];
   }
   
 }
