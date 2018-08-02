@@ -9,7 +9,7 @@ DAO PlayMarket 2.0 is a decentralized Android App Store that accepts payments in
 Personal freedom is impossible without economic security and independence. Therefore, we created an open, censorship-resistant marketplace using blockchain and smart contracts.
 
 ##### Address of the main contract for Rinkeby: 0x857A6198520aFd1B6Cba74a9313A57B6F07743BD, event {fromBlock: 2643525}
-##### Interface [abi](https://github.com/CryptonStudio/PlayMarket-2.0-Contracts/blob/master/docs/interface.json)
+##### Interface [abi](https://github.com/CryptonStudio/PlayMarket-2.0-Contracts/blob/master/contracts/Platform/interface.json)
 
 # Specification
 ## Methods for the application
