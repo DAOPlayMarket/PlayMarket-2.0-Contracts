@@ -151,12 +151,10 @@ contract PEX is SafeMath, Ownable {
   }
 
   function changeFeeMake(uint feeMake_) public onlyAdmin {
-    //require(feeMake_ < feeMake);
     feeMake = feeMake_;
   }
 
   function changeFeeTake(uint feeTake_) public onlyAdmin {
-    //require(feeTake_ < feeTake);
     feeTake = feeTake_;
   }
 
