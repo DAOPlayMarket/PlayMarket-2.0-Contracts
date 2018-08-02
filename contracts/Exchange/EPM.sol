@@ -106,8 +106,6 @@ contract ERC20 {
 
 contract PEX is SafeMath, Ownable {
   
-  bytes32 public _hash;
-  
   address public admin;
   
   address public feeAccount;
