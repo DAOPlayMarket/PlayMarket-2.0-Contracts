@@ -86,7 +86,6 @@ contract Ownable {
 
 /**
  * @title ERC20 interface
- * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 contract ERC20 {
   uint public decimals;
@@ -104,25 +103,34 @@ contract ERC20 {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
+/**
+ * @title PlayMarket 2.0 Exchange
+ */
 contract PEX is SafeMath, Ownable {
   
   address public admin;
-  
   address public feeAccount;
   uint public feeMake; 
   uint public feeTake; 
 
   mapping (address => mapping (address => uint)) public tokens; 
   mapping (address => mapping (bytes32 => uint)) public orders; 
+  mapping (address => bool) public whitelistTokens;
 
   event Deposit(address token, address user, uint amount, uint balance);
   event Withdraw(address token, address user, uint amount, uint balance);
   event Order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user);
   event Cancel(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, bytes32 hash);
   event Trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address get, address give, bytes32 hash);
+  event WhitelistTokens(address token, bool value);
   
   modifier onlyAdmin {
     assert(msg.sender == owner || msg.sender == admin);
+    _;
+  }
+
+  modifier onlyWhitelistTokens(address token) {
+    assert(whitelistTokens[token]);
     _;
   }
   
@@ -152,7 +160,11 @@ contract PEX is SafeMath, Ownable {
     feeTake = feeTake_;
   }
 
-  
+  function setWhitelistTokens(address token, bool value) public onlyAdmin {
+    whitelistTokens[token] = value;
+    emit WhitelistTokens(token, value);
+  }
+
   /**
    * deposit ETH
    */
@@ -185,7 +197,7 @@ contract PEX is SafeMath, Ownable {
     emit Withdraw(0, msg.sender, amount, tokens[0][msg.sender]);
   }
   
-  function depositToken(address token, uint amount) public {
+  function depositToken(address token, uint amount) public onlyWhitelistTokens(token) {
     require(token != address(0));
     require(ERC20(token).transferFrom(msg.sender, this, amount));
     tokens[token][msg.sender] = safeAdd(tokens[token][msg.sender], amount);
@@ -211,7 +223,6 @@ contract PEX is SafeMath, Ownable {
   }
   
   function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) public {
-    //amount is in amountBuy terms
     bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user);
     if (!(
       (orders[user][hash]>0 || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
@@ -265,6 +276,5 @@ contract PEX is SafeMath, Ownable {
     bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user);
     return orders[user][hash];
   }
-  
 }
 
