@@ -211,7 +211,6 @@ contract PEX is SafeMath, Ownable {
     bytes32 hash = sha256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce);
     orders[msg.sender][hash] = true;
     emit Order(tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender);
-    _hash = hash;
   }
   
   function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) public {
