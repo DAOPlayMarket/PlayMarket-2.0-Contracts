@@ -484,13 +484,13 @@ contract PlayMarket is Ownable {
     emit makeDepositEvent(msg.sender, msg.value);
   }
   
-  function takeDeposit() public {
-    uint256 depositNode = adrNodeContract.getDeposit(msg.sender);
-    adrNodeContract.takeDeposit(msg.sender, depositNode);
-    adrNodeContract.confirmationNode(msg.sender, false);
-    msg.sender.transfer(depositNode);
-    emit confirmationNodeEvent(msg.sender, false);
-    emit takeDepositEvent(msg.sender, depositNode);
+  function takeDeposit(address _node) public onlyOwner {
+    uint256 depositNode = adrNodeContract.getDeposit(_node);
+    adrNodeContract.takeDeposit(_node, depositNode);
+    adrNodeContract.confirmationNode(_node, false);
+    _node.transfer(depositNode);
+    emit confirmationNodeEvent(_node, false);
+    emit takeDepositEvent(_node, depositNode);
   }
   
   function confirmationNode(address _node, bool _value) public onlyOwner {
