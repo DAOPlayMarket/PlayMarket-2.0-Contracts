@@ -485,6 +485,7 @@ contract PlayMarket is Ownable {
   }
   
   function takeDeposit(address _node) public onlyOwner {
+    require(_node != address(0));
     uint256 depositNode = adrNodeContract.getDeposit(_node);
     adrNodeContract.takeDeposit(_node, depositNode);
     adrNodeContract.confirmationNode(_node, false);
