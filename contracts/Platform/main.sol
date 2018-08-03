@@ -369,7 +369,7 @@ contract PlayMarket is Ownable {
   event changeInfoNodeEvent(address adrNode, string hash, string hashTag, string ip, string coordinates);
   
   //Reviews events
-  event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex);
+  event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex, uint256 block.timestamp);
   
   //ICO events 
   event releaseICOEvent(address adrDev, uint idApp, bool release, address ICO);
@@ -557,6 +557,6 @@ contract PlayMarket is Ownable {
    */
   function pushFeedbackRating(uint idApp, uint vote, string description, bytes32 txIndex) public {
     require( vote > 0 && vote <= 5);
-    emit newRating(msg.sender, idApp, vote, description, txIndex);
+    emit newRating(msg.sender, idApp, vote, description, txIndex, block.timestamp);
   }
 }
