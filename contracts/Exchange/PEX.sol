@@ -115,22 +115,27 @@ contract PEX is SafeMath, Ownable {
 
   mapping (address => mapping (address => uint)) public tokens; 
   mapping (address => mapping (bytes32 => uint)) public orders; 
-  mapping (address => bool) public whitelistTokens;
+  
+  struct whitelistToken {
+    bool isSet;
+    uint256 timestamp;
+  }
+  mapping (address => whitelistToken) public whitelistTokens;
 
   event Deposit(address token, address user, uint amount, uint balance);
   event Withdraw(address token, address user, uint amount, uint balance);
   event Order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user);
   event Cancel(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, bytes32 hash);
   event Trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address get, address give, bytes32 hash);
-  event WhitelistTokens(address token, bool value);
+  event WhitelistTokens(address token, bool isSet, uint256 timestamp);
   
   modifier onlyAdmin {
     assert(msg.sender == owner || admins[msg.sender]);
     _;
   }
 
-  modifier onlyWhitelistTokens(address token) {
-    assert(whitelistTokens[token]);
+  modifier onlyWhitelistTokens(address token, uint256 timestamp) {
+    assert(whitelistTokens[token].isSet && whitelistTokens[token].timestamp <= timestamp);
     _;
   }
   
@@ -157,9 +162,10 @@ contract PEX is SafeMath, Ownable {
     feeTake = feeTake_;
   }
 
-  function setWhitelistTokens(address token, bool value) public onlyAdmin {
-    whitelistTokens[token] = value;
-    emit WhitelistTokens(token, value);
+  function setWhitelistTokens(address token, bool isSet, uint256 timestamp) public onlyAdmin {
+    whitelistTokens[token].isSet = isSet;
+    whitelistTokens[token].timestamp = timestamp;
+    emit WhitelistTokens(token, isSet, timestamp);
   }
 
   /**
@@ -194,7 +200,7 @@ contract PEX is SafeMath, Ownable {
     emit Withdraw(0, msg.sender, amount, tokens[0][msg.sender]);
   }
   
-  function depositToken(address token, uint amount) public onlyWhitelistTokens(token) {
+  function depositToken(address token, uint amount) public onlyWhitelistTokens(token, block.timestamp) {
     require(token != address(0));
     require(ERC20(token).transferFrom(msg.sender, this, amount));
     tokens[token][msg.sender] = safeAdd(tokens[token][msg.sender], amount);
