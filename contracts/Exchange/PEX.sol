@@ -108,7 +108,7 @@ contract ERC20 {
  */
 contract PEX is SafeMath, Ownable {
   
-  address public admin;
+  mapping (address => bool) admins;
   address public feeAccount;
   uint public feeMake; 
   uint public feeTake; 
@@ -125,7 +125,7 @@ contract PEX is SafeMath, Ownable {
   event WhitelistTokens(address token, bool value);
   
   modifier onlyAdmin {
-    assert(msg.sender == owner || msg.sender == admin);
+    assert(msg.sender == owner || admins[msg.sender]);
     _;
   }
 
@@ -134,15 +134,14 @@ contract PEX is SafeMath, Ownable {
     _;
   }
   
-  function PEX(address admin_, address feeAccount_, uint feeMake_, uint feeTake_) public {
-    admin = admin_;
+  function PEX(address feeAccount_, uint feeMake_, uint feeTake_) public {
     feeAccount = feeAccount_;
     feeMake = feeMake_;
     feeTake = feeTake_;
   }
   
-  function changeAdmin(address admin_) public onlyAdmin {
-    admin = admin_;
+  function setAdmin(address admin_, bool value) public onlyOwner {
+    admins[admin_] = value;
   }
 
   function changeFeeAccount(address feeAccount_) public onlyAdmin {
