@@ -64,11 +64,10 @@ contract Agent is Ownable {
   function setAgent(address _adrAgent) public onlyOwner{
     adrAgent = _adrAgent;
   }
-  
 }
 
 /**
- * @title Logs contract - basic contract for working with logs
+ * @title Logs contract - basic contract for working with logs (only events)
  */
 contract Logs is Agent{
   
