@@ -368,7 +368,7 @@ contract PlayMarket is Ownable {
   event changeInfoNodeEvent(address adrNode, string hash, string hashTag, string ip, string coordinates);
   
   //Reviews events
-  event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex, uint256 block.timestamp);
+  event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex, uint256 blocktimestamp);
   
   //ICO events 
   event releaseICOEvent(address adrDev, uint idApp, bool release, address ICO);
