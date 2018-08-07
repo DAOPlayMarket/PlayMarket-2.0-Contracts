@@ -359,7 +359,7 @@ contract PlayMarket is Ownable {
   //Developer events 
   event registrationDeveloperEvent(address indexed developer, bytes32 name, bytes32 info);
   event changeDeveloperInfoEvent(address indexed developer, bytes32 name, bytes32 info);
-  event confirmationDeveloperEvent(address adrDev, bool value);
+  event confirmationDeveloperEvent(address indexed developer, bool value);
   
   //Node events
   event registrationNodeEvent(address indexed adrNode, bool confirmation, string hash, string hashTag, uint256 deposit, string ip, string coordinates);
