@@ -281,8 +281,7 @@ contract Application{
 }
 
 /**
- * @title IcoTokensPMT
- * @dev 
+ * @title IcoTokensPMT interface contract - basic contract for working with IcoTokensPMT
  */
 contract IcoTokensPMT {
   
@@ -548,7 +547,7 @@ contract PlayMarket is Ownable {
     emit newContractEvent(_name, _symbol, msg.sender, _idApp);
   }
   
-   /**
+  /**
    * @dev We do not store the data in the contract, but generate the event. This allows you to make feedback as cheap as possible. The event generation costs 8 wei for 1 byte, and data storage in the contract 20,000 wei for 32 bytes
    * @param idApp voice application identifier
    * @param vote voter rating
