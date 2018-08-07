@@ -197,7 +197,6 @@ contract StandardToken is ERC20, SafeMath{
 
 /**
  * @title StandartToken
- * @dev 
  */
 contract StandartTokenPMT is StandardToken, Ownable {
 
@@ -447,7 +446,6 @@ contract StandartTokenPMT is StandardToken, Ownable {
 
 /**
  * @title exchangeRate
- * @dev 
  */
 contract exchangeRateContract {
   uint public exchangeRate;
@@ -474,31 +472,51 @@ contract Agent is Ownable {
 }
 
 /**
+ * @title PEX interface contract - basic contract for working with PEX
+ */
+contract PEX {
+  
+  /**
+   * @dev 
+   * @param token address token contract
+   * @param isSet default true
+   * @param timestamp time of commencement of trading on the exchange
+   */
+  function setWhitelistTokens(address token, bool isSet, uint256 timestamp) public;
+}
+
+/**
  * @title IcoTokensPMT
- * @dev 
  */
 contract IcoTokensPMT is Agent, SafeMath{
   
   struct _contractAdd {
     string name;
     string symbol;
-    uint decimals;
+    uint256 decimals;
     address contractAddress;
+    uint256 startsAt;
     uint256 totalInUSD;
     bool release;
   }
 
+  PEX public adrPEXContract;
   address public DAOPlayMarket;
   address public exchangeRateAddress;
   uint256 public initialSupply = 10000000000000000;
-  uint public decimals_ = 8; 
+  uint256 public decimals_ = 8; 
+  uint256 public endsAt = 90 days;
   
   mapping (address => mapping (uint =>  _contractAdd)) public contractAdd;
   
-  function IcoTokensPMT (address _DAOPlayMarket, address _exchangeRateAddress ) public{
+  event setPEXAdrEvent(address adrPEX);
+  
+  function IcoTokensPMT (address _DAOPlayMarket, address _exchangeRateAddress, address _adrPEXContract ) public{
     DAOPlayMarket = _DAOPlayMarket;
     exchangeRateAddress = _exchangeRateAddress;
+    adrPEXContract = PEX(_adrPEXContract);
   }
+  
   /**
    * @dev getTokensContract 
    */
@@ -509,6 +527,7 @@ contract IcoTokensPMT is Agent, SafeMath{
     contractAdd[_adrDev][_idApp].symbol = _symbol;
     contractAdd[_adrDev][_idApp].decimals = decimals_;
     contractAdd[_adrDev][_idApp].contractAddress = address(contractAddress);
+    contractAdd[_adrDev][_idApp].startsAt = _startsAt;
     contractAdd[_adrDev][_idApp].totalInUSD = _totalInUSD;
     contractAdd[_adrDev][_idApp].release = false;
     
@@ -521,9 +540,10 @@ contract IcoTokensPMT is Agent, SafeMath{
    * @param _initialSupply how many tokens will be released
    * @param _decimals decimals Tokens
    */
-  function setInfo(uint256 _initialSupply, uint _decimals) public onlyOwner {
+  function setInfo(uint256 _initialSupply, uint256 _decimals, uint256 _endsAt) public onlyOwner {
     initialSupply = _initialSupply;
     decimals_ = _decimals;
+    endsAt = _endsAt;
   }
   
   /**
@@ -544,14 +564,23 @@ contract IcoTokensPMT is Agent, SafeMath{
   
   /**
    * @dev 
-   * @param _dev address developer
+   * @param _adrPEXContract current PEX address
+   */
+  function setPEXAdr(address _adrPEXContract) public onlyOwner {
+    adrPEXContract = PEX(_adrPEXContract);
+  }
+  
+  /**
+   * @dev 
+   * @param _adrDev address developer
    * @param _idApp id app
    * @param _release release
    */
-  function setRelease(address _dev, uint _idApp, bool _release ) public onlyAgent returns (address){
-    require(contractAdd[_dev][_idApp].contractAddress != address(0));
-    contractAdd[_dev][_idApp].release = _release;
-    return contractAdd[_dev][_idApp].contractAddress;
+  function setRelease(address _adrDev, uint _idApp, bool _release) public onlyAgent returns (address){
+    require(contractAdd[_adrDev][_idApp].contractAddress != address(0));
+    contractAdd[_adrDev][_idApp].release = _release;
+    adrPEXContract.setWhitelistTokens(contractAdd[_adrDev][_idApp].contractAddress, _release, contractAdd[_adrDev][_idApp].startsAt+endsAt);
+    return contractAdd[_adrDev][_idApp].contractAddress;
   }
  
 }
