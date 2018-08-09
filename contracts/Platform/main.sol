@@ -313,7 +313,7 @@ contract IcoTokensPMT {
    * @param _release release
    * @return address
    */
-  function setRelease(address _dev, uint _idApp, bool _release) public returns (address) ;
+  function setRelease(address _dev, uint _idApp, bool _release) public returns (address);
   
   /**
    * @dev deprecated
@@ -322,6 +322,49 @@ contract IcoTokensPMT {
    * @return address
    */
   function getAddress(address _dev, uint _idApp) public returns (address);
+}
+
+
+/**
+ * @title Logs interface contract - basic contract for working with logs (only events)
+ */
+contract Logs {
+  
+  function registrationApplicationEvent_(uint idApp, string hash, string hashTag, bool publish, uint256 price, address adrDev) public;
+  
+  function changeHashEvent_(uint idApp, string hash, string hashTag) public;
+  
+  function changePublishEvent_(uint idApp, bool publish) public;
+  
+  function changePriceEvent_(uint idApp, uint256 price) public;
+  
+  function buyAppEvent_(address user, address developer, uint idApp, address adrNode, uint256 price) public;
+  
+  function registrationApplicationICOEvent_(uint idApp, string hash, string hashTag) public;
+  
+  function changeIcoHashEvent_(uint idApp, string hash, string hashTag) public;
+  
+  function registrationDeveloperEvent_(address developer, bytes32 name, bytes32 info) public;
+  
+  function changeDeveloperInfoEvent_(address developer, bytes32 name, bytes32 info) public;
+  
+  function confirmationDeveloperEvent_(address developer, bool value) public;
+  
+  function registrationNodeEvent_(address adrNode, bool confirmation, string hash, string hashTag, uint256 deposit, string ip, string coordinates) public;
+  
+  function confirmationNodeEvent_(address adrNode, bool value) public;
+  
+  function makeDepositEvent_(address adrNode, uint256 deposit) public;
+  
+  function takeDepositEvent_(address adrNode, uint256 deposit) public;
+  
+  function changeInfoNodeEvent_(address adrNode, string hash, string hashTag, string ip, string coordinates) public;
+  
+  function newRating_(address voter , uint idApp, uint vote, string description, bytes32 txIndex, uint256 blocktimestamp) public;
+  
+  function releaseICOEvent_(address adrDev, uint idApp, bool release, address ICO) public;
+  
+  function newContractEvent_(string name, string symbol, address adrDev, uint idApp) public;
 }
 
 /**
@@ -333,6 +376,7 @@ contract PlayMarket is Ownable {
   Application public adrApplicationContract;
   Node public adrNodeContract;
   IcoTokensPMT public adrICOContract;
+  Logs public adrLogsContract;
   
   uint256 public procDev = 99;
   uint256 public procNode = 1;
@@ -343,47 +387,20 @@ contract PlayMarket is Ownable {
   event setApplicationAdrEvent(address adrApp);
   event setNodeAdrEvent(address adrNode);
   event setICOAdrEvent(address adrICO);
+  event setLogsAdrEvent(address adrLogs);
   
-  //App events 
-  event registrationApplicationEvent(uint idApp, string hash, string hashTag, bool publish, uint256 price, address adrDev);
-  event changeHashEvent(uint idApp, string hash, string hashTag);
-  event changePublishEvent(uint idApp, bool publish);
-  event changePriceEvent(uint idApp, uint256 price);
-  event buyAppEvent(address indexed user, address indexed developer, uint idApp, address indexed adrNode, uint256 price);
-  
-  //Ico App events 
-  event registrationApplicationICOEvent(uint idApp, string hash, string hashTag);
-  event changeIcoHashEvent(uint idApp, string hash, string hashTag);
-  
-  //Developer events 
-  event registrationDeveloperEvent(address indexed developer, bytes32 name, bytes32 info);
-  event changeDeveloperInfoEvent(address indexed developer, bytes32 name, bytes32 info);
-  event confirmationDeveloperEvent(address indexed developer, bool value);
-  
-  //Node events
-  event registrationNodeEvent(address indexed adrNode, bool confirmation, string hash, string hashTag, uint256 deposit, string ip, string coordinates);
-  event confirmationNodeEvent(address adrNode, bool value);
-  event makeDepositEvent(address indexed adrNode, uint256 deposit);
-  event takeDepositEvent(address indexed adrNode, uint256 deposit);
-  event changeInfoNodeEvent(address adrNode, string hash, string hashTag, string ip, string coordinates);
-  
-  //Reviews events
-  event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex, uint256 blocktimestamp);
-  
-  //ICO events 
-  event releaseICOEvent(address adrDev, uint idApp, bool release, address ICO);
-  event newContractEvent(string name, string symbol, address adrDev, uint idApp);
-  
-  function PlayMarket(address _adrDeveloperContract, address _adrApplicationContract, address _adrNodeContract, address _adrICOContract) public {
+  function PlayMarket(address _adrDeveloperContract, address _adrApplicationContract, address _adrNodeContract, address _adrICOContract, address _adrLogsContract) public {
     require(_adrDeveloperContract != address(0));
     require(_adrApplicationContract != address(0));
     require(_adrNodeContract != address(0));
     require(_adrICOContract != address(0));
+    require(_adrLogsContract != address(0));
     
     adrDeveloperContract = Developer(_adrDeveloperContract);
     adrApplicationContract = Application(_adrApplicationContract);
     adrNodeContract = Node(_adrNodeContract);
     adrICOContract = IcoTokensPMT(_adrICOContract);
+    adrLogsContract = Logs(_adrLogsContract);
   }
   
   function setDeveloperAdr(address _adrDeveloperContract) public onlyOwner {
@@ -406,81 +423,86 @@ contract PlayMarket is Ownable {
     emit setICOAdrEvent(_adrICOContract);
   }
   
+  function setLogsAdr(address _adrLogsContract) public onlyOwner {
+    adrLogsContract = Logs(_adrLogsContract);
+    emit setLogsAdrEvent(_adrLogsContract);
+  }
+  
   function buyApp(uint _idApp, address _adrNode) public payable {
     require(checkBuy(_idApp,msg.sender) == false);
     address adrDev = adrApplicationContract.getDeveloper(_idApp);
     require(adrDeveloperContract.checkConfirmation(adrDev));
     adrNodeContract.buyApp(_adrNode, msg.value, procNode);
     adrApplicationContract.buyApp(_idApp, msg.sender, adrDev, msg.value, procDev);
-    emit buyAppEvent(msg.sender, adrDev, _idApp, _adrNode, msg.value);
+    adrLogsContract.buyAppEvent_(msg.sender, adrDev, _idApp, _adrNode, msg.value);
   }
   
   function registrationApplication(string _hash, string _hashTag, bool _publish, uint256 _price) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     uint256 _idApp = adrApplicationContract.registrationApplication(_hash, _hashTag, _publish, _price, msg.sender);
-    emit registrationApplicationEvent(_idApp, _hash, _hashTag, _publish, _price, msg.sender);
+    adrLogsContract.registrationApplicationEvent_(_idApp, _hash, _hashTag, _publish, _price, msg.sender);
   }
   
   function registrationApplicationICO(uint _idApp, string _hash, string _hashTag) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.registrationApplicationICO(_idApp, _hash, _hashTag, msg.sender);
-    emit registrationApplicationICOEvent(_idApp, _hash, _hashTag);
+    adrLogsContract.registrationApplicationICOEvent_(_idApp, _hash, _hashTag);
   }  
   
   function changeHash(uint _idApp, string _hash, string _hashTag) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changeHash(_idApp, _hash, _hashTag, msg.sender);
-    emit changeHashEvent(_idApp, _hash, _hashTag);
+    adrLogsContract.changeHashEvent_(_idApp, _hash, _hashTag);
   }
   
   function changeIcoHash(uint _idApp, string _hash, string _hashTag) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changeIcoHash( _idApp, _hash, _hashTag, msg.sender);
-    emit changeIcoHashEvent(_idApp, _hash, _hashTag);
+    adrLogsContract.changeIcoHashEvent_(_idApp, _hash, _hashTag);
   }
   
   function changePublish(uint _idApp, bool _publish) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changePublish(_idApp, _publish, msg.sender);
-    emit changePublishEvent(_idApp, _publish);
+    adrLogsContract.changePublishEvent_(_idApp, _publish);
   }
   
   function changePrice(uint _idApp, uint256 _price) public {
     require(adrDeveloperContract.checkConfirmation(msg.sender));
     adrApplicationContract.changePrice(_idApp, _price, msg.sender);
-    emit changePriceEvent(_idApp, _price);
+    adrLogsContract.changePriceEvent_(_idApp, _price);
   }
   
   function changePublishOwner(uint _idApp, bool _publish, address _dev) public onlyOwner {
     adrApplicationContract.changePublish(_idApp, _publish, _dev);
-    emit changePublishEvent(_idApp, _publish);
+    adrLogsContract.changePublishEvent_(_idApp, _publish);
   }
   
   function registrationDeveloper(bytes32 _name, bytes32 _info) public {
     adrDeveloperContract.registrationDeveloper(msg.sender, _name,_info);
-    emit registrationDeveloperEvent(msg.sender, _name, _info);	
+    adrLogsContract.registrationDeveloperEvent_(msg.sender, _name, _info);	
   }
 	
   function changeDeveloperInfo(bytes32 _name, bytes32 _info) public {
     adrDeveloperContract.changeDeveloperInfo(msg.sender, _name,_info);
-    emit changeDeveloperInfoEvent(msg.sender, _name, _info);	
+    adrLogsContract.changeDeveloperInfoEvent_(msg.sender, _name, _info);	
   }
 
   function registrationNode( string _hash, string _hashTag, string _ip, string _coordinates) public payable {
     require(msg.value == deposit);
     require(adrNodeContract.getDeposit(msg.sender) == 0);
     adrNodeContract.registrationNode(msg.sender, _hash, _hashTag, msg.value, _ip, _coordinates);
-    emit registrationNodeEvent(msg.sender, false, _hash, _hashTag, msg.value, _ip, _coordinates);	
+    adrLogsContract.registrationNodeEvent_(msg.sender, false, _hash, _hashTag, msg.value, _ip, _coordinates);	
   }
   
   function changeInfoNode(string _hash, string _hashTag, string _ip, string _coordinates) public {
     adrNodeContract.changeInfoNode(msg.sender, _hash, _hashTag, _ip, _coordinates);
-    emit changeInfoNodeEvent(msg.sender, _hash, _hashTag, _ip, _coordinates);	
+    adrLogsContract.changeInfoNodeEvent_(msg.sender, _hash, _hashTag, _ip, _coordinates);	
   }
   
   function makeDeposit() public payable {
     adrNodeContract.makeDeposit(msg.sender, msg.value);
-    emit makeDepositEvent(msg.sender, msg.value);
+    adrLogsContract.makeDepositEvent_(msg.sender, msg.value);
   }
   
   function takeDeposit(address _node) public onlyOwner {
@@ -489,18 +511,18 @@ contract PlayMarket is Ownable {
     adrNodeContract.takeDeposit(_node, depositNode);
     adrNodeContract.confirmationNode(_node, false);
     _node.transfer(depositNode);
-    emit confirmationNodeEvent(_node, false);
-    emit takeDepositEvent(_node, depositNode);
+    adrLogsContract.confirmationNodeEvent_(_node, false);
+    adrLogsContract.takeDepositEvent_(_node, depositNode);
   }
   
   function confirmationNode(address _node, bool _value) public onlyOwner {
     adrNodeContract.confirmationNode(_node,_value);
-    emit confirmationNodeEvent(_node, _value);
+    adrLogsContract.confirmationNodeEvent_(_node, _value);
   }
   
   function confirmationDeveloper(address _developer, bool _value) public onlyOwner {
     adrDeveloperContract.confirmationDeveloper(_developer,_value);
-    emit confirmationDeveloperEvent(_developer, _value);
+    adrLogsContract.confirmationDeveloperEvent_(_developer, _value);
   }
 
   function collectNode() public {
@@ -537,14 +559,14 @@ contract PlayMarket is Ownable {
   
   function setRelease(address _adrDev, uint _idApp, bool _release ) public onlyOwner {
     address newContract  = adrICOContract.setRelease(_adrDev, _idApp, _release);
-    emit releaseICOEvent(_adrDev, _idApp, _release, newContract);
+    adrLogsContract.releaseICOEvent_(_adrDev, _idApp, _release, newContract);
   }
   
   function getTokensContract(string _name, string _symbol, address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _idApp) public {
     address adrDev = adrApplicationContract.getDeveloper(_idApp);
     require(msg.sender == adrDev);
     adrICOContract.getTokensContract(_name, _symbol,_multisigWallet, _startsAt, _totalInUSD, _idApp, msg.sender);
-    emit newContractEvent(_name, _symbol, msg.sender, _idApp);
+    adrLogsContract.newContractEvent_(_name, _symbol, msg.sender, _idApp);
   }
   
   /**
@@ -556,6 +578,6 @@ contract PlayMarket is Ownable {
    */
   function pushFeedbackRating(uint idApp, uint vote, string description, bytes32 txIndex) public {
     require( vote > 0 && vote <= 5);
-    emit newRating(msg.sender, idApp, vote, description, txIndex, block.timestamp);
+    adrLogsContract.newRating_(msg.sender, idApp, vote, description, txIndex, block.timestamp);
   }
 }
