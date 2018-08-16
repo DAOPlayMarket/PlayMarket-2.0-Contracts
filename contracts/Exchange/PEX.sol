@@ -114,10 +114,11 @@ contract PEX is SafeMath, Ownable {
   uint public feeTake; 
 
   mapping (address => mapping (address => uint)) public tokens; 
-  mapping (address => mapping (bytes32 => uint)) public orders; 
+  mapping (address => mapping (bytes32 => bool)) public orders;
+  mapping (address => mapping (bytes32 => uint)) public orderFills;  
   
   struct whitelistToken {
-    bool isSet;
+    bool active;
     uint256 timestamp;
   }
   mapping (address => whitelistToken) public whitelistTokens;
@@ -127,7 +128,7 @@ contract PEX is SafeMath, Ownable {
   event Order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user);
   event Cancel(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, bytes32 hash);
   event Trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address get, address give, bytes32 hash);
-  event WhitelistTokens(address token, bool isSet, uint256 timestamp);
+  event WhitelistTokens(address token, bool active, uint256 timestamp);
   
   modifier onlyAdmin {
     assert(msg.sender == owner || admins[msg.sender]);
@@ -135,7 +136,7 @@ contract PEX is SafeMath, Ownable {
   }
 
   modifier onlyWhitelistTokens(address token, uint256 timestamp) {
-    assert(whitelistTokens[token].isSet && whitelistTokens[token].timestamp <= timestamp);
+    assert(whitelistTokens[token].active && whitelistTokens[token].timestamp <= timestamp);
     _;
   }
   
@@ -162,10 +163,10 @@ contract PEX is SafeMath, Ownable {
     feeTake = feeTake_;
   }
 
-  function setWhitelistTokens(address token, bool isSet, uint256 timestamp) public onlyAdmin {
-    whitelistTokens[token].isSet = isSet;
+  function setWhitelistTokens(address token, bool active, uint256 timestamp) public onlyAdmin {
+    whitelistTokens[token].active = active;
     whitelistTokens[token].timestamp = timestamp;
-    emit WhitelistTokens(token, isSet, timestamp);
+    emit WhitelistTokens(token, active, timestamp);
   }
 
   /**
@@ -221,19 +222,19 @@ contract PEX is SafeMath, Ownable {
   
   function order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce) public {
     bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender);
-    orders[msg.sender][hash] = amountBuy;
+    orders[msg.sender][hash] = true;
     emit Order(tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender);
   }
   
   function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) public {
     bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user);
     if (!(
-      (orders[user][hash]>0 || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
+      (orders[user][hash] || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
       block.timestamp <= expires &&
-      safeSub(orders[user][hash], amount) >= 0
+      safeAdd(orderFills[user][hash], amount) <= amountBuy
     )) revert();
     tradeBalances(tokenBuy, amountBuy, tokenSell, amountSell, user, amount);
-    orders[user][hash] = safeSub(orders[user][hash], amount);
+    orderFills[user][hash] = safeAdd(orderFills[user][hash], amount);
     emit Trade(tokenBuy, amount, tokenSell, amountSell * amount / amountBuy, user, msg.sender, hash);
   }
 
@@ -249,8 +250,8 @@ contract PEX is SafeMath, Ownable {
   
   function cancelOrder(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) public {
     bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender);
-    if (!(orders[msg.sender][hash]>0 || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == msg.sender)) revert();
-    orders[msg.sender][hash] = 0;
+    if (!(orders[msg.sender][hash] || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == msg.sender)) revert();
+    orderFills[msg.sender][hash] = amountBuy;
     emit Cancel(tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender, v, r, s, hash);
   }
   
@@ -265,11 +266,11 @@ contract PEX is SafeMath, Ownable {
   function availableVolume(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) public constant returns(uint) {
     bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user);
     if (!(
-      (orders[user][hash]>0 || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
+      (orders[user][hash] || ecrecover(keccak256("\x19Ethereum Signed Message:\n32", hash),v,r,s) == user) &&
       block.timestamp <= expires
     )) return 0;
     
-    uint available1 = orders[user][hash];
+    uint available1 = safeSub(amountBuy, orderFills[user][hash]);
     uint available2 = safeMul(tokens[tokenSell][user], amountBuy) / amountSell;
     if (available1<available2) return available1;
     return available2;
@@ -277,7 +278,7 @@ contract PEX is SafeMath, Ownable {
 
   function amountFilled(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user) public constant returns(uint) {
     bytes32 hash = keccak256(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user);
-    return orders[user][hash];
+    return orderFills[user][hash];
   }
 }
 
