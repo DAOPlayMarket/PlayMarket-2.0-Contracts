@@ -127,7 +127,7 @@ contract PEX is SafeMath, Ownable {
   event Withdraw(address token, address user, uint amount, uint balance);
   event Order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user);
   event Cancel(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, bytes32 hash);
-  event Trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address user, address recipient, bytes32 hash, uint256 timestamp);
+  event Trade(address indexed tokenBuy, uint indexed amountBuy, address tokenSell, uint amountSell, address user, address recipient, bytes32 hash, uint256 indexed timestamp);
   event WhitelistTokens(address token, bool active, uint256 timestamp);
   
   modifier onlyAdmin {
