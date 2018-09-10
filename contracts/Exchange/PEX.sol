@@ -18,11 +18,16 @@ contract SafeMath {
   }
 	
   function safeDiv(uint256 x, uint256 y) internal pure returns (uint256) {
+    assert(y > 0);
     uint256 z = x / y;
     return z;
   }
 	
   function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {
+     if (x == 0) {
+      return 0;
+    }
+    
     uint256 z = x * y;
     assert(x == 0 || z / x == y);
     return z;
@@ -127,7 +132,7 @@ contract PEX is SafeMath, Ownable {
   event Withdraw(address token, address user, uint amount, uint balance);
   event Order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user);
   event Cancel(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, bytes32 hash);
-  event Trade(address indexed tokenBuy, uint indexed amountBuy, address tokenSell, uint amountSell, address user, address recipient, bytes32 hash, uint256 indexed timestamp);
+  event Trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address user, address recipient, bytes32 hash, uint256 timestamp);
   event WhitelistTokens(address token, bool active, uint256 timestamp);
   
   modifier onlyAdmin {
@@ -244,8 +249,8 @@ contract PEX is SafeMath, Ownable {
     tokens[tokenBuy][msg.sender] = safeSub(tokens[tokenBuy][msg.sender], safeAdd(amount, feeTakeXfer));
     tokens[tokenBuy][user] = safeAdd(tokens[tokenBuy][user], safeSub(amount, feeMakeXfer));
     tokens[tokenBuy][feeAccount] = safeAdd(tokens[tokenBuy][feeAccount], safeAdd(feeMakeXfer, feeTakeXfer));
-    tokens[tokenSell][user] = safeSub(tokens[tokenSell][user], safeMul(amountSell, amount) / amountBuy);
-    tokens[tokenSell][msg.sender] = safeAdd(tokens[tokenSell][msg.sender], safeMul(amountSell, amount) / amountBuy);
+    tokens[tokenSell][user] = safeSub(tokens[tokenSell][user], safeDiv(safeMul(amountSell, amount), amountBuy));
+    tokens[tokenSell][msg.sender] = safeAdd(tokens[tokenSell][msg.sender], safeDiv(safeMul(amountSell, amount), amountBuy));
   }
   
   function cancelOrder(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) public {
@@ -271,7 +276,7 @@ contract PEX is SafeMath, Ownable {
     )) return 0;
     
     uint available1 = safeSub(amountBuy, orderFills[user][hash]);
-    uint available2 = safeMul(tokens[tokenSell][user], amountBuy) / amountSell;
+    uint available2 = safeDiv(safeMul(tokens[tokenSell][user], amountBuy), amountSell);
     if (available1<available2) return available1;
     return available2;
   }
