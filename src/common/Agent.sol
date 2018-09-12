@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import '/src/common/Ownable.sol';
+import './Ownable.sol';
 
 /**
  * @title Agent contract - base contract with an agent
