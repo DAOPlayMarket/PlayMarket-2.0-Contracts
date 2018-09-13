@@ -159,7 +159,7 @@ contract PEX is SafeMath, Agent {
     }
 
     function tradeBalances(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address user, uint amount) private {
-        uint feeMakeXfer = safeMul(amount, getFeeMake(getAccountType(msg.sender))) / (10**18);
+        uint feeMakeXfer = safeMul(amount, getFeeMake(getAccountType(user))) / (10**18);
         uint feeTakeXfer = safeMul(amount, getFeeTake(getAccountType(msg.sender))) / (10**18);
         tokens[tokenBuy][msg.sender] = safeSub(tokens[tokenBuy][msg.sender], safeAdd(amount, feeTakeXfer));
         tokens[tokenBuy][user] = safeAdd(tokens[tokenBuy][user], safeSub(amount, feeMakeXfer));
