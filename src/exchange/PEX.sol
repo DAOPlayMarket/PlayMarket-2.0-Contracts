@@ -41,7 +41,9 @@ contract PEX is SafeMath, Agent {
   
     constructor (address feeAccount_, uint feeMake_, uint feeTake_) public {
         feeAccount = feeAccount_;
-        feeTypes[0] = Fee(feeMake_,feeTake_);
+        feeTypes[0] = Fee(feeMake_, feeTake_);
+        whitelistTokens[0] = whitelistToken(true, 1);
+        emit WhitelistTokens(0, true, 1);
     }
     
     function setAccountType(address user_, uint256 type_) external onlyAgent {
