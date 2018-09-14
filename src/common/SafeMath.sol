@@ -23,6 +23,10 @@ contract SafeMath {
   }
 	
   function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {    
+    if (x == 0) {
+      return 0;
+    }
+    
     uint256 z = x * y;
     assert(z / x == y);
     return z;
