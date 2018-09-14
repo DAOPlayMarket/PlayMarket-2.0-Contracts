@@ -1,35 +1,30 @@
 pragma solidity ^0.4.24;
 
-import '/src/common/Agent.sol';
-import '/src/common/SafeMath.sol';
-import '/src/platform/common/nodeI.sol';
+import '../../common/Agent.sol';
+import '../../common/SafeMath.sol';
+import '../storage/nodeStorageI.sol';
 
 /**
  * @title Node contract - basic contract for working with nodes
  */
-contract Node is NodeI, Agent, SafeMath {
+contract Node is Agent, SafeMath {
 
-  struct _Node {
-    bool confirmation;
-    string hash;
-    string hashTag;
-    uint256 deposit;
-    string ip;
-    string coordinates;
-    bool isSet;
+  NodeStorageI public NodeStorage;
+
+  event setStorageContractEvent(address _contract);
+
+  function setStorageContract(address _contract) external onlyOwner {
+    NodeStorage = NodeStorageI(_contract);
+    emit setStorageContractEvent(_contract);
   }
-  
-  mapping (address => uint256) public nodeRevenue;
-  mapping (address => _Node) public nodes;
-	
+
   /**
    * @dev 
    * @param _adrNode The address of the node through which the transaction passes
    * @param _value application fee
    */
   function buyApp(address _adrNode, uint _value) public onlyAgent {
-    require(nodes[_adrNode].confirmation == true);
-    nodeRevenue[_adrNode] = safeAdd(nodeRevenue[_adrNode], _value);
+    //require(nodes[_adrNode].confirmation == true);    
   }
 
   /**
@@ -42,15 +37,6 @@ contract Node is NodeI, Agent, SafeMath {
    * @param _coordinates coordinates
    */
   function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit, string _ip, string _coordinates) external onlyAgent {
-    nodes[_adrNode] = _Node({
-      confirmation: false,
-      hash: _hash,
-      hashTag: _hashTag,
-      deposit: _deposit,
-      ip: _ip,
-      coordinates: _coordinates,
-      isSet: true
-    });
   }
   
   /**
@@ -62,11 +48,7 @@ contract Node is NodeI, Agent, SafeMath {
    * @param _coordinates coordinates
    */
   function changeInfoNode(address _adrNode, string _hash, string _hashTag, string _ip, string _coordinates) external onlyAgent {
-    assert(nodes[_adrNode].isSet);
-    nodes[_adrNode].hash = _hash;
-    nodes[_adrNode].hashTag = _hashTag;
-    nodes[_adrNode].ip = _ip;
-    nodes[_adrNode].coordinates = _coordinates;
+    //assert(nodes[_adrNode].isSet);
   }
   
   /**
@@ -75,7 +57,7 @@ contract Node is NodeI, Agent, SafeMath {
    * @return amount deposit
    */
   function getDeposit(address _adrNode) public constant onlyAgent returns (uint256) {
-    return nodes[_adrNode].deposit;
+    //return nodes[_adrNode].deposit;
   }
 
   /**
@@ -84,7 +66,7 @@ contract Node is NodeI, Agent, SafeMath {
    * @return amount revenue
    */
   function getRevenue(address _adrNode) external constant onlyAgent returns (uint256) {
-    return nodeRevenue[_adrNode];
+    //return nodeRevenue[_adrNode];
   }
   
   /**
@@ -93,8 +75,7 @@ contract Node is NodeI, Agent, SafeMath {
    * @param _value deposit amount
    */
   function makeDeposit(address _adrNode, uint256 _value) public onlyAgent {
-    require(_value > 0);
-    nodes[_adrNode].deposit = safeAdd(nodes[_adrNode].deposit, _value);
+    require(_value > 0);    
   }
   
   /**
@@ -103,8 +84,7 @@ contract Node is NodeI, Agent, SafeMath {
    * @param _value deposit amount
    */
   function takeDeposit(address _adrNode, uint256 _value) public onlyAgent {
-    require(nodes[_adrNode].deposit >= _value);
-    nodes[_adrNode].deposit = safeSub(nodes[_adrNode].deposit, _value);
+    //require(nodes[_adrNode].deposit >= _value);    
   }
   
   /**
@@ -112,7 +92,7 @@ contract Node is NodeI, Agent, SafeMath {
    * @param _adrNode The address of the node 
    */
   function collectNode(address _adrNode) public onlyAgent{
-    nodeRevenue[_adrNode] = 0;
+    
   }
   
   /**
@@ -121,7 +101,6 @@ contract Node is NodeI, Agent, SafeMath {
    * @param _value value
    */
   function confirmationNode(address _adrNode, bool _value) public onlyAgent{
-    assert(nodes[_adrNode].isSet);
-    nodes[_adrNode].confirmation = _value;
+    //assert(nodes[_adrNode].isSet);    
   }
 }

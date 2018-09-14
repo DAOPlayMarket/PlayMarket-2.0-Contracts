@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
-import '/src/common/Agent.sol';
-import '/src/platform/common/logsI.sol';
+import '../../common/Agent.sol';
+import './logsI.sol';
 
 /**
  * @title Logs contract - basic contract for working with logs (only events)

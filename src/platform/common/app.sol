@@ -1,15 +1,13 @@
 pragma solidity ^0.4.24;
 
-import '/src/common/SafeMath.sol';
-import '/src/common/Agent.sol';
-import '/src/platform/common/appI.sol';
-import '/src/platform/common/appStorageI.sol';
-//import '/src/platform/common/objStorageI.sol';
+import '../../common/Agent.sol';
+import '../../common/SafeMath.sol';
+import '../storage/appStorageI.sol';
 
 /**
  * @title Application contract - basic contract for working with applications
  */
-contract Application is ApplicationI, Agent, SafeMath {
+contract Application is Agent, SafeMath {
 
   AppStorageI public AppStorage;
 
@@ -30,7 +28,7 @@ contract Application is ApplicationI, Agent, SafeMath {
    * @return number of current applications
    */
   function registrationApplication(string _hash, string _hashTag, bool _publish, uint256 _price, address _dev, uint _kind) external onlyAgent returns (uint256) {    
-    return AppStorage.addApp(_dev, _hash, _hashTag, _price, _kind, _publish, false);
+    //return AppStorage.addApp(_dev, _hash, _hashTag, _price, _kind, _publish, false);
   }
   
   /**
@@ -39,7 +37,7 @@ contract Application is ApplicationI, Agent, SafeMath {
    * @param _status true/false
    */
   function confirmationApplication(uint _app, bool _status) external onlyAgent {
-    AppStorage.confirmApp(_app, _status);
+    //AppStorage.confirmApp(_app, _status);
   }
 
   /**
@@ -49,7 +47,7 @@ contract Application is ApplicationI, Agent, SafeMath {
    * @param _hashTag hashTag
    * @param _dev Developer address
    */
-  function registrationApplicationICO(uint _app, string _hash, string _hashTag, address _dev) external onlyAgent {
+  function registrationApplicationICO(uint _app, string _hash, uint16 _hashTag, address _dev) external onlyAgent {
     require(checkDeveloper(_app,_dev));
     AppStorage.addAppICO(_app, _hash, _hashTag);
   }
@@ -61,7 +59,7 @@ contract Application is ApplicationI, Agent, SafeMath {
    * @param _hashTag hashTag
    * @param _dev Developer address
    */
-  function changeHash(uint _app, string _hash, string _hashTag, address _dev) external onlyAgent {  
+  function changeHash(uint _app, string _hash, uint16 _hashTag, address _dev) external onlyAgent {  
     require(checkDeveloper(_app,_dev));
     AppStorage.changeHash(_app, _hash, _hashTag);
   }
@@ -74,8 +72,7 @@ contract Application is ApplicationI, Agent, SafeMath {
    */
   function changePublish(uint _app, bool _publish, address _dev) external onlyAgent {
     require(checkDeveloper(_app,_dev));
-    AppStorage.changePublish(_app, _publish);
-    
+    //AppStorage.changePublish(_app, _publish);
   }
 
   /**
@@ -86,7 +83,7 @@ contract Application is ApplicationI, Agent, SafeMath {
    */
   function changePrice(uint _app, uint256 _price, address _dev) external onlyAgent {
     require(checkDeveloper(_app,_dev));
-    AppStorage.changePrice(_app, _price);
+    //AppStorage.changePrice(_app, _price);
   }
   
   /**
@@ -98,7 +95,7 @@ contract Application is ApplicationI, Agent, SafeMath {
    */
   function changeIcoHash(uint _app, string _hash, uint16 _hashTag, address _dev) external onlyAgent {
     require(checkDeveloper(_app,_dev));
-    AppStorage.changeIcoHash(_app, _hash, _hashTag);
+    //AppStorage.changeIcoHash(_app, _hash, _hashTag);
   }
 
   /**
