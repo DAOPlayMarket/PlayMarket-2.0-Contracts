@@ -1,8 +1,7 @@
 pragma solidity ^0.4.24;
 
-import '/src/common/SafeMath.sol';
-import '/src/common/Ownable.sol';
-import '/src/common/Agent.sol';
+import './Ownable.sol';
+import './Agent.sol';
 
 /**
  * @title RateContract Interface

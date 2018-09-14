@@ -1,10 +1,10 @@
 pragma solidity ^0.4.24;
 
-import '/src/common/SafeMath.sol';
-import '/src/common/Agent.sol';
-import '/src/common/RateI.sol';
-import '/src/exchange/PEX.sol';
-import '/src/tokensale/crowdsale.sol';
+import '../common/SafeMath.sol';
+import '../common/Agent.sol';
+import '../common/RateI.sol';
+import '../exchange/PEX.sol';
+import './crowdsale.sol';
 
 /**
  * @title 

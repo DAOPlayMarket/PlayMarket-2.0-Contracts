@@ -22,15 +22,16 @@ contract SafeMath {
     return z;
   }
 	
-  function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {
+  function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {    
     uint256 z = x * y;
-    assert(x == 0 || z / x == y);
+    assert(z / x == y);
     return z;
   }
 
   function safePerc(uint256 x, uint256 y) internal pure returns (uint256) {
-    uint256 z = x * y / 100;
-    assert(x == 0 || z * 100 / x == y);
+    uint256 z = x * y;
+    assert(x == 0 || z / x == y);    
+    z = z / 100;
     return z;
   }
 

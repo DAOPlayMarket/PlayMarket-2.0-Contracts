@@ -2,11 +2,12 @@ pragma solidity ^0.4.24;
 
 import '/src/common/Agent.sol';
 import '/src/common/SafeMath.sol';
+import '/src/platform/common/nodeI.sol';
 
 /**
  * @title Node contract - basic contract for working with nodes
  */
-contract Node is Agent, SafeMath {
+contract Node is NodeI, Agent, SafeMath {
 
   struct _Node {
     bool confirmation;
@@ -40,7 +41,7 @@ contract Node is Agent, SafeMath {
    * @param _ip ip
    * @param _coordinates coordinates
    */
-  function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit, string _ip, string _coordinates) public onlyAgent {
+  function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit, string _ip, string _coordinates) external onlyAgent {
     nodes[_adrNode] = _Node({
       confirmation: false,
       hash: _hash,
@@ -60,7 +61,7 @@ contract Node is Agent, SafeMath {
    * @param _ip ip
    * @param _coordinates coordinates
    */
-  function changeInfoNode(address _adrNode, string _hash, string _hashTag, string _ip, string _coordinates) public onlyAgent {
+  function changeInfoNode(address _adrNode, string _hash, string _hashTag, string _ip, string _coordinates) external onlyAgent {
     assert(nodes[_adrNode].isSet);
     nodes[_adrNode].hash = _hash;
     nodes[_adrNode].hashTag = _hashTag;

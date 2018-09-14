@@ -1,17 +1,17 @@
 pragma solidity ^0.4.24;
 
-import '/src/common/Agent.sol';
-import '/src/common/SafeMath.sol';
-import '/src/platform/common/appI.sol';
-import '/src/platform/common/devI.sol';
-import '/src/platform/common/nodeI.sol';
-import '/src/platform/common/logsI.sol';
-import '/src/tokensale/tokensale.sol';
+import '../common/Agent.sol';
+import '../common/SafeMath.sol';
+//import './common/appI.sol';
+//import './common/devI.sol';
+//import './common/nodeI.sol';
+import './common/logsI.sol';
+import '../tokensale/tokensale.sol';
 
 /**
  * @title PlayMarket contract - basic contract DAO PlayMarket 2.0
  */
-contract PlayMarket is Agent, SafeMath {
+contract PlayMarket is Application, Developer, Agent, SafeMath {
   
   DeveloperI public DeveloperContract;
   ApplicationI public ApplicationContract;

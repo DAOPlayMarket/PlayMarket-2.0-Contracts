@@ -4,9 +4,9 @@ pragma solidity ^0.4.24;
  * @title Decentralized Autonomous Organization PlayMarket 2.0
  */
 
-import '/src/common/SafeMath.sol';
-import '/src/common/Ownable.sol';
-import '/src/common/ERC20.sol';
+import '../common/SafeMath.sol';
+import '../common/Ownable.sol';
+import '../common/ERC20.sol';
 
 contract DAOPM is Ownable {
     // Contract Variables and events
@@ -68,7 +68,7 @@ contract DAOPM is Ownable {
         int marginOfVotesForMajority
     )  payable public {
         changeVotingRules(minimumQuorumForProposals, minutesForDebate, marginOfVotesForMajority);
-        // It’s necessary to add an empty first member
+        // Itï¿½s necessary to add an empty first member
         addMember(0, "");
         // and let's add the founder, to save a step later
         addMember(owner, 'founder');

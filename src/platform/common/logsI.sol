@@ -25,7 +25,6 @@ interface LogsI {
   function takeDepositEvent_(address adrNode, uint256 deposit) external;
   function changeInfoNodeEvent_(address adrNode, string hash, string hashTag, string ip, string coordinates) external;
   
-  
   //Reviews events
   function newRating_(address voter , uint idApp, uint vote, string description, bytes32 txIndex, uint256 blocktimestamp) external;
 

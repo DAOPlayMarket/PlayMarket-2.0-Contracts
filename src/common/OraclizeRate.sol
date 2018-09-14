@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
 
-import '/src/common/Ownable.sol';
-import '/src/common/Agent.sol';
-import '/src/common/OraclizeAPI.sol';
-import '/src/common/RateI.sol';
+import './Ownable.sol';
+import './Agent.sol';
+import './OraclizeAPI.sol';
+import './RateI.sol';
 
 /**
  * @title OraclizeRateContract  

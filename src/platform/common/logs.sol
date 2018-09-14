@@ -1,23 +1,24 @@
 pragma solidity ^0.4.24;
 
 import '/src/common/Agent.sol';
+import '/src/platform/common/logsI.sol';
 
 /**
  * @title Logs contract - basic contract for working with logs (only events)
  */
-contract Logs is Agent{
+contract Logs is LogsI, Agent {
   
   //App events 
-  event registrationApplicationEvent(uint idApp, string hash, string hashTag, bool publish, uint256 price, address adrDev);
-  event confirmationApplicationEvent(uint idApp, bool _status, address _moderator);
-  event changeHashEvent(uint idApp, string hash, string hashTag);
-  event changePublishEvent(uint idApp, bool publish);
-  event changePriceEvent(uint idApp, uint256 price);
-  event buyAppEvent(address indexed user, address indexed developer, uint idApp, address indexed adrNode, uint256 price);
+  event registrationApplicationEvent(uint _app, string hash, string hashTag, bool publish, uint256 price, address adrDev);
+  event confirmationApplicationEvent(uint _app, bool _status, address _moderator);
+  event changeHashEvent(uint _app, string hash, string hashTag);
+  event changePublishEvent(uint _app, bool publish);
+  event changePriceEvent(uint _app, uint256 price);
+  event buyAppEvent(address indexed user, address indexed developer, uint _app, address indexed adrNode, uint256 price);
   
   //Ico App events 
-  event registrationApplicationICOEvent(uint idApp, string hash, string hashTag);
-  event changeIcoHashEvent(uint idApp, string hash, string hashTag);
+  event registrationApplicationICOEvent(uint _app, string hash, string hashTag);
+  event changeIcoHashEvent(uint _app, string hash, string hashTag);
   
   //Developer events 
   event registrationDeveloperEvent(address indexed developer, bytes32 name, bytes32 info);
@@ -32,49 +33,49 @@ contract Logs is Agent{
   event changeInfoNodeEvent(address adrNode, string hash, string hashTag, string ip, string coordinates);
   
   //Reviews events
-  event newRating(address voter , uint idApp, uint vote, string description, bytes32 txIndex, uint256 blocktimestamp);
+  event newRating(address voter , uint _app, uint vote, string description, bytes32 txIndex, uint256 blocktimestamp);
   
   //ICO events 
-  event releaseICOEvent(address adrDev, uint idApp, bool release, address ICO);
-  event newContractEvent(string name, string symbol, address adrDev, uint idApp);
+  event releaseICOEvent(address adrDev, uint _app, bool release, address ICO);
+  event newContractEvent(string name, string symbol, address adrDev, uint _app);
   
-  function registrationApplicationEvent_(uint idApp, string hash, string hashTag, bool publish, uint256 price, address adrDev) public onlyAgent {
-    emit registrationApplicationEvent(idApp, hash, hashTag, publish, price, adrDev);
+  function registrationApplicationEvent_(uint _app, string hash, string hashTag, bool publish, uint256 price, address adrDev) external onlyAgent {
+    emit registrationApplicationEvent(_app, hash, hashTag, publish, price, adrDev);
   }
 
-  function confirmationApplicationEvent_(uint idApp, bool _status, address _moderator) public onlyAgent {
-    emit confirmationApplicationEvent(idApp, _status, _moderator);
+  function confirmationApplicationEvent_(uint _app, bool _status, address _moderator) public onlyAgent {
+    emit confirmationApplicationEvent(_app, _status, _moderator);
   }
   
-  function changeHashEvent_(uint idApp, string hash, string hashTag) public onlyAgent {
-    emit changeHashEvent(idApp, hash, hashTag);
+  function changeHashEvent_(uint _app, string hash, string hashTag) external onlyAgent {
+    emit changeHashEvent(_app, hash, hashTag);
   }
   
-  function changePublishEvent_(uint idApp, bool publish) public onlyAgent {
-    emit changePublishEvent(idApp, publish);
+  function changePublishEvent_(uint _app, bool publish) public onlyAgent {
+    emit changePublishEvent(_app, publish);
   }
   
-  function changePriceEvent_(uint idApp, uint256 price) public onlyAgent {
-    emit changePriceEvent(idApp, price);
+  function changePriceEvent_(uint _app, uint256 price) public onlyAgent {
+    emit changePriceEvent(_app, price);
   }
   
-  function buyAppEvent_(address user, address developer, uint idApp, address adrNode, uint256 price) public onlyAgent {
-    emit buyAppEvent(user, developer, idApp, adrNode, price);
+  function buyAppEvent_(address user, address developer, uint _app, address adrNode, uint256 price) public onlyAgent {
+    emit buyAppEvent(user, developer, _app, adrNode, price);
   }
   
-  function registrationApplicationICOEvent_(uint idApp, string hash, string hashTag) public onlyAgent {
-    emit registrationApplicationICOEvent(idApp, hash, hashTag);
+  function registrationApplicationICOEvent_(uint _app, string hash, string hashTag) external onlyAgent {
+    emit registrationApplicationICOEvent(_app, hash, hashTag);
   }
   
-  function changeIcoHashEvent_(uint idApp, string hash, string hashTag) public onlyAgent {
-    emit changeIcoHashEvent(idApp, hash, hashTag);
+  function changeIcoHashEvent_(uint _app, string hash, string hashTag) external onlyAgent {
+    emit changeIcoHashEvent(_app, hash, hashTag);
   }
   
-  function registrationDeveloperEvent_(address developer, bytes32 name, bytes32 info) public onlyAgent {
+  function registrationDeveloperEvent_(address developer, bytes32 name, bytes32 info) external onlyAgent {
     emit registrationDeveloperEvent(developer, name, info);
   }
   
-  function changeDeveloperInfoEvent_(address developer, bytes32 name, bytes32 info) public onlyAgent {
+  function changeDeveloperInfoEvent_(address developer, bytes32 name, bytes32 info) external onlyAgent {
     emit changeDeveloperInfoEvent(developer, name, info);
   }
   
@@ -82,7 +83,7 @@ contract Logs is Agent{
     emit confirmationDeveloperEvent(developer, value);
   }
   
-  function registrationNodeEvent_(address adrNode, bool confirmation, string hash, string hashTag, uint256 deposit, string ip, string coordinates) public onlyAgent {
+  function registrationNodeEvent_(address adrNode, bool confirmation, string hash, string hashTag, uint256 deposit, string ip, string coordinates) external onlyAgent {
     emit registrationNodeEvent(adrNode, confirmation, hash, hashTag, deposit, ip, coordinates);
   }
   
@@ -98,19 +99,19 @@ contract Logs is Agent{
     emit takeDepositEvent(adrNode, deposit);
   }
   
-  function changeInfoNodeEvent_(address adrNode, string hash, string hashTag, string ip, string coordinates) public onlyAgent {
+  function changeInfoNodeEvent_(address adrNode, string hash, string hashTag, string ip, string coordinates) external onlyAgent {
     emit changeInfoNodeEvent(adrNode, hash, hashTag, ip, coordinates);
   }
   
-  function newRating_(address voter , uint idApp, uint vote, string description, bytes32 txIndex, uint256 blocktimestamp) public onlyAgent {
-    emit newRating(voter , idApp, vote, description, txIndex, blocktimestamp);
+  function newRating_(address voter , uint _app, uint vote, string description, bytes32 txIndex, uint256 blocktimestamp) external onlyAgent {
+    emit newRating(voter , _app, vote, description, txIndex, blocktimestamp);
   }
   
-  function releaseICOEvent_(address adrDev, uint idApp, bool release, address ICO) public onlyAgent {
-    emit releaseICOEvent(adrDev, idApp, release, ICO);
+  function releaseICOEvent_(address adrDev, uint _app, bool release, address ICO) public onlyAgent {
+    emit releaseICOEvent(adrDev, _app, release, ICO);
   }
   
-  function newContractEvent_(string name, string symbol, address adrDev, uint idApp) public onlyAgent {
-    emit newContractEvent(name, symbol, adrDev, idApp);
+  function newContractEvent_(string name, string symbol, address adrDev, uint _app) external onlyAgent {
+    emit newContractEvent(name, symbol, adrDev, _app);
   }
 }

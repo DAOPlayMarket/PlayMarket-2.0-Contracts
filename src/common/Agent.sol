@@ -8,6 +8,7 @@ import './Ownable.sol';
 contract Agent is Ownable {
 
   address public defAgent;
+
   mapping(address => bool) public Agents;
   
   constructor() public {

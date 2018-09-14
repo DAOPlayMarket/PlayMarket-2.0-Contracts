@@ -2,11 +2,12 @@ pragma solidity ^0.4.24;
 
 import '/src/common/Agent.sol';
 import '/src/common/SafeMath.sol';
+import '/src/platform/common/devI.sol';
 
 /**
  * @title Developer contract - basic contract for working with developers
  */
-contract Developer is Agent, SafeMath {
+contract Developer is DeveloperI, Agent, SafeMath {
   
   struct _Developer {    
     bytes32 name;
