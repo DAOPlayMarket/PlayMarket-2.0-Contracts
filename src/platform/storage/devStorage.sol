@@ -104,7 +104,7 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     Devs[_dev].store = _store;
   }
 
-  function setRating(address _dev, int256 _rating) external onlyAgentDev(_dev) {
+  function setRating(address _dev, int _rating) external onlyAgentDev(_dev) {
     DevsRating[Agents[msg.sender].store][_dev] = _rating;
   }
 }

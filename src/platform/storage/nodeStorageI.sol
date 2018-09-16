@@ -5,8 +5,8 @@ pragma solidity ^0.4.24;
  */
 interface NodeStorageI {
   
-  function addNode(address _node, uint16 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external;
-  function changeInfo(address _node, string _hash, uint16 _hashType, string _ip, string _coordinates) external;
+  function addNode(address _node, uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external;
+  function changeInfo(address _node, string _hash, uint32 _hashType, string _ip, string _coordinates) external;
   function buyObject(address _node) payable external;
   // collect the accumulated amount
   function collect(address _node) external;
@@ -26,7 +26,7 @@ interface NodeStorageI {
   // Nodes getters
   **************************************************************************/
   function getPMTContract() external view returns (address);
-  function getHashType(address _node) external view returns (uint16);
+  function getHashType(address _node) external view returns (uint32);
   function getStore(address _node) external view returns (uint32);
   function getState(address _node) external view returns (bool);
   function getConfirmation(address _node) external view returns (bool);
@@ -43,7 +43,7 @@ interface NodeStorageI {
   // Nodes setters
   **************************************************************************/
   function setPMTContract(address _contract) external;
-  function setHashType(address _node, uint16 _hashType) external;
+  function setHashType(address _node, uint32 _hashType) external;
   function setStore(address _node, uint32 _store) external;
   function setConfirmation(address _node, bool _state) external;
   function setReserv(address _node, bytes24 _reserv) external ;

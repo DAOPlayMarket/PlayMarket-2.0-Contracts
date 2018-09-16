@@ -15,7 +15,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   event refundNodeEvent(address _node, uint256 _ETH, uint256 _PMT);
 
   struct _Node {
-    uint16  hashType;   // default 0 - IPFS
+    uint32  hashType;   // default 0 - IPFS
     uint32  store;      // default 1
     bool state;         // service variable to determine the state of the structure
     bool confirmation;  // decides platform    
@@ -48,7 +48,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     PMTContract = ERC20I(_PMT);
   }
   
-  function addNode(address _node, uint16 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external onlyAgentStore(Nodes[_node].store) {
+  function addNode(address _node, uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external onlyAgentStore(Nodes[_node].store) {
     assert(!Nodes[_node].state);
     Nodes[_node]=_Node({
       hashType: _hashType,
@@ -62,7 +62,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     });
   }
 
-  function changeInfo(address _node, string _hash, uint16 _hashType, string _ip, string _coordinates) external onlyAgentStore(Nodes[_node].store) {
+  function changeInfo(address _node, string _hash, uint32 _hashType, string _ip, string _coordinates) external onlyAgentStore(Nodes[_node].store) {
     Nodes[_node].hash = _hash;
     Nodes[_node].hashType = _hashType;
     Nodes[_node].ip = _ip;
@@ -149,7 +149,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     return PMTContract;
   }  
 
-  function getHashType(address _node) external view onlyAgentStore(Nodes[_node].store) returns (uint16) {
+  function getHashType(address _node) external view onlyAgentStore(Nodes[_node].store) returns (uint32) {
     return Nodes[_node].hashType;
   }
 
@@ -208,7 +208,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     PMTContract = ERC20I(_contract);
   }  
 
-  function setHashType(address _node, uint16 _hashType) external onlyAgentStore(Nodes[_node].store) {
+  function setHashType(address _node, uint32 _hashType) external onlyAgentStore(Nodes[_node].store) {
     Nodes[_node].hashType = _hashType;
   }
 
@@ -222,19 +222,19 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     emit confirmationNodeEvent(_node, _state);
   }
 
-  function setReserv(address _node, bytes24 _reserv) external onlyAgentStore(Nodes[_node].store){
+  function setReserv(address _node, bytes24 _reserv) external onlyAgentStore(Nodes[_node].store) {
     Nodes[_node].reserv = _reserv;
   }
 
-  function setHash(address _node, string _hash) external onlyAgentStore(Nodes[_node].store){
+  function setHash(address _node, string _hash) external onlyAgentStore(Nodes[_node].store) {
     Nodes[_node].hash = _hash;
   }
 
-  function setIP(address _node, string _ip) external onlyAgentStore(Nodes[_node].store){
+  function setIP(address _node, string _ip) external onlyAgentStore(Nodes[_node].store) {
     Nodes[_node].ip = _ip;
   }
 
-  function setCoordinates(address _node, string _coordinates) external onlyAgentStore(Nodes[_node].store){
+  function setCoordinates(address _node, string _coordinates) external onlyAgentStore(Nodes[_node].store) {
     Nodes[_node].coordinates = _coordinates;
   }
 

@@ -3,111 +3,71 @@ pragma solidity ^0.4.24;
 import '../../common/Agent.sol';
 import '../../common/SafeMath.sol';
 import '../storage/devStorageI.sol';
+import '../storage/logStorageI.sol';
 
 /**
  * @title Developer contract - basic contract for working with developers
  */
-contract Developer is Agent, SafeMath {
+contract Dev is Agent, SafeMath {
   
   bool autoConfirm = true;
-  int defRaiting = 0;
+  int defRating = 0;
 
   DevStorageI public DevStorage;
+  LogStorageI public LogStorage;
 
-  event setStorageContractEvent(address _contract);
+  event setDevStorageContractEvent(address _contract);
 
-  function setStorageContract(address _contract) external onlyOwner {
+  // link to dev storage
+  function setDevStorageContract(address _contract) public onlyOwner {
     DevStorage = DevStorageI(_contract);
-    emit setStorageContractEvent(_contract);
+    emit setDevStorageContractEvent(_contract);
   }
   
-  /**
-   * @dev 
-   * @param _dev Developer address
-   * @param _value Developer revenue 
-   */
-  function buyApp(address _dev, uint _value) public onlyAgent {
-    //assert(developers[_dev].isSet);
-  }
+  // link to log storage
+  function setDevLogStorageContract(address _contract) public onlyOwner {
+    LogStorage = LogStorageI(_contract);    
+  }  
 
-  /**
-   * @dev 
-   * @param _dev Developer address
-   * @param _name Developer name
-   * @param _info Additional Information
-   */
-  function registrationDeveloper(address _dev, bytes32 _name, bytes32 _info) public onlyAgent {
-    //assert(!developers[_dev].isSet);
+  function addDev(bytes32 _name, bytes32 _info, bytes26 _reserv) public {
+    require(!DevStorage.getState(msg.sender));
+    DevStorage.addDev(msg.sender, _name, _info, autoConfirm, _reserv);
+    DevStorage.setRating(msg.sender, defRating);
+    LogStorage.addDevEvent(msg.sender, _name, _info);
   }
 	
-  /**
-   * @dev 
-   * @param _dev Developer address
-   * @param _name Developer name
-   * @param _info Additional Information
-   */
-  function changeDeveloperInfo(address _dev, bytes32 _name, bytes32 _info) public onlyAgent {
-    //assert(developers[_dev].isSet);
+  function changeNameDev(bytes32 _name, bytes32 _info) public {
+    require(!DevStorage.getState(msg.sender));
+    DevStorage.changeName(msg.sender,_name, _info);
+    LogStorage.changeNameDevEvent(msg.sender, _name, _info);
   }
   
-  /**
-   * @dev 
-   * @param _dev Developer address
-   * @param _raiting Developer raiting
-   */
-  function changeDeveloperRaiting(address _dev, int _raiting) public onlyAgent {
-    //assert(developers[_dev].isSet);
-    //if (_raiting < 0) developers[_dev].confirmation = false;
+  // collect the accumulated amount
+  function collectDev() external {
+    require(DevStorage.getRevenue(msg.sender) > 0);
+    DevStorage.collect(msg.sender);
   }
 
-  /**
-   * @dev 
-   * @param _autoConfirm autoConfirm
-   */
+  function setConfirmationDev(address _dev, bool _state) external onlyAgent {
+    require(!DevStorage.getState(_dev));
+    DevStorage.setConfirmation(_dev, _state);
+    LogStorage.setConfirmationDevEvent(_dev, _state);
+  }
+
+  function changeRatingDev(address _dev, int _rating) public onlyAgent {
+    require(!DevStorage.getState(_dev));
+    DevStorage.setRating(_dev, _rating);
+    if (_rating < 0) DevStorage.setConfirmation(msg.sender, false);
+  }
+
+  /************************************************************************* 
+  // default params setters (onlyOwner => DAO)
+  **************************************************************************/ 
   function changeAutoConfirm(bool _autoConfirm) public onlyOwner {
     autoConfirm = _autoConfirm;
   }
   
-  /**
-   * @dev 
-   * @param _defRaiting Developer default raiting sets on registration
-   */
-  function changeDefRaiting(int _defRaiting) public onlyOwner {
-    defRaiting = _defRaiting;
-  }
-
-  /**
-   * @dev 
-   * @param _dev Developer address
-   */
-  function checkConfirmation(address _dev) public constant onlyAgent returns (bool success) {
-    //require(developers[_dev].confirmation == true);
-    return true;
-  }
-  
-  /**
-   * @dev 
-   * @param _dev Developer address
-   * @param _value value
-   */
-  function confirmationDeveloper(address _dev, bool _value) public onlyAgent {
-    //assert(developers[_dev].isSet);
-  }
-
-  /**
-   * @dev 
-   * @param _dev The address of the node 
-   * @return amount revenue
-   */
-  function getRevenue(address _dev) external constant onlyAgent returns (uint256) {
-    //return developerRevenue[_dev];
-  }  
-
-  /**
-   * @dev 
-   * @param _dev Developer address
-   */  
-  function collectDeveloper(address _dev) public onlyAgent{
-    //developerRevenue[_dev] = 0;
+  function changeDefRating(int _defRating) public onlyOwner {
+    defRating = _defRating;
   }
 }

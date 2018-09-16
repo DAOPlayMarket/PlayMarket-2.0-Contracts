@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import '../../common/Agent.sol';
 import '../../common/SafeMath.sol';
+import '../storage/logStorageI.sol';
 import '../storage/nodeStorageI.sol';
 
 /**
@@ -10,97 +11,90 @@ import '../storage/nodeStorageI.sol';
 contract Node is Agent, SafeMath {
 
   NodeStorageI public NodeStorage;
+  LogStorageI  public LogStorage;
 
   event setStorageContractEvent(address _contract);
 
-  function setStorageContract(address _contract) external onlyOwner {
+  // link to node storage
+  function setNodeStorageContract(address _contract) public onlyOwner {
     NodeStorage = NodeStorageI(_contract);
     emit setStorageContractEvent(_contract);
   }
 
-  /**
-   * @dev 
-   * @param _adrNode The address of the node through which the transaction passes
-   * @param _value application fee
-   */
-  function buyApp(address _adrNode, uint _value) public onlyAgent {
-    //require(nodes[_adrNode].confirmation == true);    
+  // link to log storage
+  function setNodeLogStorageContract(address _contract) public onlyOwner {
+    LogStorage = LogStorageI(_contract);    
+  }  
+
+  function addNode(uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external {
+    NodeStorage.addNode(msg.sender, _hashType, _reserv, _hash, _ip, _coordinates);
+    LogStorage.addNodeEvent(msg.sender, _hashType, _reserv, _hash, _ip, _coordinates);
   }
 
-  /**
-   * @dev 
-   * @param _adrNode The address of the node 
-   * @param _hash hash
-   * @param _hashTag hashTag
-   * @param _deposit deposit
-   * @param _ip ip
-   * @param _coordinates coordinates
-   */
-  function registrationNode(address _adrNode, string _hash, string _hashTag, uint256 _deposit, string _ip, string _coordinates) external onlyAgent {
-  }
-  
-  /**
-   * @dev 
-   * @param _adrNode The address of the node 
-   * @param _hash hash
-   * @param _hashTag hashTag
-   * @param _ip ip
-   * @param _coordinates coordinates
-   */
-  function changeInfoNode(address _adrNode, string _hash, string _hashTag, string _ip, string _coordinates) external onlyAgent {
-    //assert(nodes[_adrNode].isSet);
-  }
-  
-  /**
-   * @dev 
-   * @param _adrNode The address of the node 
-   * @return amount deposit
-   */
-  function getDeposit(address _adrNode) public constant onlyAgent returns (uint256) {
-    //return nodes[_adrNode].deposit;
+  function changeNodeInfo(string _hash, uint32 _hashType, string _ip, string _coordinates) external {
+    require(!NodeStorage.getState(msg.sender));
+    NodeStorage.changeInfo(msg.sender, _hash, _hashType, _ip, _coordinates);
+    LogStorage.changeInfoNodeEvent(msg.sender, _hash, _hashType, _ip, _coordinates);
+  }  
+
+  function collectNode() external {
+    require(!NodeStorage.getState(msg.sender));
+    NodeStorage.collect(msg.sender);
+  }  
+
+  // make an insurance deposit ETH and PMT
+  // make sure, approve PMT to this contract first from address msg.sender
+  function makeDeposit(address _node, uint _value) external payable {
+    require(!NodeStorage.getState(_node));
+    require(msg.value > 0 && _value > 0);
+    require(address(NodeStorage).call.value(msg.value)(abi.encodeWithSignature("makeDeposit(address,address,uint)", _node, msg.sender, _value)));
+  }  
+
+  // make an insurance deposit ETH
+  function makeDepositETH(address _node) external payable {
+    require(!NodeStorage.getState(_node));
+    require(msg.value > 0);
+    require(address(NodeStorage).call.value(msg.value)(abi.encodeWithSignature("makeDepositETH(address)", _node)));
+  }    
+
+  // make an insurance deposit PMT
+  // make sure, approve PMT to this contract first from address msg.sender
+  function makeDepositPMT(address _node, uint _value) external payable {
+    require(!NodeStorage.getState(_node));
+    require(_value > 0);
+    require(address(NodeStorage).call.value(0)(abi.encodeWithSignature("makeDepositPMT(address,address,uint)", _node, msg.sender, _value)));
   }
 
-  /**
-   * @dev 
-   * @param _adrNode The address of the node 
-   * @return amount revenue
-   */
-  function getRevenue(address _adrNode) external constant onlyAgent returns (uint256) {
-    //return nodeRevenue[_adrNode];
+  // request a deposit refund
+  function requestRefund() external {
+    require(!NodeStorage.getState(msg.sender));
+    uint _refundTime;
+    (,,,,_refundTime,)=NodeStorage.getDeposit(msg.sender);
+    require(block.timestamp > _refundTime);
+    NodeStorage.requestRefund(msg.sender);
+    // ++ LogStorage
   }
-  
-  /**
-   * @dev 
-   * @param _adrNode The address of the node 
-   * @param _value deposit amount
-   */
-  function makeDeposit(address _adrNode, uint256 _value) public onlyAgent {
-    require(_value > 0);    
+
+  // request a deposit refund
+  function refund() external {
+    require(!NodeStorage.getState(msg.sender));
+    uint _refundTime;
+    (,,,,_refundTime,)=NodeStorage.getDeposit(msg.sender);
+    require(block.timestamp > _refundTime);
+    NodeStorage.refund(msg.sender);
+    // ++ LogStorage
   }
-  
-  /**
-   * @dev 
-   * @param _adrNode The address of the node 
-   * @param _value deposit amount
-   */
-  function takeDeposit(address _adrNode, uint256 _value) public onlyAgent {
-    //require(nodes[_adrNode].deposit >= _value);    
+
+  function setConfirmationNode(address _node, bool _state) external onlyAgent {
+    require(!NodeStorage.getState(_node));
+    NodeStorage.setConfirmation(_node, _state);
+    // ++ LogStorage     
   }
-  
-  /**
-   * @dev 
-   * @param _adrNode The address of the node 
-   */
-  function collectNode(address _adrNode) public onlyAgent{
-    
-  }
-  
-  /**
-   * @dev 
-   * @param _adrNode The address of the node 
-   * @param _value value
-   */
-  function confirmationNode(address _adrNode, bool _value) public onlyAgent{
-    //assert(nodes[_adrNode].isSet);    
+
+  function setDepositLimitsNode(address _node, uint _ETH, uint _PMT) external onlyAgent {
+    require(!NodeStorage.getState(_node));
+    require(_ETH > NodeStorage.getDefETH());
+    require(_PMT > NodeStorage.getDefPMT());
+    NodeStorage.setDepositLimits(_node, _ETH, _PMT);
   }
 }

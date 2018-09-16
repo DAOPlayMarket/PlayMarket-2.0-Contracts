@@ -9,10 +9,9 @@ import './appStorageI.sol';
 contract AppStorage is AppStorageI, AgentStorage {
 	
   struct _App {
-    uint16  hashType;   // default 0 - IPFS
-    uint16  appType;    // default 0 - android application
-    uint32  store;      // default 1
-    uint176 price;      // price in virtual units (PMC)
+    uint32  hashType;   // default 0 - IPFS
+    uint32  appType;    // default 0 - android application
+    uint32  store;      // default 1    
     bool publish;       // the developer decides whether to publish or not
     bool confirmation;  // decides platform, after verification (Nodes and mobile application display only approved and published Apps)
     address developer;  // link to developer
@@ -20,7 +19,7 @@ contract AppStorage is AppStorageI, AgentStorage {
   }
 
   struct _AppICO {    
-    uint16 hashType;    // default 0 - IPFS
+    uint32 hashType;    // default 0 - IPFS
     bool confirmation;  // decides platform, after verification (Nodes and mobile application display only approved and published Apps)
     string hash;        // hash of content in storage system
   }
@@ -32,17 +31,16 @@ contract AppStorage is AppStorageI, AgentStorage {
   mapping (uint => _AppICO) private AppsICO;
 
   // array of Applications Objects
-  mapping (uint => mapping (uint => uint176)) private AppsOBJ; // AppsOBJ[_app][_obj] = price;
+  mapping (uint => mapping (uint => uint)) private AppsOBJ; // AppsOBJ[_app][_obj] = price; (in virtual units (PMC))
 
   // array of purchases users in Application  
   mapping (uint => mapping (address => mapping (uint => bool))) private AppsPurchases; // AppsPurchases[_app][_user][_obj] = true/false;
 
-  function addApp(string _hash, uint16 _hashType, bool _publish, uint176 _price, address _dev, uint16 _appType, uint32 _store) external onlyAgentStore(_store) returns (uint256) {
+  function addApp(uint32 _hashType, uint32 _appType, uint32 _store, uint _price, bool _publish, address _dev, string _hash) external onlyAgentStore(_store) returns (uint) {
     Apps.push(_App({
       hashType: _hashType,
       appType: _appType,
-      store: Agents[msg.sender].store,
-      price: _price,
+      store: _store,      
       publish: _publish,
       confirmation: false,
       developer: _dev,
@@ -54,19 +52,19 @@ contract AppStorage is AppStorageI, AgentStorage {
     return Apps.length-1;
   }
 
-  function addAppICO(uint _app, string _hash, uint16 _hashType) external onlyAgentStore(Apps[_app].store) {
+  function addAppICO(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
     AppsICO[_app].hash =_hash;
     AppsICO[_app].hashType = _hashType;
     AppsICO[_app].confirmation = false;
   }
 
-  function changeHash(uint _app,  string _hash, uint16 _hashType) external onlyAgentStore(Apps[_app].store) {
+  function changeHash(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
     Apps[_app].hash = _hash;
     Apps[_app].hashType = _hashType;
     Apps[_app].confirmation = false;
   }
 
-  function changeHashICO(uint _app, string _hash, uint16 _hashType) external onlyAgentStore(Apps[_app].store) {
+  function changeHashICO(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
     AppsICO[_app].hash =_hash;
     AppsICO[_app].hashType =_hashType;
     AppsICO[_app].confirmation = false;
@@ -80,7 +78,7 @@ contract AppStorage is AppStorageI, AgentStorage {
 
   // _obj = 0 - application
   // _state: true - buy, false - cancel buy
-  function buyObject(uint _app, address _user, uint _obj, bool _state, uint176 _price) external onlyAgentStore(Apps[_app].store) {
+  function buyObject(uint _app, address _user, uint _obj, bool _state, uint _price) external onlyAgentStore(Apps[_app].store) {
     require(AppsOBJ[_app][_obj] == _price);
     AppsPurchases[_app][_user][_obj] = _state;
   }
@@ -94,21 +92,21 @@ contract AppStorage is AppStorageI, AgentStorage {
   /************************************************************************* 
   // Apps getters
   **************************************************************************/
-  function getHashType(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint16) {
+  function getHashType(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint32) {
     return Apps[_app].hashType;
   }
 
-  function getAppType(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint16) {
+  function getAppType(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint32) {
     return Apps[_app].appType;
   }
 
   // return application price
-  function getPrice(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint176) {
-    return Apps[_app].price;
+  function getPrice(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint) {
+    return AppsOBJ[_app][0];
   }
 
   // return price object in application
-  function getPrice(uint _app, uint _obj) external view onlyAgentStore(Apps[_app].store) returns (uint176) {
+  function getPrice(uint _app, uint _obj) external view onlyAgentStore(Apps[_app].store) returns (uint) {
     return AppsOBJ[_app][_obj];
   }
 
@@ -129,7 +127,7 @@ contract AppStorage is AppStorageI, AgentStorage {
   }
 
   // AppsICO getters
-  function getHashTypeICO(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint16) {
+  function getHashTypeICO(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint32) {
     return AppsICO[_app].hashType;
   }
 
@@ -144,37 +142,37 @@ contract AppStorage is AppStorageI, AgentStorage {
   /************************************************************************* 
   // Apps setters
   **************************************************************************/
-  function setHashType(uint _app, uint16 _hashType) external onlyAgentStore(Apps[_app].store) {
+  function setHashType(uint _app, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
     Apps[_app].hashType = _hashType;
   }
 
-  function setAppType(uint _app, uint16 _appType) external onlyAgentStore(Apps[_app].store) {
+  function setAppType(uint _app, uint32 _appType) external onlyAgentStore(Apps[_app].store) {
     Apps[_app].appType = _appType;
   }
 
   // set application price
-  function setPrice(uint _app, uint176 _price) external onlyAgentStore(Apps[_app].store) {
-    Apps[_app].price = _price;
+  function setPrice(uint _app, uint _price) external onlyAgentStore(Apps[_app].store) {
+    AppsOBJ[_app][0] = _price;
   }
 
   // set price object in application
-  function setPrice(uint _app, uint _obj, uint176 _price) external onlyAgentStore(Apps[_app].store) {
+  function setPrice(uint _app, uint _obj, uint _price) external onlyAgentStore(Apps[_app].store) {
     AppsOBJ[_app][_obj] = _price;
   }
 
   // set price object in application
   function setPrice(uint _app, 
-    uint _obj01, uint176 _price01, 
-    uint _obj02, uint176 _price02) external onlyAgentStore(Apps[_app].store) {
+    uint _obj01, uint _price01, 
+    uint _obj02, uint _price02) external onlyAgentStore(Apps[_app].store) {
     AppsOBJ[_app][_obj01] = _price01;
     AppsOBJ[_app][_obj02] = _price02;    
   }  
 
   // set price object in application
   function setPrice(uint _app, 
-    uint _obj01, uint176 _price01, 
-    uint _obj02, uint176 _price02, 
-    uint _obj03, uint176 _price03) external onlyAgentStore(Apps[_app].store) {
+    uint _obj01, uint _price01, 
+    uint _obj02, uint _price02, 
+    uint _obj03, uint _price03) external onlyAgentStore(Apps[_app].store) {
     AppsOBJ[_app][_obj01] = _price01;
     AppsOBJ[_app][_obj02] = _price02;
     AppsOBJ[_app][_obj03] = _price03;    
@@ -182,10 +180,10 @@ contract AppStorage is AppStorageI, AgentStorage {
 
   // set price object in application
   function setPrice(uint _app, 
-    uint _obj01, uint176 _price01, 
-    uint _obj02, uint176 _price02, 
-    uint _obj03, uint176 _price03, 
-    uint _obj04, uint176 _price04) external onlyAgentStore(Apps[_app].store) {
+    uint _obj01, uint _price01, 
+    uint _obj02, uint _price02, 
+    uint _obj03, uint _price03, 
+    uint _obj04, uint _price04) external onlyAgentStore(Apps[_app].store) {
     AppsOBJ[_app][_obj01] = _price01;
     AppsOBJ[_app][_obj02] = _price02;
     AppsOBJ[_app][_obj03] = _price03;
@@ -194,11 +192,11 @@ contract AppStorage is AppStorageI, AgentStorage {
 
   // set price object in application
   function setPrice(uint _app, 
-    uint _obj01, uint176 _price01, 
-    uint _obj02, uint176 _price02, 
-    uint _obj03, uint176 _price03, 
-    uint _obj04, uint176 _price04, 
-    uint _obj05, uint176 _price05) external onlyAgentStore(Apps[_app].store) {
+    uint _obj01, uint _price01, 
+    uint _obj02, uint _price02, 
+    uint _obj03, uint _price03, 
+    uint _obj04, uint _price04, 
+    uint _obj05, uint _price05) external onlyAgentStore(Apps[_app].store) {
     AppsOBJ[_app][_obj01] = _price01;
     AppsOBJ[_app][_obj02] = _price02;
     AppsOBJ[_app][_obj03] = _price03;
@@ -223,7 +221,7 @@ contract AppStorage is AppStorageI, AgentStorage {
   }
 
   // AppsICO setters
-  function setHashTypeICO(uint _app, uint16 _hashType) external onlyAgentStore(Apps[_app].store) {
+  function setHashTypeICO(uint _app, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
     AppsICO[_app].hashType = _hashType;
   }
 

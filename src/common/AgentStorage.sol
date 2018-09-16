@@ -32,6 +32,11 @@ contract AgentStorage is Ownable {
     assert(!DevsStoreBlocked[_dev][Agents[msg.sender].store]); 
     _;
   }
+
+  modifier onlyAgentLog() {
+    assert(Agents[msg.sender].state);
+    _;
+  }
   
   function updateAgentStorage(address _agent, uint32 _store, bool _state) public onlyOwner {
     assert(_agent != address(0));

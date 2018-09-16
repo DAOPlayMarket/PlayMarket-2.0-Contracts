@@ -3,171 +3,69 @@ pragma solidity ^0.4.24;
 import '../../common/Agent.sol';
 import '../../common/SafeMath.sol';
 import '../storage/appStorageI.sol';
+import '../storage/logStorageI.sol';
 
 /**
- * @title Application contract - basic contract for working with applications
+ * @title Application contract - basic contract for working with applications storage
  */
-contract Application is Agent, SafeMath {
+contract App is Agent, SafeMath {
 
   AppStorageI public AppStorage;
+  LogStorageI public LogStorage;
 
-  event setStorageContractEvent(address _contract);
+  event setAppStorageContractEvent(address _contract);
 
-  function setStorageContract(address _contract) external onlyOwner {
+  // link to app storage
+  function setAppStorageContract(address _contract) public onlyOwner {
     AppStorage = AppStorageI(_contract);
-    emit setStorageContractEvent(_contract);
+    emit setAppStorageContractEvent(_contract);
   }
-	
-  /**
-   * @dev 
-   * @param _hash hash
-   * @param _hashTag hashTag
-   * @param _publish publish
-   * @param _price price App
-   * @param _dev Developer address
-   * @return number of current applications
-   */
-  function registrationApplication(string _hash, string _hashTag, bool _publish, uint256 _price, address _dev, uint _kind) external onlyAgent returns (uint256) {    
-    //return AppStorage.addApp(_dev, _hash, _hashTag, _price, _kind, _publish, false);
+
+  // link to log storage
+  function setAppLogStorageContract(address _contract) public onlyOwner {
+    LogStorage = LogStorageI(_contract);    
+  }  
+
+  function setAppConfirmation(uint _app, bool _state) external onlyAgent {
+    AppStorage.setConfirmation(_app, _state);
+    LogStorage.setConfirmationAppEvent(_app, _state, msg.sender); // msg.sender - moderator
   }
   
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _status true/false
-   */
-  function confirmationApplication(uint _app, bool _status) external onlyAgent {
-    //AppStorage.confirmApp(_app, _status);
-  }
-
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _hash hash
-   * @param _hashTag hashTag
-   * @param _dev Developer address
-   */
-  function registrationApplicationICO(uint _app, string _hash, uint16 _hashTag, address _dev) external onlyAgent {
-    require(checkDeveloper(_app,_dev));
-    AppStorage.addAppICO(_app, _hash, _hashTag);
-  }
-	
-   /**
-   * @dev 
-   * @param _app ID application
-   * @param _hash hash
-   * @param _hashTag hashTag
-   * @param _dev Developer address
-   */
-  function changeHash(uint _app, string _hash, uint16 _hashTag, address _dev) external onlyAgent {  
-    require(checkDeveloper(_app,_dev));
-    AppStorage.changeHash(_app, _hash, _hashTag);
+  // after change hash application - confirmation sets to false
+  function changeHash(uint _app, string _hash, uint32 _hashType) external {  
+    require(AppStorage.getDeveloper(_app) == msg.sender);
+    AppStorage.changeHash(_app, _hash, _hashType);
+    LogStorage.changeHashEvent(_app, _hash, _hashType);
   }
   
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _publish publish
-   * @param _dev Developer address
-   */
-  function changePublish(uint _app, bool _publish, address _dev) external onlyAgent {
-    require(checkDeveloper(_app,_dev));
-    //AppStorage.changePublish(_app, _publish);
+  function changePublish(uint _app, bool _publish) external {
+    require(AppStorage.getDeveloper(_app) == msg.sender);
+    AppStorage.setPublish(_app, _publish);
+    LogStorage.changePublishEvent(_app, _publish);
   }
 
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _price new price application
-   * @param _dev Developer address
-   */
-  function changePrice(uint _app, uint256 _price, address _dev) external onlyAgent {
-    require(checkDeveloper(_app,_dev));
-    //AppStorage.changePrice(_app, _price);
+  function changePrice(uint _app, uint _price) external {
+    require(AppStorage.getDeveloper(_app) == msg.sender);
+    AppStorage.setPrice(_app, _price);
+    LogStorage.changePriceEvent(_app, _price);
   }
   
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _hash hash
-   * @param _hashTag hashTag
-   * @param _dev Developer address
-   */
-  function changeIcoHash(uint _app, string _hash, uint16 _hashTag, address _dev) external onlyAgent {
-    require(checkDeveloper(_app,_dev));
-    //AppStorage.changeIcoHash(_app, _hash, _hashTag);
+  function changeHashICO(uint _app, string _hash, uint32 _hashType) external onlyAgent {
+    require(AppStorage.getDeveloper(_app) == msg.sender);
+    AppStorage.changeHashICO(_app, _hash, _hashType);
+    LogStorage.changeHashICOEvent(_app, _hash, _hashType);
   }
 
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _dev Developer address
-   * @return boolean
-   */  
-  function checkDeveloper(uint _app, address _dev) private view returns (bool success) {
-      require(AppStorage.getDeveloper(_app) == _dev);
-      return true;
-  }
-
-  /**
-   * @dev 
-   * @param _app ID application
-   * @return developer address
-   */  
-  function getDeveloper(uint _app) external onlyAgent view returns (address) {
+  function getDeveloper(uint _app) external view returns (address) {
     return AppStorage.getDeveloper(_app);
   }
 
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _price price application
-   * @return boolean
-   */  
-  function checkSum(uint _app, uint256 _price) private view returns (bool success) {
-      require(AppStorage.getPrice(_app) == _price);
-      return true;
+  // check application buy
+  function checkBuy(uint _app, address _user) external view returns (bool success) {
+    return AppStorage.checkBuy(_app, _user, 0);
   }
 
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _user user address
-   * @param _price price application in virtual units (PMC)
-   */  
-  function buyApp(uint _app, address _user, uint _price) external onlyAgent {
-    require(checkSum(_app,_price));
-    AppStorage.buyObject(_app, _user, 0, true);
-  }
-
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _user user address
-   * @param _obj ID object in application
-   */  
-  function buyObject(uint _app, address _user, uint _obj, bool _state) external onlyAgent {
-    AppStorage.buyObject(_app, _user, _obj, _state);
-  }
-
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _user user address
-   * @param _obj ID object in application
-   * @param _price price of object in application
-   */  
-  function buyObject(uint _app, address _user, uint _obj, bool _state, uint _price) external onlyAgent {
-    AppStorage.buyObject(_app, _user, _obj, _state);
-  }
-
-  /**
-   * @dev 
-   * @param _app ID application
-   * @param _user user address
-   * @param _user _obj ID object (0 - means application)
-   * @return boolean
-   */
+  // check objects buy
   function checkBuy(uint _app, address _user, uint _obj) external view returns (bool success) {
     return AppStorage.checkBuy(_app, _user, _obj);
   }
