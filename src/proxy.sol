@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
- import '../common/Agent.sol';
+ import './common/Agent.sol';
  
  contract Proxy is Agent {
      struct Version {
