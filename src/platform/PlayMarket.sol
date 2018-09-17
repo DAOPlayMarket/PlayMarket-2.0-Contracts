@@ -6,22 +6,21 @@ import './common/app.sol';
 import './common/dev.sol';
 import './common/log.sol';
 import './common/node.sol';
-import '../tokensale/tokensale.sol';
+import './ICO/ICOListI.sol';
 
 /**
  * @title PlayMarket contract - basic contract DAO PlayMarket 2.0
  */
 contract PlayMarket is App, Dev, Log, Node {
   
-  TokenSale public ICOContract;
-  
+  ICOListI public ICOList;  
   LogStorageI public LogStorage;
   
   uint32 public store = 1;
   uint32 public percDev = 99;
   uint32 public percNode = 1;
   
-  event setICOContractEvent(address _ICO);  
+  event setICOListEvent(address _ICO);  
   
   constructor (address _app, address _dev, address _node, address _ICO, address _log) public {
     require(_app  != address(0));
@@ -122,31 +121,9 @@ contract PlayMarket is App, Dev, Log, Node {
   function addAppICO(uint _app, string _hash, uint32 _hashTag, address _dev) external onlyAgent {
     //require(checkDeveloper(_app,_dev));
     AppStorage.addAppICO(_app, _hash, _hashTag);
+    //...
   }
   
-  function setICOContract(address _ICOContract) public onlyOwner {
-    ICOContract = TokenSale(_ICOContract);
-    emit setICOContractEvent(_ICOContract);
-  }
-  
-  // ICO ...
-  function registrationApplicationICO(uint _app, string _hash, string _hashTag) public {
-    //require(DeveloperContract.checkConfirmation(msg.sender));
-    //ApplicationContract.registrationApplicationICO(_app, _hash, _hashTag, msg.sender);
-    //LogStorage.registrationApplicationICOEvent(_app, _hash, _hashTag);
-  }   
-
-  function setRelease(address _adrDev, uint _app, bool _release ) public onlyOwner {
-    address newContract  = ICOContract.setRelease(_adrDev, _app, _release);
-    LogStorage.releaseICOEvent(_adrDev, _app, _release, newContract);
-  }
-  
-  function getTokensContract(string _name, string _symbol, address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _app) public {
-    //address adrDev = ApplicationContract.getDeveloper(_app);
-    //require(msg.sender == adrDev);
-    ICOContract.getTokensContract(_name, _symbol, _multisigWallet, _startsAt, _totalInUSD, _app, msg.sender);
-    LogStorage.newContractEvent(_name, _symbol, msg.sender, _app);
-  } 
 
   /************************************************************************* 
   // default params setters (onlyOwner => DAO)

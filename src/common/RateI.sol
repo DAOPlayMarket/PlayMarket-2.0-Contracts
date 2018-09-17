@@ -1,8 +1,5 @@
 pragma solidity ^0.4.24;
 
-import './Ownable.sol';
-import './Agent.sol';
-
 /**
  * @title RateContract Interface
  * @dev 

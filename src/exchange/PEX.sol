@@ -50,7 +50,7 @@ contract PEX is SafeMath, Agent {
         accountTypes[user_] = type_;
     }
 
-    function getAccountType(address user_) public view returns(uint256) {
+    function getAccountType(address user_) external view returns(uint256) {
         return accountTypes[user_];
     }
   
@@ -58,11 +58,11 @@ contract PEX is SafeMath, Agent {
         feeTypes[type_] = Fee(feeMake_,feeTake_);
     }
     
-    function getFeeMake(uint256 type_ ) public view returns(uint256) {
+    function getFeeMake(uint256 type_ ) external view returns(uint256) {
         return (feeTypes[type_].feeMake);
     }
     
-    function getFeeTake(uint256 type_ ) public view returns(uint256) {
+    function getFeeTake(uint256 type_ ) external view returns(uint256) {
         return (feeTypes[type_].feeTake);
     }
     
@@ -161,8 +161,8 @@ contract PEX is SafeMath, Agent {
     }
 
     function tradeBalances(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address user, uint amount) private {
-        uint feeMakeXfer = safeMul(amount, getFeeMake(getAccountType(user))) / (10**18);
-        uint feeTakeXfer = safeMul(amount, getFeeTake(getAccountType(msg.sender))) / (10**18);
+        uint feeMakeXfer = safeMul(amount, feeTypes[accountTypes[user]].feeMake) / (10**18);
+        uint feeTakeXfer = safeMul(amount, feeTypes[accountTypes[msg.sender]].feeTake) / (10**18);
         tokens[tokenBuy][msg.sender] = safeSub(tokens[tokenBuy][msg.sender], safeAdd(amount, feeTakeXfer));
         tokens[tokenBuy][user] = safeAdd(tokens[tokenBuy][user], safeSub(amount, feeMakeXfer));
         tokens[tokenBuy][feeAccount] = safeAdd(tokens[tokenBuy][feeAccount], safeAdd(feeMakeXfer, feeTakeXfer));

@@ -19,6 +19,11 @@ contract AgentStorage is Ownable {
     Agents[msg.sender] = _Agent(true, 1);
   }
 
+  modifier onlyAgent() {
+    assert(Agents[msg.sender].state);
+    _;
+  }
+
   modifier onlyAgentStore(uint32 _store) {
     assert(Agents[msg.sender].state);
     assert(Agents[msg.sender].store == _store);
