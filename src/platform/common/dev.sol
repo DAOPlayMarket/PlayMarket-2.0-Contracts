@@ -10,7 +10,6 @@ import '../storage/logStorageI.sol';
  */
 contract Dev is Agent, SafeMath {
   
-  bool autoConfirm = true;
   int defRating = 0;
   uint32 defStore = 1;
 
@@ -64,10 +63,7 @@ contract Dev is Agent, SafeMath {
   /************************************************************************* 
   // default params setters (onlyOwner => DAO)
   **************************************************************************/ 
-  function changeAutoConfirm(bool _autoConfirm) public onlyOwner {
-    autoConfirm = _autoConfirm;
-  }
-  
+
   function changeDefRating(int _defRating) public onlyOwner {
     defRating = _defRating;
   }
