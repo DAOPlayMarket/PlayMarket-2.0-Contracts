@@ -65,7 +65,6 @@ contract LogStorage is LogStorageI, AgentStorage {
     emit BuyAppEvent(Agents[msg.sender].store, _user, _dev, _app, _node, _price);
   }
   
-
   /** 
   ** Applications ICO events 
   **/

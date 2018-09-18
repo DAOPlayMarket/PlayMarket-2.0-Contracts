@@ -42,7 +42,7 @@ contract PlayMarket is App, Dev, Log, Node {
   // add/register new application
   function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, string _hash) external returns (uint) {
     uint app = AppStorage.addApp(_hashType, _appType, store, _price, _publish, msg.sender, _hash);
-    LogStorage.addAppEvent(app, _hashType, _appType, store, _price, _publish, msg.sender, _hash);
+    LogStorage.addAppEvent(app, _hashType, _appType, _price, _publish, msg.sender, _hash);
     return app;
   }
 
@@ -51,7 +51,7 @@ contract PlayMarket is App, Dev, Log, Node {
     
     require(!AppStorage.checkBuy(_app, msg.sender, 0));
     address _dev = AppStorage.getDeveloper(_app);
-    require(DevStorage.getConfirmation(_dev));
+    require(!DevStorage.getStoreBlocked(_dev));
 
     require(address(NodeStorage).call.value(safePerc(msg.value, percNode))(abi.encodeWithSignature("buyObject(address)", _node)));
     require(address(DevStorage).call.value(safePerc(msg.value, percDev))(abi.encodeWithSignature("buyObject(address)", _dev)));
@@ -65,7 +65,7 @@ contract PlayMarket is App, Dev, Log, Node {
     
     require(!AppStorage.checkBuy(_app, msg.sender, 0));
     address _dev = AppStorage.getDeveloper(_app);
-    require(DevStorage.getConfirmation(_dev));
+    require(!DevStorage.getStoreBlocked(_dev));
 
     AppStorage.buyObject(_app, msg.sender, 0, true, _price);
     require(address(NodeStorage).call.value(safePerc(msg.value, percNode))(abi.encodeWithSignature("buyObject(address)", _node)));
@@ -79,7 +79,7 @@ contract PlayMarket is App, Dev, Log, Node {
     
     require(!AppStorage.checkBuy(_app, msg.sender, _obj));
     address _dev = AppStorage.getDeveloper(_app);
-    require(DevStorage.getConfirmation(_dev));
+    require(!DevStorage.getStoreBlocked(_dev));
 
     require(address(NodeStorage).call.value(safePerc(msg.value, percNode))(abi.encodeWithSignature("buyObject(address)", _node)));
     require(address(DevStorage).call.value(safePerc(msg.value, percDev))(abi.encodeWithSignature("buyObject(address)", _dev)));
@@ -93,7 +93,7 @@ contract PlayMarket is App, Dev, Log, Node {
     
     require(!AppStorage.checkBuy(_app, msg.sender, _obj));
     address _dev = AppStorage.getDeveloper(_app);
-    require(DevStorage.getConfirmation(_dev));
+    require(!DevStorage.getStoreBlocked(_dev));
 
     AppStorage.buyObject(_app, msg.sender, _obj, true, _price);
     require(address(NodeStorage).call.value(safePerc(msg.value, percNode))(abi.encodeWithSignature("buyObject(address)", _node)));

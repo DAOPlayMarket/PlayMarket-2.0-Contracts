@@ -4,6 +4,7 @@ import '../../common/SafeMath.sol';
 import '../../common/AgentStorage.sol';
 import '../../common/RateI.sol';
 import '../../exchange/PEXI.sol';
+import './ICOListI.sol';
 import './CrowdSaleI.sol';
 import './AppTokenBuildI.sol';
 import './CrowdSaleBuildI.sol';
@@ -11,7 +12,7 @@ import './CrowdSaleBuildI.sol';
 /**
  * @title List of ICO contract
  */
-contract ICOList is AgentStorage, SafeMath {
+contract ICOList is ICOListI, AgentStorage, SafeMath {
   
   struct _ICO {
     string name;
@@ -34,28 +35,52 @@ contract ICOList is AgentStorage, SafeMath {
   mapping (uint => address) public CrowdSales;
   
   event setPEXContractEvent(address _contract);
+  event setAppTokenContractEvent(address _contract);
+  event setCrowdSaleContractEvent(address _contract);
   
   constructor (address _PMFund, address _PEXContract) public {
     PMFund      = _PMFund;
     PEXContract = PEXI(_PEXContract);
   }
-  
+
   /**
-   * @dev CreateICO 
+   * @dev Create CrowdSale contract
    * @param _CSID - CrowdSale ID in array CrowdSales;
-   * @param _ATID - AppToken ID in array AppTokens;
    */
-  function CreateICO(string _name, string _symbol, uint _decimals, address _multisigWallet, uint _startsAt, uint _duration, uint _totalInUSD, uint _app, address _dev, uint _CSID, uint _ATID) public onlyAgent returns (address) {
-    require(_CSID > 0 && _ATID > 0);
+  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _CSID, uint _app, address _dev) external onlyAgent returns (address) {
+    require(_CSID > 0);
+    require(CrowdSales[_CSID] != address(0));
     require(_multisigWallet != address(0));
     require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
 
     // create CrowdSale contract _CSID type
     address CrowdSale = CrowdSaleBuildI(CrowdSales[_CSID]).CreateCrowdSaleContract(_multisigWallet, _startsAt, _totalInUSD, _dev);
+
+    return CrowdSale;
+  }
+
+  /**
+   * @dev Create AppToken contract   
+   * @param _ATID - AppToken ID in array AppTokens;
+   */
+  function CreateAppToken(string _name, string _symbol, address _crowdsale, uint _ATID, uint _app, address _dev) external onlyAgent returns (address) {
+    require(_ATID > 0);
+    require(AppTokens[_ATID] != address(0));    
+    require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
+
     // create AppToken contract _ATID type and set _CrowdSale as owner
-    address AppToken = AppTokenBuildI(CrowdSales[_ATID]).CreateAppTokenContract(_name, _symbol, CrowdSale, PMFund);
-    // link Token to CrowdSale    
-    CrowdSaleI(CrowdSale).setTokenContract(address(AppToken));
+    address AppToken = AppTokenBuildI(AppTokens[_ATID]).CreateAppTokenContract(_name, _symbol, _crowdsale, PMFund);
+
+    return AppToken;
+  }
+  
+  /**
+   * @dev CreateICO 
+   */
+  function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _totalInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external onlyAgent {
+    require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
+
+    CrowdSaleI(_crowdsale).setTokenContract(address(_apptoken));
 
     ICOs[Agents[msg.sender].store][_dev][_app] = _ICO({
         name: _name,
@@ -64,12 +89,10 @@ contract ICOList is AgentStorage, SafeMath {
         startsAt: _startsAt,
         duration: _duration,
         totalInUSD: _totalInUSD,
-        token: AppToken,
-        crowdsale: CrowdSale,
+        token: _apptoken,
+        crowdsale: _crowdsale,
         confirmation: false
     });
-
-    return CrowdSale;
   }
 
   /**
@@ -93,7 +116,19 @@ contract ICOList is AgentStorage, SafeMath {
         confirmation: false
     });    
   }  
+
+  function setAppTokenContract(uint _ATID, address _contract) external onlyOwner {
+    require(AppTokens[_ATID] == address(0));
+    AppTokens[_ATID] = _contract;
+    emit setAppTokenContractEvent(_contract);
+  }
   
+  function setCrowdSaleContract(uint _CSID, address _contract) external onlyOwner {
+    require(CrowdSales[_CSID] == address(0));
+    CrowdSales[_CSID] = _contract;
+    emit setCrowdSaleContractEvent(_contract);
+  }
+
   function setPMFund(address _PMFund) external onlyOwner {
     PMFund = _PMFund;
   }
