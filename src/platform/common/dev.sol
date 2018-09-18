@@ -29,7 +29,7 @@ contract Dev is Agent, SafeMath {
     LogStorage = LogStorageI(_contract);    
   }  
 
-  function addDev(bytes32 _name, bytes32 _info, bytes27 _reserv ) public {
+  function addDev(bytes32 _name, bytes32 _info, bytes27 _reserv) public {
     require(!DevStorage.getState(msg.sender));
     DevStorage.addDev(msg.sender, _name, _info, _reserv, defStore);
     DevStorage.setRating(msg.sender, defRating);
