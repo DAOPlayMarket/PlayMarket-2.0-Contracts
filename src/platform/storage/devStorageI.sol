@@ -5,7 +5,7 @@ pragma solidity ^0.4.24;
  */
 interface DevStorageI {
 
-  function addDev(address _dev, bytes32 _name, bytes32 _info, bytes27 _reserv, uint32 _store) external;  
+  function addDev(address _dev, bytes32 _name, bytes32 _info, bytes27 _reserv) external;  
   function changeName(address _dev, bytes32 _name, bytes32 _info) external;
   // _obj = 0 - application
   // _value: developer revenue

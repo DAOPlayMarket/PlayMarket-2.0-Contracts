@@ -11,7 +11,6 @@ import '../storage/logStorageI.sol';
 contract Dev is Agent, SafeMath {
   
   int defRating = 0;
-  uint32 defStore = 1;
 
   DevStorageI public DevStorage;
   LogStorageI public LogStorage;
@@ -31,7 +30,7 @@ contract Dev is Agent, SafeMath {
 
   function addDev(bytes32 _name, bytes32 _info, bytes27 _reserv) public {
     require(!DevStorage.getState(msg.sender));
-    DevStorage.addDev(msg.sender, _name, _info, _reserv, defStore);
+    DevStorage.addDev(msg.sender, _name, _info, _reserv);
     DevStorage.setRating(msg.sender, defRating);
     LogStorage.addDevEvent(msg.sender, _name, _info);
   }
@@ -51,7 +50,7 @@ contract Dev is Agent, SafeMath {
   function setStoreBlockedDev(address _dev, bool _state) external onlyAgent {
     require(!DevStorage.getState(_dev));
     DevStorage.setStoreBlocked(_dev, _state);
-    LogStorage.setConfirmationDevEvent(_dev, _state);
+    LogStorage.setStoreBlockedDevEvent(_dev, _state);
   }
 
   function changeRatingDev(address _dev, int _rating) public onlyAgent {

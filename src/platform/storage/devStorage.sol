@@ -27,13 +27,13 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     _;
   }
   
-  function addDev(address _dev, bytes32 _name, bytes32 _info, bytes27 _reserv, uint32 _store) external onlyAgentStore(_store) {
+  function addDev(address _dev, bytes32 _name, bytes32 _info, bytes27 _reserv) external onlyAgentDev() {
     require(!Devs[_dev].state);
     Devs[_dev]=_Dev({
       name: _name,
       info: _info,
       state: true,
-      store: _store,
+      store: Agents[msg.sender].store,
       reserv: _reserv
     });
   }

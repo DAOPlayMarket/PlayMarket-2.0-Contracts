@@ -34,8 +34,8 @@ contract LogStorage is LogStorageI, AgentStorage {
   event FeedbackRatingEvent(uint32 indexed store, address voter, uint indexed _app, uint vote, string description, bytes32 txIndex, uint blocktimestamp);
   
   //ICO events 
-  event releaseICOEvent(address adrDev, uint _app, bool release, address ICO);
-  event newContractEvent(string name, string symbol, address adrDev, uint _app);
+  //event releaseICOEvent(address adrDev, uint _app, bool release, address ICO);
+  //event newContractEvent(string name, string symbol, address adrDev, uint _app);
   
 
   /** 
