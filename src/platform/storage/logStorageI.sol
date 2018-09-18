@@ -21,6 +21,7 @@ interface LogStorageI {
   function addDevEvent(address _dev, bytes32 name, bytes32 info) external;
   function changeNameDevEvent(address _dev, bytes32 name, bytes32 info) external;
   function setStoreBlockedDevEvent(address _dev, bool _state) external;
+  function setRatingDevEvent(address _dev, int _rating) external;
   
   //Node events  
   function addNodeEvent(address _node, uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external;

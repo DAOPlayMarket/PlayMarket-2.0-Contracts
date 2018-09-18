@@ -28,7 +28,7 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
   }
   
   function addDev(address _dev, bytes32 _name, bytes32 _info, bytes27 _reserv) external onlyAgentDev() {
-    require(!Devs[_dev].state);
+    assert(!Devs[_dev].state);
     Devs[_dev]=_Dev({
       name: _name,
       info: _info,
@@ -39,22 +39,22 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
   }
 
   function changeName(address _dev, bytes32 _name, bytes32 _info) external onlyAgentDev() CheckBlock(_dev) {
-    require(Devs[_dev].state);
+    assert(Devs[_dev].state);
     Devs[_dev].name = _name;
     Devs[_dev].info = _info;
   }
 
   function buyObject(address _dev) payable external onlyAgentDev() CheckBlock(_dev){
-    require(Devs[_dev].state);
-    require(msg.value > 0);
+    assert(Devs[_dev].state);
+    assert(msg.value > 0);
     DevsRevenue[_dev] = safeAdd(DevsRevenue[_dev], msg.value);
   }
 
   // collect the accumulated amount
   function collect(address _dev) external onlyAgentDev() CheckBlock(_dev){
-    require(Devs[_dev].state);
+    assert(Devs[_dev].state);
     uint256 amount = DevsRevenue[_dev];
-    require(amount > 0);
+    assert(amount > 0);
     DevsRevenue[_dev] = 0;
     _dev.transfer(amount);
   }

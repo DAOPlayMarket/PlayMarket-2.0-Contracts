@@ -24,6 +24,7 @@ contract LogStorage is LogStorageI, AgentStorage {
   event AddDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _info);
   event ChangeNameDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _info);
   event SetStoreBlockedDevEvent(uint32 indexed _store, address indexed _dev, bool _state);
+  event SetRatingDevEvent(uint32 indexed _store, address indexed _dev, int _rating);
   
   //Node events  
   event AddNodeEvent(uint32 indexed _store, address indexed _node, uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates);
@@ -93,7 +94,9 @@ contract LogStorage is LogStorageI, AgentStorage {
     emit SetStoreBlockedDevEvent(Agents[msg.sender].store, _dev, _state);
   }
   
-
+  function setRatingDevEvent(address _dev, int _rating) external onlyAgentLog {
+    emit SetRatingDevEvent(Agents[msg.sender].store, _dev, _rating);
+  }
   /** 
   ** Nodes events 
   **/  

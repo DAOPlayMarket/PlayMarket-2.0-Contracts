@@ -36,7 +36,7 @@ contract Dev is Agent, SafeMath {
   }
 	
   function changeNameDev(bytes32 _name, bytes32 _info) public {
-    require(!DevStorage.getState(msg.sender));
+    require(DevStorage.getState(msg.sender));
     DevStorage.changeName(msg.sender,_name, _info);
     LogStorage.changeNameDevEvent(msg.sender, _name, _info);
   }
@@ -48,15 +48,15 @@ contract Dev is Agent, SafeMath {
   }
 
   function setStoreBlockedDev(address _dev, bool _state) external onlyAgent {
-    require(!DevStorage.getState(_dev));
+    require(DevStorage.getState(_dev));
     DevStorage.setStoreBlocked(_dev, _state);
     LogStorage.setStoreBlockedDevEvent(_dev, _state);
   }
 
-  function changeRatingDev(address _dev, int _rating) public onlyAgent {
-    require(!DevStorage.getState(_dev));
+  function setRatingDev(address _dev, int _rating) external onlyAgent {
+    require(DevStorage.getState(_dev));
     DevStorage.setRating(_dev, _rating);
-    if (_rating < 0) DevStorage.setStoreBlocked(msg.sender, false);
+    LogStorage.setRatingDevEvent(_dev, _rating);
   }
 
   /************************************************************************* 
