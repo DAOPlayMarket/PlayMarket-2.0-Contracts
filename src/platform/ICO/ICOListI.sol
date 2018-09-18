@@ -6,16 +6,29 @@ pragma solidity ^0.4.24;
 interface ICOListI {
   
   /**
-   * @dev CreateICO 
+   * @dev Create CrowdSale contract
    * @param _CSID - CrowdSale ID in array CrowdSales;
+   */
+  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _duration, uint _totalInUSD, uint _CSID, uint _app, address _dev) external returns (address);
+
+  /**
+   * @dev Create AppToken contract   
    * @param _ATID - AppToken ID in array AppTokens;
    */
-  function CreateICO(string _name, string _symbol, uint _decimals, address _multisigWallet, uint _startsAt, uint _duration, uint _totalInUSD, uint _app, address _dev, uint _CSID, uint _ATID) external returns (address);
+  function CreateAppToken(string _name, string _symbol, address _crowdsale, uint _ATID, uint _app, address _dev) external returns (address);
+  
+  /**
+   * @dev CreateICO 
+   */
+  function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _totalInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external;
 
   /**
    * @dev DeleteICO 
    */
   function DeleteICO(uint _app, address _dev) external;
+
+  function setAppTokenContract(uint _ATID, address _contract) external;
+  function setCrowdSaleContract(uint _CSID, address _contract) external;
   
   function setPMFund(address _PMFund) external;
   function setPEXContract(address _contract) external;
