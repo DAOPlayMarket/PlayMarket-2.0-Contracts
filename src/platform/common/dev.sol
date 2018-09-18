@@ -10,7 +10,7 @@ import '../storage/logStorageI.sol';
  */
 contract Dev is Agent, SafeMath {
   
-  int defRating = 0;
+  int public defRating = 0;
 
   DevStorageI public DevStorage;
   LogStorageI public LogStorage;
