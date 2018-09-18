@@ -98,32 +98,32 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
   // Devs setters
   **************************************************************************/
   function setName(address _dev, bytes32 _name) external onlyAgentDev() {
-    require(Devs[_dev].state);
+    //require(Devs[_dev].state);
     Devs[_dev].name = _name;
   }
 
   function setInfo(address _dev, bytes32 _info) external onlyAgentDev() {
-    require(Devs[_dev].state);
+    //require(Devs[_dev].state);
     Devs[_dev].info = _info;
   }
 
   function setStore(address _dev, uint32 _store) external onlyOwner {
-    require(Devs[_dev].state);
+    //require(Devs[_dev].state);
     Devs[_dev].store = _store;
   }
 
   function setReserv(address _dev, bytes27 _reserv) external onlyAgentDev() {
-    require(Devs[_dev].state);
+   //require(Devs[_dev].state);
     Devs[_dev].reserv = _reserv;
   }
   
   function setStoreBlocked(address _dev, bool _state) external onlyAgentDev() {
-    require(Devs[_dev].state);
+    //require(Devs[_dev].state);
     DevsStoreBlocked[Agents[msg.sender].store][_dev] = _state;
   }
 
   function setRating(address _dev, int _rating) external onlyAgentDev() {
-    require(Devs[_dev].state);
+    //require(Devs[_dev].state);
     DevsRating[Agents[msg.sender].store][_dev] = _rating;
   }
 }
