@@ -12,6 +12,7 @@ contract Dev is Agent, SafeMath {
   
   bool autoConfirm = true;
   int defRating = 0;
+  uint32 defStore = 1;
 
   DevStorageI public DevStorage;
   LogStorageI public LogStorage;
@@ -29,9 +30,9 @@ contract Dev is Agent, SafeMath {
     LogStorage = LogStorageI(_contract);    
   }  
 
-  function addDev(bytes32 _name, bytes32 _info, bytes26 _reserv) public {
+  function addDev(bytes32 _name, bytes32 _info, bytes27 _reserv ) public {
     require(!DevStorage.getState(msg.sender));
-    DevStorage.addDev(msg.sender, _name, _info, autoConfirm, _reserv);
+    DevStorage.addDev(msg.sender, _name, _info, _reserv, defStore);
     DevStorage.setRating(msg.sender, defRating);
     LogStorage.addDevEvent(msg.sender, _name, _info);
   }
@@ -48,16 +49,16 @@ contract Dev is Agent, SafeMath {
     DevStorage.collect(msg.sender);
   }
 
-  function setConfirmationDev(address _dev, bool _state) external onlyAgent {
+  function setStoreBlockedDev(address _dev, bool _state) external onlyAgent {
     require(!DevStorage.getState(_dev));
-    DevStorage.setConfirmation(_dev, _state);
+    DevStorage.setStoreBlocked(_dev, _state);
     LogStorage.setConfirmationDevEvent(_dev, _state);
   }
 
   function changeRatingDev(address _dev, int _rating) public onlyAgent {
     require(!DevStorage.getState(_dev));
     DevStorage.setRating(_dev, _rating);
-    if (_rating < 0) DevStorage.setConfirmation(msg.sender, false);
+    if (_rating < 0) DevStorage.setStoreBlocked(msg.sender, false);
   }
 
   /************************************************************************* 
