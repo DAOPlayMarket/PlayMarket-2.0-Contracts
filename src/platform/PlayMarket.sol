@@ -4,7 +4,6 @@ import '../common/Agent.sol';
 import '../common/SafeMath.sol';
 import './common/app.sol';
 import './common/dev.sol';
-//import './common/log.sol';
 import './common/node.sol';
 import './ICO/ICOListI.sol';
 
@@ -14,7 +13,6 @@ import './ICO/ICOListI.sol';
 contract PlayMarket is App, Dev, Node {
   
   ICOListI public ICOList;  
-  LogStorageI public LogStorage;
   
   uint32 public percDev = 99;
   uint32 public percNode = 1;
@@ -30,7 +28,7 @@ contract PlayMarket is App, Dev, Node {
     
     setAppStorageContract(_app);
     setDevStorageContract(_dev);
-    //setLogStorageContract(_log);
+    setLogStorageContract(_log);
     setNodeStorageContract(_node);    
   }
 

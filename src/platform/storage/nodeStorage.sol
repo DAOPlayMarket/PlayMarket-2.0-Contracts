@@ -93,7 +93,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   function makeDeposit(address _node, address _from, uint256 _value) payable external onlyAgentStore(Nodes[_node].store) {
     assert(Nodes[_node].state);
     assert(msg.value > 0 && _value > 0);
-    assert(!PMTContract.transferFrom(_from, this, _value));
+    assert(PMTContract.transferFrom(_from, this, _value));
     NodesDeposit[_node].ETH = safeAdd(NodesDeposit[_node].ETH, msg.value);
     NodesDeposit[_node].PMT = safeAdd(NodesDeposit[_node].PMT, _value);
   }
@@ -110,7 +110,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   function makeDepositPMT(address _node, address _from, uint256 _value) payable external onlyAgentStore(Nodes[_node].store) {
     assert(Nodes[_node].state);
     assert(_value > 0);
-    assert(!PMTContract.transferFrom(_from, this, _value));
+    assert(PMTContract.transferFrom(_from, this, _value));
     NodesDeposit[_node].PMT = safeAdd(NodesDeposit[_node].PMT, _value);
   }
 
