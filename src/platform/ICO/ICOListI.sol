@@ -9,7 +9,7 @@ interface ICOListI {
    * @dev Create CrowdSale contract
    * @param _CSID - CrowdSale ID in array CrowdSales;
    */
-  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _duration, uint _totalInUSD, uint _CSID, uint _app, address _dev) external returns (address);
+  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _CSID, uint _app, address _dev) external returns (address);  
 
   /**
    * @dev Create AppToken contract   
@@ -34,4 +34,6 @@ interface ICOListI {
   function setPEXContract(address _contract) external;
   // confirm ICO and add token to DAO PlayMarket 2.0 Exchange (DAOPEX)
   function setConfirmation(address _dev, uint _app, bool _state) external returns (address);
+
+  function updateAgentStorage(address _agent, uint32 _store, bool _state);
 }

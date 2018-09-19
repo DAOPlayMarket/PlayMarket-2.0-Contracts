@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+import '../../Base.sol';
 import '../../common/Agent.sol';
 import '../../common/SafeMath.sol';
 import '../storage/logStorageI.sol';
@@ -8,10 +9,9 @@ import '../storage/nodeStorageI.sol';
 /**
  * @title Node contract - basic contract for working with nodes
  */
-contract Node is Agent, SafeMath {
+contract Node is Agent, SafeMath, Base {
 
   NodeStorageI public NodeStorage;
-  LogStorageI  public LogStorage;
 
   event setStorageContractEvent(address _contract);
 
@@ -20,11 +20,6 @@ contract Node is Agent, SafeMath {
     NodeStorage = NodeStorageI(_contract);
     emit setStorageContractEvent(_contract);
   }
-
-  // link to log storage
-  function setNodeLogStorageContract(address _contract) public onlyOwner {
-    LogStorage = LogStorageI(_contract);    
-  }  
 
   function addNode(uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external {
     NodeStorage.addNode(msg.sender, _hashType, _reserv, _hash, _ip, _coordinates);

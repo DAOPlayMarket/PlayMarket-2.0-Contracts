@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+import '../../Base.sol';
 import '../../common/Agent.sol';
 import '../../common/SafeMath.sol';
 import '../storage/appStorageI.sol';
@@ -8,10 +9,9 @@ import '../storage/logStorageI.sol';
 /**
  * @title Application contract - basic contract for working with applications storage
  */
-contract App is Agent, SafeMath {
+contract App is Agent, SafeMath, Base {
 
   AppStorageI public AppStorage;
-  LogStorageI public LogStorage;
 
   event setAppStorageContractEvent(address _contract);
 
@@ -20,11 +20,6 @@ contract App is Agent, SafeMath {
     AppStorage = AppStorageI(_contract);
     emit setAppStorageContractEvent(_contract);
   }
-
-  // link to log storage
-  function setAppLogStorageContract(address _contract) public onlyOwner {
-    LogStorage = LogStorageI(_contract);    
-  }  
 
   function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, string _hash) external {
     uint app = AppStorage.addApp(_hashType, _appType, _price, _publish, msg.sender, _hash);

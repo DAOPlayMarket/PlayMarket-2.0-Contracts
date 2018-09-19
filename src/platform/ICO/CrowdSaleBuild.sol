@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import '../../common/Ownable.sol';
-import './crowdsale.sol';
+import './CrowdSale.sol';
 
 /**
  * @title CrowdSale build contract (for apps ICO)

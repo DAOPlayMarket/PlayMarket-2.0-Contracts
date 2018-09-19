@@ -11,6 +11,8 @@ import '../../exchange/PEXI.sol';
  */
 contract CrowdSale is Ownable, SafeMath {
 
+  bytes32 public version = "1.0.0";
+  
   uint public decimals;
   
   RateContractI public RateContract;

@@ -11,7 +11,7 @@ import './ICO/ICOListI.sol';
 /**
  * @title PlayMarket contract - basic contract DAO PlayMarket 2.0
  */
-contract PlayMarket is App, Dev,  Node {
+contract PlayMarket is App, Dev, Node {
   
   ICOListI public ICOList;  
   LogStorageI public LogStorage;

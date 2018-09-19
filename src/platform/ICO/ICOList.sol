@@ -115,7 +115,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
         crowdsale: address(0),
         confirmation: false
     });    
-  }  
+  }
 
   function setAppTokenContract(uint _ATID, address _contract) external onlyOwner {
     require(AppTokens[_ATID] == address(0));

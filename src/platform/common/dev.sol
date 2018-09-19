@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+import '../../Base.sol';
 import '../../common/Agent.sol';
 import '../../common/SafeMath.sol';
 import '../storage/devStorageI.sol';
@@ -8,12 +9,11 @@ import '../storage/logStorageI.sol';
 /**
  * @title Developer contract - basic contract for working with developers
  */
-contract Dev is Agent, SafeMath {
+contract Dev is Agent, SafeMath, Base {
   
   int public defRating = 0;
 
   DevStorageI public DevStorage;
-  LogStorageI public LogStorage;
 
   event setDevStorageContractEvent(address _contract);
 
@@ -23,11 +23,6 @@ contract Dev is Agent, SafeMath {
     emit setDevStorageContractEvent(_contract);
   }
   
-  // link to log storage
-  function setDevLogStorageContract(address _contract) public onlyOwner {
-    LogStorage = LogStorageI(_contract);    
-  }  
-
   function addDev(bytes32 _name, bytes32 _info, bytes27 _reserv) public {
     require(!DevStorage.getState(msg.sender));
     DevStorage.addDev(msg.sender, _name, _info, _reserv);
