@@ -8,14 +8,14 @@ interface LogStorageI {
   //App events 
   function addAppEvent(uint _app, uint32 _hashType, uint32 _appType, uint _price, bool _publish, address _dev, string _hash) external;
   function setConfirmationAppEvent(uint _app, bool _state, address _moderator) external;
-  function changeHashEvent(uint _app, string _hash, uint32 _hashType) external;
+  function changeHashAppEvent(uint _app, string _hash, uint32 _hashType) external;
   function changePublishEvent(uint _app, bool _publish) external;
-  function changePriceEvent(uint _app, uint _price) external;
-  function buyAppEvent(address _user, address _dev, uint _app, address _node, uint _price) external;
+  function setPriceEvent(uint _app, uint _obj, uint _price) external;
+  function buyAppEvent(address _user, address _dev, uint _app, uint _obj, address _node, uint _price) external;
   
   //ICO App events 
   function addAppICOEvent(uint _app, string hash, uint32 hashType) external;
-  function changeHashICOEvent(uint _app, string hash, uint32 hashType) external;
+  function changeHashAppICOEvent(uint _app, string hash, uint32 hashType) external;
   
   //Developer events 
   function addDevEvent(address _dev, bytes32 name, bytes32 info) external;

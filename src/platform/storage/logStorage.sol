@@ -11,14 +11,14 @@ contract LogStorage is LogStorageI, AgentStorage {
   //App events 
   event AddAppEvent(uint32 indexed _store, uint indexed _app, uint32 _hashType, uint32 indexed _appType, uint _price, bool _publish, address _dev, string _hash);
   event SetConfirmationAppEvent(uint32 indexed _store, uint indexed _app, bool _state, address _moderator);
-  event ChangeHashEvent(uint32 indexed _store, uint indexed _app, string _hash, uint32 _hashType);
+  event ChangeHashAppEvent(uint32 indexed _store, uint indexed _app, string _hash, uint32 _hashType);
   event ChangePublishEvent(uint32 indexed _store, uint indexed _app, bool publish);
-  event ChangePriceEvent(uint32 indexed _store, uint indexed _app, uint price);
-  event BuyAppEvent(uint32 indexed _store, address indexed _user, address indexed _dev, uint _app, address _node, uint price);
+  event SetPriceEvent(uint32 indexed _store, uint indexed _app, uint _obj ,uint price);
+  event BuyAppEvent(uint32 indexed _store, address indexed _user, address indexed _dev, uint _app, uint _obj, address _node, uint price);
   
   //Ico App events 
   event AddAppICOEvent(uint32 indexed _store, uint _app, string hash, uint32 _hashType);
-  event ChangeICOHashEvent(uint32 indexed _store, uint indexed _app, string hash, uint32 _hashType);
+  event ChangeHashAppICOEvent(uint32 indexed _store, uint indexed _app, string hash, uint32 _hashType);
   
   //Developer events 
   event AddDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _info);
@@ -50,20 +50,20 @@ contract LogStorage is LogStorageI, AgentStorage {
     emit SetConfirmationAppEvent(Agents[msg.sender].store, _app, _state, _moderator);
   }
   
-  function changeHashEvent(uint _app, string _hash, uint32 _hashType) external onlyAgentLog {
-    emit ChangeHashEvent(Agents[msg.sender].store, _app, _hash, _hashType);
+  function changeHashAppEvent(uint _app, string _hash, uint32 _hashType) external onlyAgentLog {
+    emit ChangeHashAppEvent(Agents[msg.sender].store, _app, _hash, _hashType);
   }
   
   function changePublishEvent(uint _app, bool _publish) external onlyAgentLog {
     emit ChangePublishEvent(Agents[msg.sender].store, _app, _publish);
   }
   
-  function changePriceEvent(uint _app, uint _price) external onlyAgentLog {
-    emit ChangePriceEvent(Agents[msg.sender].store, _app, _price);
+  function setPriceEvent(uint _app, uint _obj, uint _price) external onlyAgentLog {
+    emit SetPriceEvent(Agents[msg.sender].store, _obj, _app, _price);
   }
   
-  function buyAppEvent(address _user, address _dev, uint _app, address _node, uint _price) external onlyAgentLog {
-    emit BuyAppEvent(Agents[msg.sender].store, _user, _dev, _app, _node, _price);
+  function buyAppEvent(address _user, address _dev, uint _app, uint _obj, address _node, uint _price) external onlyAgentLog {
+    emit BuyAppEvent(Agents[msg.sender].store, _user, _dev, _app, _obj, _node, _price);
   }
   
   /** 
@@ -73,8 +73,8 @@ contract LogStorage is LogStorageI, AgentStorage {
     emit AddAppICOEvent(Agents[msg.sender].store, _app, hash, hashType);
   }
   
-  function changeHashICOEvent(uint _app, string hash, uint32 hashType) external onlyAgentLog {
-    emit ChangeICOHashEvent(Agents[msg.sender].store, _app, hash, hashType);
+  function changeHashAppICOEvent(uint _app, string hash, uint32 hashType) external onlyAgentLog {
+    emit ChangeHashAppICOEvent(Agents[msg.sender].store, _app, hash, hashType);
   }
 
 

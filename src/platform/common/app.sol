@@ -26,6 +26,13 @@ contract App is Agent, SafeMath {
     LogStorage = LogStorageI(_contract);    
   }  
 
+ // add/register new application
+  function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, string _hash) external returns (uint) {
+    uint app = AppStorage.addApp(_hashType, _appType, store, _price, _publish, msg.sender, _hash);
+    LogStorage.addAppEvent(app, _hashType, _appType, _price, _publish, msg.sender, _hash);
+    return app;
+  }
+  
   function setAppConfirmation(uint _app, bool _state) external onlyAgent {
     AppStorage.setConfirmation(_app, _state);
     LogStorage.setConfirmationAppEvent(_app, _state, msg.sender); // msg.sender - moderator
@@ -34,8 +41,8 @@ contract App is Agent, SafeMath {
   // after change hash application - confirmation sets to false
   function changeHash(uint _app, string _hash, uint32 _hashType) external {  
     require(AppStorage.getDeveloper(_app) == msg.sender);
-    AppStorage.changeHash(_app, _hash, _hashType);
-    LogStorage.changeHashEvent(_app, _hash, _hashType);
+    AppStorage.changeHashApp(_app, _hash, _hashType);
+    LogStorage.changeHashAppEvent(_app, _hash, _hashType);
   }
   
   function changePublish(uint _app, bool _publish) external {
@@ -52,8 +59,8 @@ contract App is Agent, SafeMath {
   
   function changeHashICO(uint _app, string _hash, uint32 _hashType) external onlyAgent {
     require(AppStorage.getDeveloper(_app) == msg.sender);
-    AppStorage.changeHashICO(_app, _hash, _hashType);
-    LogStorage.changeHashICOEvent(_app, _hash, _hashType);
+    AppStorage.changeHashAppICO(_app, _hash, _hashType);
+    LogStorage.changeHashAppICOEvent(_app, _hash, _hashType);
   }
 
   function getDeveloper(uint _app) external view returns (address) {

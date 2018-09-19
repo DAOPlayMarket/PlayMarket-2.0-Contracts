@@ -31,40 +31,43 @@ contract AppStorage is AppStorageI, AgentStorage {
   mapping (uint => _AppICO) private AppsICO;
 
   // array of Applications Objects
-  mapping (uint => mapping (uint => uint)) private AppsOBJ; // AppsOBJ[_app][_obj] = price; (in virtual units (PMC))
-
+  mapping (uint => mapping (uint => uint)) private AppsOBJprice; // AppsOBJ[_app][_obj] = price; (in virtual units (PMC))
+  mapping (uint => mapping (uint => uint)) private AppsOBJduration;
   // array of purchases users in Application  
   mapping (uint => mapping (address => mapping (uint => bool))) private AppsPurchases; // AppsPurchases[_app][_user][_obj] = true/false;
+  mapping (uint => mapping (address => mapping (uint => uint))) private AppsSubscriptions; // AppsSubscription[_app][_user][_obj] = end time subscription;
 
-  function addApp(uint32 _hashType, uint32 _appType, uint32 _store, uint _price, bool _publish, address _dev, string _hash) external onlyAgentStore(_store) returns (uint) {
+  function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, address _dev, string _hash) external onlyAgent() returns (uint) {
     Apps.push(_App({
       hashType: _hashType,
       appType: _appType,
-      store: _store,      
+      store: Agents[msg.sender].store,      
       publish: _publish,
       confirmation: false,
       developer: _dev,
       hash: _hash     
     }));
 
-    AppsOBJ[Apps.length-1][0] = _price;
-
+    AppsOBJprice[Apps.length-1][0] = _price;
     return Apps.length-1;
   }
 
   function addAppICO(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
+    assert(Apps[_app].developer != address(0));
     AppsICO[_app].hash =_hash;
     AppsICO[_app].hashType = _hashType;
     AppsICO[_app].confirmation = false;
   }
 
-  function changeHash(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
+  function changeHashApp(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
+    assert(Apps[_app].developer != address(0));
     Apps[_app].hash = _hash;
     Apps[_app].hashType = _hashType;
     Apps[_app].confirmation = false;
   }
 
-  function changeHashICO(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
+  function changeHashAppICO(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
+    assert(Apps[_app].developer != address(0));
     AppsICO[_app].hash =_hash;
     AppsICO[_app].hashType =_hashType;
     AppsICO[_app].confirmation = false;
@@ -76,19 +79,30 @@ contract AppStorage is AppStorageI, AgentStorage {
     AppsPurchases[_app][_user][_obj] = _state;
   }
 
+  function buySubscription(uint _app, address _user, uint _obj, uint _endTime) external onlyAgentStore(Apps[_app].store) {
+    AppsSubscriptions[_app][_user][_obj] = _endTime;
+  }
   // _obj = 0 - application
   // _state: true - buy, false - cancel buy
   function buyObject(uint _app, address _user, uint _obj, bool _state, uint _price) external onlyAgentStore(Apps[_app].store) {
-    require(AppsOBJ[_app][_obj] == _price);
+    require(AppsOBJprice[_app][_obj] == _price);
     AppsPurchases[_app][_user][_obj] = _state;
   }
 
+  function buySubscription(uint _app, address _user, uint _obj, uint _endTime, uint _price) external onlyAgentStore(Apps[_app].store) {
+    require(AppsOBJprice[_app][_obj] == _price);
+    AppsSubscriptions[_app][_user][_obj] = _endTime;
+  }
+  
   // _obj = 0 - application
   // _state: true - buy, false - yet not buyed or cancel buy
-  function checkBuy(uint _app, address _user, uint _obj) external view onlyAgentStore(Apps[_app].store) returns (bool _state) {
+  function getBuyObject(uint _app, address _user, uint _obj) external view onlyAgentStore(Apps[_app].store) returns (bool _state) {
     return AppsPurchases[_app][_user][_obj];
   }
 
+  function getTimeSubscription(uint _app, address _user, uint _obj) external view onlyAgentStore(Apps[_app].store) returns (uint _endTime) {
+    return AppsSubscriptions[_app][_user][_obj];
+  }
   /************************************************************************* 
   // Apps getters
   **************************************************************************/
@@ -100,16 +114,16 @@ contract AppStorage is AppStorageI, AgentStorage {
     return Apps[_app].appType;
   }
 
-  // return application price
-  function getPrice(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint) {
-    return AppsOBJ[_app][0];
-  }
-
-  // return price object in application
+  // return price object
   function getPrice(uint _app, uint _obj) external view onlyAgentStore(Apps[_app].store) returns (uint) {
-    return AppsOBJ[_app][_obj];
+    return AppsOBJprice[_app][_obj];
   }
 
+  // return price object
+  function getDuration(uint _app, uint _obj) external view onlyAgentStore(Apps[_app].store) returns (uint) {
+    return AppsOBJduration[_app][_obj];
+  }
+  
   function getPublish(uint _app) external view onlyAgentStore(Apps[_app].store) returns (bool) {
     return Apps[_app].publish;
   }
@@ -150,60 +164,43 @@ contract AppStorage is AppStorageI, AgentStorage {
     Apps[_app].appType = _appType;
   }
 
-  // set application price
-  function setPrice(uint _app, uint _price) external onlyAgentStore(Apps[_app].store) {
-    AppsOBJ[_app][0] = _price;
-  }
-
-  // set price object in application
+  // set price 
   function setPrice(uint _app, uint _obj, uint _price) external onlyAgentStore(Apps[_app].store) {
-    AppsOBJ[_app][_obj] = _price;
+    AppsOBJprice[_app][_obj] = _price;
   }
-
-  // set price object in application
-  function setPrice(uint _app, 
-    uint _obj01, uint _price01, 
-    uint _obj02, uint _price02) external onlyAgentStore(Apps[_app].store) {
-    AppsOBJ[_app][_obj01] = _price01;
-    AppsOBJ[_app][_obj02] = _price02;    
+  
+  function setPrice(uint _app, uint[] _arrObj, uint[] _arrPrice) external onlyAgentStore(Apps[_app].store) {
+    require(_arrObj.length == _arrPrice.length);
+    for(uint i =0; i < _arrObj.length; i++){
+      if(_arrObj[i]!=0)
+        AppsOBJprice[_app][_arrObj[i]] = _arrPrice[i];
+    }
   }  
 
-  // set price object in application
-  function setPrice(uint _app, 
-    uint _obj01, uint _price01, 
-    uint _obj02, uint _price02, 
-    uint _obj03, uint _price03) external onlyAgentStore(Apps[_app].store) {
-    AppsOBJ[_app][_obj01] = _price01;
-    AppsOBJ[_app][_obj02] = _price02;
-    AppsOBJ[_app][_obj03] = _price03;    
+  function setPrice(uint _app, uint[] _arrObj, uint _price) external onlyAgentStore(Apps[_app].store) {
+    for(uint i =0; i < _arrObj.length; i++){
+      if(_arrObj[i]!=0)
+        AppsOBJprice[_app][_arrObj[i]] = _price;
+    }
+  } 
+  
+  function setDuration(uint _app, uint _obj, uint _duration) external onlyAgentStore(Apps[_app].store) {
+   AppsOBJduration[_app][_obj] = _duration;
   }  
-
-  // set price object in application
-  function setPrice(uint _app, 
-    uint _obj01, uint _price01, 
-    uint _obj02, uint _price02, 
-    uint _obj03, uint _price03, 
-    uint _obj04, uint _price04) external onlyAgentStore(Apps[_app].store) {
-    AppsOBJ[_app][_obj01] = _price01;
-    AppsOBJ[_app][_obj02] = _price02;
-    AppsOBJ[_app][_obj03] = _price03;
-    AppsOBJ[_app][_obj04] = _price04;
-  }
-
-  // set price object in application
-  function setPrice(uint _app, 
-    uint _obj01, uint _price01, 
-    uint _obj02, uint _price02, 
-    uint _obj03, uint _price03, 
-    uint _obj04, uint _price04, 
-    uint _obj05, uint _price05) external onlyAgentStore(Apps[_app].store) {
-    AppsOBJ[_app][_obj01] = _price01;
-    AppsOBJ[_app][_obj02] = _price02;
-    AppsOBJ[_app][_obj03] = _price03;
-    AppsOBJ[_app][_obj04] = _price04;
-    AppsOBJ[_app][_obj05] = _price05;
-  }
-
+  
+  function setDuration(uint _app, uint[] _arrObj, uint[] _arrDuration) external onlyAgentStore(Apps[_app].store) {
+    require(_arrObj.length == _arrDuration.length);
+    for(uint i =0; i < _arrObj.length; i++){
+      AppsOBJduration[_app][_arrObj[i]] = _arrDuration[i];
+    }
+  }  
+  
+  function setDuration(uint _app, uint[] _arrObj, uint _duration) external onlyAgentStore(Apps[_app].store) {
+    for(uint i =0; i < _arrObj.length; i++){
+      AppsOBJduration[_app][_arrObj[i]] = _duration;
+    }
+  }  
+  
   function setPublish(uint _app, bool _state) external onlyAgentStore(Apps[_app].store) {
     Apps[_app].publish = _state;
   }
