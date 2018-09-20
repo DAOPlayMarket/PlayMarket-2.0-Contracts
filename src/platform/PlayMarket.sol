@@ -98,7 +98,15 @@ contract PlayMarket is App, Dev, Node {
     LogStorage.buyAppEvent(msg.sender, _dev, _app, _obj, _node, msg.value);
   }
   
+  function buy(uint _app, address _node, uint _obj) public payable {
+    address _dev = AppStorage.getDeveloper(_app);
+    require(!DevStorage.getStoreBlocked(_dev));
 
+    require(address(NodeStorage).call.value(safePerc(msg.value, percNode))(abi.encodeWithSignature("buyObject(address)", _node)));
+    require(address(DevStorage).call.value(safePerc(msg.value, percDev))(abi.encodeWithSignature("buyObject(address)", _dev)));
+
+    LogStorage.buyAppEvent(msg.sender, _dev, _app, _obj, _node, msg.value);
+  }
   /** 
   // Application ICO function
   **/ 
