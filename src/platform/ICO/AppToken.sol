@@ -21,7 +21,7 @@ contract AppToken is ERC20, Ownable {
 
   constructor(string _name, string _symbol, address _CrowdSale, address _PMFund) public {
     name = _name;
-    symbol = _symbol;    
+    symbol = _symbol;
 
     totalSupply_ = initialSupply*10**decimals;
     // creating initial tokens
@@ -50,5 +50,17 @@ contract AppToken is ERC20, Ownable {
     symbol = _symbol;
 
     emit UpdatedTokenInformation(_name, _symbol);
+  }
+
+  function getDecimals() public view returns (uint) {
+    return decimals;
+  }
+
+  function getName() public view returns (string) {
+    return name;
+  }
+
+  function getSymbol() public view returns (string) {
+    return symbol;
   }
 }

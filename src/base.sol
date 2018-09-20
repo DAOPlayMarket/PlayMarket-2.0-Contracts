@@ -7,7 +7,7 @@ contract Base is Ownable {
 
 	LogStorageI public LogStorage;
 
-  event setLogStorageContractEvent(address _contract);
+	event setLogStorageContractEvent(address _contract);
 
   // link to log storage  
   function setLogStorageContract(address _contract) public onlyOwner {

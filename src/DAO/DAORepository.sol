@@ -58,7 +58,7 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
   function cleanProposal() external onlyOwner {
     _Proposal[] p; 
     for (uint k = 0; k < Proposals.length; k++) {
-      if (Proposals[k].endTime < now + guardInterval) {
+      if (Proposals[k].endTime > now + guardInterval) {
         p.push(Proposals[k]);
       }
     }
@@ -68,6 +68,10 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
   function vote(uint _propID, address _voter, uint _numberOfVotes) external onlyOwner {
     assert(repository[_voter] > safeAdd(voted[_propID][_voter], _numberOfVotes));
     voted[_propID][_voter] = safeAdd(voted[_propID][_voter], _numberOfVotes);
+  }
+
+  function getBalance(address _owner) public onlyOwner returns (uint) {
+    return repository[_owner];
   }
 
   function getNotLockedBalance(address _owner) public onlyOwner returns (uint) {
