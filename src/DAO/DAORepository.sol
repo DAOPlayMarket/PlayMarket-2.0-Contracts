@@ -19,10 +19,10 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
     uint endTime;         // end time of voting
   }
   
-  _Proposal[] public Proposals;                                   // contains active proposals
+  _Proposal[] public Proposals;                             // contains active proposals
 
-  mapping (address => uint) private repository;                   // contains PMT balances
-  mapping (uint => mapping (address => uint)) private voted; // contains voted PMT on proposals
+  mapping (address => uint) public repository;              // contains PMT balances
+  mapping (uint => mapping (address => uint)) public voted; // contains voted PMT on proposals
 
   bool public WithdrawIsBlockedByFund = false;
 

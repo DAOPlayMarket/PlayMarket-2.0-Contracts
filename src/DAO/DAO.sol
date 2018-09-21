@@ -13,8 +13,6 @@ contract DAOPM is Ownable {
 
     uint TotalPMT = 30000000000; // total count PMT tokens (decimals 4)
 
-    uint private guardInterval = 5 minutes;
-
     // minimum quorum - number of votes must be more than minimum quorum
     uint public minimumQuorum;
     // debating period duration
@@ -50,7 +48,8 @@ contract DAOPM is Ownable {
     }
 
     _Proposal[] public Proposals;
-    mapping (uint => mapping (address => bool)) voted; 
+    mapping (uint => mapping (address => bool)) public voted;
+    mapping (uint => uint) public ProposalIndex; // temporarely index of Proposal in DAO Repository
 
     event ProposalAdded(uint proposalID, address recipient, uint amount, string description, string fullDescHash);
     event Voted(uint proposalID, bool position, address voter, string justification);
@@ -104,7 +103,7 @@ contract DAOPM is Ownable {
     function addProposal(address _recipient, uint _amount, string _desc, string _fullDescHash, bytes _transactionByteCode) onlyMembers public returns (uint) {
 
         Proposals.push(_Proposal({      
-            endTimeOfVoting: now + debatingPeriodDuration * 1 minutes + guardInterval,
+            endTimeOfVoting: now + debatingPeriodDuration * 1 minutes,
             executed: false,
             proposalPassed: false,
             numberOfVotes: 0,
@@ -117,6 +116,9 @@ contract DAOPM is Ownable {
             fullDescHash: _fullDescHash
         }));
         
+        // save proposal index in temporarely array in DAO Repository
+        ProposalIndex[Proposals.length-1] = DAORepository.addProposal(Proposals.length-1, now + debatingPeriodDuration * 1 minutes);
+
         emit ProposalAdded(Proposals.length-1, _recipient, _amount, _desc, _fullDescHash);
 
         return Proposals.length-1;
@@ -199,6 +201,8 @@ contract DAOPM is Ownable {
             // Proposal failed
             p.proposalPassed = false;
         }
+
+        DAORepository.delProposal(ProposalIndex[_proposalID]);
 
         // Fire Events
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);
