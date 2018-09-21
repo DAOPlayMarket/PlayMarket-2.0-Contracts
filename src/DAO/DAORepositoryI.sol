@@ -10,7 +10,7 @@ interface DAORepositoryI {
   function delProposal(uint _id) external;
   function cleanProposal() external;
 
-  function vote(uint _propID, address _voter, uint _numberOfVotes) external;
+  function vote(uint _propID, address _voter, uint _numberOfVotes) external returns (bool);
 
   function getBalance(address _owner) public returns (uint);
   function getNotLockedBalance(address _owner) public returns (uint);

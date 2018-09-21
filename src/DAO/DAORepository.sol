@@ -15,13 +15,13 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
   uint private guardInterval = 5 minutes;
 
   struct _Proposal {
-    uint id;       // proposal ID in DAO
-    uint endTime;  // end time of voting
+    uint propID;          // proposal ID in DAO    
+    uint endTime;         // end time of voting
   }
   
-  _Proposal[] public Proposals;                              // contains active proposals
+  _Proposal[] public Proposals;                                   // contains active proposals
 
-  mapping (address => uint) private repository;              // contains PMT balances
+  mapping (address => uint) private repository;                   // contains PMT balances
   mapping (uint => mapping (address => uint)) private voted; // contains voted PMT on proposals
 
   bool public WithdrawIsBlockedByFund = false;
@@ -37,7 +37,7 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
 
   function addProposal(uint _propID, uint _endTime) external onlyOwner returns (uint) {
     Proposals.push(_Proposal({
-      id: _propID,
+      propID: _propID,
       endTime: _endTime
     }));
 
@@ -65,9 +65,10 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
     Proposals = p;
   }
 
-  function vote(uint _propID, address _voter, uint _numberOfVotes) external onlyOwner {
-    assert(repository[_voter] > safeAdd(voted[_propID][_voter], _numberOfVotes));
+  function vote(uint _propID, address _voter, uint _numberOfVotes) external onlyOwner returns (bool) {
+    assert(repository[_voter] >= safeAdd(voted[_propID][_voter], _numberOfVotes));
     voted[_propID][_voter] = safeAdd(voted[_propID][_voter], _numberOfVotes);
+    return true;
   }
 
   function getBalance(address _owner) public onlyOwner returns (uint) {

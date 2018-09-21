@@ -90,7 +90,7 @@ contract RateContract is Agent, SafeMath {
     }
 
     // execute function for creator if ERC20's get stuck in this wallet
-    function execute(address _to, uint _value, bytes _data) external onlyOwner returns (bytes32 _r) {
+    function execute(address _to, uint _value, bytes _data) external onlyOwner returns (bytes32) {
         require(_to.call.value(_value)(_data));
         return 0;
     }
