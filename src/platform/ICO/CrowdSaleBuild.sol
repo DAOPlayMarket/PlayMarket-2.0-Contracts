@@ -40,8 +40,8 @@ contract CrowdSaleBuild is Ownable {
   /**
    * @dev CreateCrowdSaleContract - create new CrowdSale contract and return him address
    */   
-  function CreateCrowdSaleContract(address _multisigWallet, uint _startsAt, uint _totalInUSD, address _dev) external returns (address) {
-    CrowdSale _contract = new CrowdSale(emission, decimals, _multisigWallet, _startsAt, _totalInUSD, RateContract, _dev);
+  function CreateCrowdSaleContract(address _multisigWallet, uint _startsAt, uint _targetInUSD, address _dev) external returns (address) {
+    CrowdSale _contract = new CrowdSale(emission, decimals, _multisigWallet, _startsAt, _targetInUSD, RateContract, _dev);
     return address(_contract);
   }
 }

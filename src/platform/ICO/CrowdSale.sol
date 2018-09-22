@@ -23,7 +23,7 @@ contract CrowdSale is Ownable, SafeMath {
   uint public currentPeriod;
   uint public totalSupply;  
   bool public SoftCap;
-  uint public totalInUSD;
+  uint public targetInUSD;
   /* The UNIX timestamp start date of the crowdsale */
   uint public startsAt;
   
@@ -69,16 +69,16 @@ contract CrowdSale is Ownable, SafeMath {
   /**
    * @dev Constructor sets default parameters
    */
-  constructor(uint _initialSupply, uint _decimals, address _multisigWallet, uint _startsAt, uint _totalInUSD, address _RateContract, address _dev) public {
+  constructor(uint _initialSupply, uint _decimals, address _multisigWallet, uint _startsAt, uint _targetInUSD, address _RateContract, address _dev) public {
     decimals = _decimals;
     multisigWallet =_multisigWallet;
     startsAt = _startsAt;
     totalSupply = _initialSupply;    
-    totalInUSD = _totalInUSD;
+    targetInUSD = _targetInUSD;
     RateContract = RateContractI(_RateContract);
     
     dev = _dev;
-    uint _price = safeDiv(_totalInUSD,40500000);
+    uint _price = safeDiv(_targetInUSD,40500000);
     price[0] = safePerc(_price,85);
     price[1] = safePerc(_price,90);
     price[2] = safePerc(_price,95);

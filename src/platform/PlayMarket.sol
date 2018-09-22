@@ -11,15 +11,13 @@ import './ICO/ICOListI.sol';
  * @title PlayMarket contract - basic contract DAO PlayMarket 2.0
  */
 contract PlayMarket is App, Dev, Node {
-  
-  ICOListI public ICOList;  
+
+  bytes32 public version = "1.0.0";
   
   uint32 public percDev = 99;
   uint32 public percNode = 1;
   
-  event setICOListEvent(address _ICO);  
-  
-  constructor (address _app, address _dev, address _node, address _ICO, address _log) public {
+  constructor (address _app, address _dev, address _node, address _log, address _ICO) public {
     require(_app  != address(0));
     require(_dev  != address(0));
     require(_log  != address(0));
@@ -29,7 +27,8 @@ contract PlayMarket is App, Dev, Node {
     setAppStorageContract(_app);
     setDevStorageContract(_dev);
     setLogStorageContract(_log);
-    setNodeStorageContract(_node);    
+    setNodeStorageContract(_node);
+    setICOListContract(_ICO);
   }
 
   /** 
@@ -107,16 +106,67 @@ contract PlayMarket is App, Dev, Node {
 
     LogStorage.buyAppEvent(msg.sender, _dev, _app, _obj, _node, msg.value);
   }
-  /** 
-  // Application ICO function
-  **/ 
 
-  function addAppICO(uint _app, string _hash, uint32 _hashTag) external onlyAgent {
-    //require(checkDeveloper(_app,_dev));
-    AppStorage.addAppICO(_app, _hash, _hashTag);
-    //...
-  }
+
+  /************************************************************************* 
+  // ICO functional
+  **************************************************************************/
+
+  ICOListI public ICOList;  
   
+  event setICOListContractEvent(address _ICO);   
+
+  struct _ICO {
+    string name;
+    string symbol;
+    uint decimals;    
+    uint startsAt;
+    uint duration;
+    uint targetInUSD;
+    address token;
+    address crowdsale;
+    bool confirmation;
+  }
+
+  mapping (uint => _ICO) public ICOs;
+
+  // link to ICOList contract
+  function setICOListContract(address _contract) public onlyOwner {
+    ICOList = ICOListI(_contract);
+    emit setICOListContractEvent(_contract);
+  }
+
+  function addAppICOInfo(uint _app, string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, string _hash, uint32 _hashType) external {
+    address _dev = AppStorage.getDeveloper(_app);
+    require(msg.sender == _dev);
+    require(!DevStorage.getStoreBlocked(_dev));
+
+    _ICO storage ico = ICOs[_app];
+    
+    ico.name = _name;
+    ico.symbol = _symbol;
+    ico.decimals = _decimals;
+    ico.startsAt = _startsAt;
+    ico.duration = _duration;
+    ico.targetInUSD = _targetInUSD;
+    
+    AppStorage.addAppICO(_app, _hash, _hashType);
+  }
+
+  function addAppICOContracts(uint _app, address _multisigWallet, uint _CSID, uint _ATID) external {
+    address _dev = AppStorage.getDeveloper(_app);
+    require(msg.sender == _dev);
+    require(!DevStorage.getStoreBlocked(_dev));
+
+    _ICO storage ico = ICOs[_app];
+
+    // create CrowdSale contract from CrowdSale Build contract
+    ico.crowdsale = ICOList.CreateCrowdSale(_multisigWallet, ico.startsAt, ico.targetInUSD, _CSID, _app, _dev);
+    // create AppToken contract from AppToken Build contract
+    ico.token = ICOList.CreateAppToken(ico.name, ico.symbol, ico.crowdsale, _ATID, _app, _dev);
+    // create ICO
+    ICOList.CreateICO(ico.name, ico.symbol, ico.decimals, ico.startsAt, ico.duration, ico.targetInUSD, ico.crowdsale, ico.token, _app, _dev);
+  }    
 
   /************************************************************************* 
   // default params setters (onlyOwner => DAO)

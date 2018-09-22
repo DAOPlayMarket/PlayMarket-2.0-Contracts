@@ -20,7 +20,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
     uint decimals;    
     uint startsAt;
     uint duration;
-    uint totalInUSD;
+    uint targetInUSD;
     address token;
     address crowdsale;
     bool confirmation;
@@ -47,14 +47,14 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
    * @dev Create CrowdSale contract
    * @param _CSID - CrowdSale ID in array CrowdSales;
    */
-  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _totalInUSD, uint _CSID, uint _app, address _dev) external onlyAgent returns (address) {
+  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _targetInUSD, uint _CSID, uint _app, address _dev) external onlyAgent returns (address) {
     require(_CSID > 0);
     require(CrowdSales[_CSID] != address(0));
     require(_multisigWallet != address(0));
     require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
 
     // create CrowdSale contract _CSID type
-    address CrowdSale = CrowdSaleBuildI(CrowdSales[_CSID]).CreateCrowdSaleContract(_multisigWallet, _startsAt, _totalInUSD, _dev);
+    address CrowdSale = CrowdSaleBuildI(CrowdSales[_CSID]).CreateCrowdSaleContract(_multisigWallet, _startsAt, _targetInUSD, _dev);
 
     return CrowdSale;
   }
@@ -77,7 +77,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
   /**
    * @dev CreateICO 
    */
-  function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _totalInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external onlyAgent {
+  function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external onlyAgent {
     require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
 
     CrowdSaleI(_crowdsale).setTokenContract(address(_apptoken));
@@ -88,7 +88,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
         decimals: _decimals,        
         startsAt: _startsAt,
         duration: _duration,
-        totalInUSD: _totalInUSD,
+        targetInUSD: _targetInUSD,
         token: _apptoken,
         crowdsale: _crowdsale,
         confirmation: false
@@ -110,7 +110,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
         decimals: 0,
         startsAt: 0,
         duration: 0,
-        totalInUSD: 0,
+        targetInUSD: 0,
         token: address(0),
         crowdsale: address(0),
         confirmation: false

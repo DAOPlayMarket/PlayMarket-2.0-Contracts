@@ -218,10 +218,18 @@ contract DAOPM is Ownable {
     }
 
     /**
-     * @dev Accept transferOwnership on a this contract
+     * @dev Accept transferOwnership on a this (DAO) contract
      */
     function acceptOwnership(address _contract) public onlyOwner {
         CommonI(_contract).acceptOwnership();
+    }
+
+    function updateAgent(address _contract, address _agent, bool _state) public onlyOwner {
+        CommonI(_contract).updateAgent(_agent, _state);
+    }
+
+    function updateAgentStorage(address _contract, address _agent, uint32 _store, bool _state) public onlyOwner {
+        CommonI(_contract).updateAgentStorage(_agent, _store, _state);
     }
 
     /**

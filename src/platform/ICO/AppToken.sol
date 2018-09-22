@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import '../../common/Ownable.sol';
 import '../../common/ERC20.sol';
+import '../../fund/PMFundI.sol';
 
 /**
  * @title Application Token based on ERC20 token
@@ -29,7 +30,10 @@ contract AppToken is ERC20, Ownable {
     emit Transfer(0x0, _CrowdSale, balances[_CrowdSale]);
 
     // send 5% - to DAO PlayMArket 2.0 Foundation
-    balances[_PMFund] = safePerc(totalSupply_,5);          
+    balances[_PMFund] = safePerc(totalSupply_,5);
+    // inform the fund about new tokens
+    PMFundI(_PMFund).makeDeposit(address(this));
+
     emit Transfer(_CrowdSale, _PMFund, balances[_PMFund]);  
 
     // change owner
