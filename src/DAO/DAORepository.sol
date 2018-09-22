@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import '../common/Ownable.sol';
+import '../common/Agent.sol';
 import '../common/SafeMath.sol';
 import '../common/ERC20I.sol';
 import './DAORepositoryI.sol';
@@ -8,7 +8,7 @@ import './DAORepositoryI.sol';
 /**
  * @title DAO PlayMarket 2.0 repository - safe repository for PMT
  */
-contract DAORepository is DAORepositoryI, Ownable, SafeMath {
+contract DAORepository is DAORepositoryI, Agent, SafeMath {
 
   bytes32 public version = "1.0.0";
 
@@ -35,6 +35,10 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
     PMT = ERC20I(_contract);
   }
 
+  /**
+   * Access only owner (DAO)
+   */
+
   function addProposal(uint _propID, uint _endTime) external onlyOwner returns (uint) {
     Proposals.push(_Proposal({
       propID: _propID,
@@ -55,7 +59,7 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
     Proposals.length = Proposals.length-1;
   }
 
-  function cleanProposal() external onlyOwner {
+  function cleanProposal() external onlyAgent {
     _Proposal[] p; 
     for (uint k = 0; k < Proposals.length; k++) {
       if (Proposals[k].endTime > now + guardInterval) {
@@ -71,11 +75,24 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
     return true;
   }
 
-  function getBalance(address _owner) public onlyOwner returns (uint) {
+  function changeStateByFund(bool _state) external onlyAgent {
+    WithdrawIsBlockedByFund = _state;
+  } 
+  
+  function setPMTContract(address _contract) external onlyOwner {
+    PMT = ERC20I(_contract);
+  }
+
+
+  /**
+   * Public access everyone
+   */
+
+  function getBalance(address _owner) public returns (uint) {
     return repository[_owner];
   }
 
-  function getNotLockedBalance(address _owner) public onlyOwner returns (uint) {
+  function getNotLockedBalance(address _owner) public returns (uint) {
     uint lock = 0;
     for (uint k = 0; k < Proposals.length; k++) {
       if (Proposals[k].endTime > now + guardInterval) {
@@ -89,7 +106,7 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
 
   // make deposit PMT
   // make sure, approve to this contract first
-  function makeDeposit(address _from, uint _value) external onlyOwner {
+  function makeDeposit(address _from, uint _value) external {
     assert(_from != address(0));
     assert(_value > 0);
     assert(PMT.transferFrom(_from, address(this), _value));
@@ -97,26 +114,23 @@ contract DAORepository is DAORepositoryI, Ownable, SafeMath {
   }
 
   // refund deposit
-  function refund(address _spender, uint _value) external onlyOwner {
+  function refund(uint _value) external {
     require(!WithdrawIsBlockedByFund);
-    require(PMT.allowance(address(this), _spender) == 0);
+    //require(PMT.allowance(address(this), msg.sender) == 0);
 
-    assert(_spender != address(0));
-    uint freeBalance = getNotLockedBalance(_spender);
+    assert(msg.sender != address(0));
+    uint freeBalance = getNotLockedBalance(msg.sender);
     assert(freeBalance >=_value);
-    repository[_spender] = safeSub(repository[_spender], _value);
-    assert(repository[_spender] >= 0);
+    repository[msg.sender] = safeSub(repository[msg.sender], _value);
+    assert(repository[msg.sender] >= 0);
 
-    PMT.approve(_spender, _value);
+    //PMT.approve(msg.sender, _value);
+    PMT.transfer(msg.sender, _value);
   }
 
-  function changeStateByFund(bool _state) external onlyOwner {
-    WithdrawIsBlockedByFund = _state;
-  } 
+  event AcceptedEtherEvent(address _sender, uint _value);
   
-  function setPMTContract(address _contract) external onlyOwner {
-    PMT = ERC20I(_contract);
+  function() public payable {
+    emit AcceptedEtherEvent(msg.sender, msg.value);
   }
-
-  function() public payable {}
 }

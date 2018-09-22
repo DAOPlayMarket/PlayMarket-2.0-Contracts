@@ -2,6 +2,7 @@ pragma solidity ^0.4.24;
 
 import '../common/SafeMath.sol';
 import '../common/Ownable.sol';
+import './CommonI.sol';
 import './DAORepositoryI.sol';
 
 /**
@@ -209,9 +210,24 @@ contract DAOPM is Ownable {
     }
 
     /**
+    * @dev Allows the DAO to transfer control of the _contract to a _newOwner.
+    * @param _newOwner The address to transfer ownership to.
+    */
+    function transferOwnership(address _contract, address _newOwner) public onlyOwner {
+        CommonI(_contract).transferOwnership(_newOwner);
+    }
+
+    /**
+     * @dev Accept transferOwnership on a this contract
+     */
+    function acceptOwnership(address _contract) public onlyOwner {
+        CommonI(_contract).acceptOwnership();
+    }
+
+    /**
      * Set total count of PMT tokens
      */
-    function setTotalPMT(uint _value) external onlyOwner {
+    function setTotalPMT(uint _value) public onlyOwner {
         assert(_value > 0);
         TotalPMT = _value;
     }
