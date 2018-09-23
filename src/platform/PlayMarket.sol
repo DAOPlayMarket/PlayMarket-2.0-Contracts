@@ -177,6 +177,5 @@ contract PlayMarket is App, Dev, Node {
 
   function setPercNode(uint32 _proc) public onlyOwner {
     percNode = _proc;
-  }  
-
+  }
 }

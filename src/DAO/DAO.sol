@@ -175,7 +175,7 @@ contract DAOPM is Ownable {
     /**
      * Finish vote
      *
-     * Count the votes proposal #`proposalID` and execute it if approved
+     * Count the votes proposal #`_proposalID` and execute it if approved
      *
      * @param _proposalID proposal number
      * @param _transactionByteCode optional: if the transaction contained a bytecode, you need to send it
@@ -207,6 +207,16 @@ contract DAOPM is Ownable {
 
         // Fire Events
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);
+    }
+
+    /**
+     * External call for executeProposal (msg.sender = DAO)
+     *
+     * @param _proposalID proposal number
+     * @param _transactionByteCode optional: if the transaction contained a bytecode, you need to send it
+     */
+    function execute(uint _proposalID, bytes _transactionByteCode) public {
+        this.executeProposal(_proposalID, _transactionByteCode);
     }
 
     /**
