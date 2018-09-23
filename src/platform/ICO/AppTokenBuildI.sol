@@ -8,5 +8,5 @@ interface AppTokenBuildI {
   /**
    * @dev CreateAppTokenContract - create new AppToken contract and return him address
    */   
-  function CreateAppTokenContract(string _name, string _symbol, address _CrowdSale, address _PMFund) external returns (address);
+  function CreateAppTokenContract(string _name, string _symbol, address _CrowdSale, address _PMFund, address _dev) external returns (address);
 }

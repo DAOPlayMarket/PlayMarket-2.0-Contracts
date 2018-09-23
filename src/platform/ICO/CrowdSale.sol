@@ -14,6 +14,7 @@ contract CrowdSale is Ownable, SafeMath {
   bytes32 public version = "1.0.0";
   
   uint public decimals;
+  uint public multiplier;
   
   RateContractI public RateContract;
   ERC20I public ERC20;
@@ -57,6 +58,10 @@ contract CrowdSale is Ownable, SafeMath {
   /* How much wei we have given back to investors. */
   uint public weiRefunded = 0;
 
+  uint public m15;
+  uint public m30;
+  uint public m45;
+
   /* A new investment was made */
   event Invested(address investor, uint weiAmount, uint tokenAmount);
   
@@ -71,6 +76,7 @@ contract CrowdSale is Ownable, SafeMath {
    */
   constructor(uint _initialSupply, uint _decimals, address _multisigWallet, uint _startsAt, uint _targetInUSD, address _RateContract, address _dev) public {
     decimals = _decimals;
+    multiplier = 10 ** decimals;
     multisigWallet =_multisigWallet;
     startsAt = _startsAt;
     totalSupply = _initialSupply;    
@@ -82,6 +88,10 @@ contract CrowdSale is Ownable, SafeMath {
     price[0] = safePerc(_price,85);
     price[1] = safePerc(_price,90);
     price[2] = safePerc(_price,95);
+
+    m15 = 15*10**(6+decimals);
+    m30 = 30*10**(6+decimals);
+    m45 = 45*10**(6+decimals);
   }
   
   /**
@@ -113,7 +123,7 @@ contract CrowdSale is Ownable, SafeMath {
     // Calculating the number of tokens
     uint tokenAmount = calculateTokens(weiAmount,currentPeriod);
     
-    require(safeAdd(tokenAmount,tokensSold)<=(45*10**(6+decimals)));
+    require(safeAdd(tokenAmount,tokensSold) <= m45);
     
     if(investedAmountOf[receiver] == 0) {
        // A new investor
@@ -164,11 +174,11 @@ contract CrowdSale is Ownable, SafeMath {
    * @return uint current stage
    */
   function getStage() public view returns (uint) {
-    if((block.timestamp < (startsAt + 30 days)) && (tokensSold < 15*10**(6+decimals))) {
+    if((block.timestamp < (startsAt + 30 days)) && (tokensSold < m15)) {
       return 0;
-    }else if ((block.timestamp < (startsAt + 60 days)) && (tokensSold < 30*10**(6+decimals))) {
+    }else if ((block.timestamp < (startsAt + 60 days)) && (tokensSold < m30)) {
       return 1;
-    }else if ((block.timestamp < (startsAt + 90 days)) && (tokensSold < 45*10**(6+decimals))) {
+    }else if ((block.timestamp < (startsAt + 90 days)) && (tokensSold < m45)) {
       return 2;
     }
     return 3;
@@ -181,8 +191,7 @@ contract CrowdSale is Ownable, SafeMath {
    * @return tokens amount
    */
   function calculateTokens(uint weiAmount,uint period) internal view returns (uint) {
-    uint usdAmount = weiToUsdCents(weiAmount);
-    uint multiplier = 10 ** decimals;
+    uint usdAmount = weiToUsdCents(weiAmount);    
     return safeDiv(safeMul(multiplier, usdAmount),price[period]);
   }
   

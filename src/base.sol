@@ -9,9 +9,9 @@ contract Base is Ownable {
 
 	event setLogStorageContractEvent(address _contract);
 
-  // link to log storage  
-  function setLogStorageContract(address _contract) public onlyOwner {
-    LogStorage = LogStorageI(_contract);
-    emit setLogStorageContractEvent(_contract);
-  }
+  	// link to log storage  
+  	function setLogStorageContract(address _contract) public onlyOwner {
+    	LogStorage = LogStorageI(_contract);
+    	emit setLogStorageContractEvent(_contract);
+  	}
 }

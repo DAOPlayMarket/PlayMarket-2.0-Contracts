@@ -69,7 +69,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
     require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
 
     // create AppToken contract _ATID type and set _CrowdSale as owner
-    address AppToken = AppTokenBuildI(AppTokens[_ATID]).CreateAppTokenContract(_name, _symbol, _crowdsale, PMFund);
+    address AppToken = AppTokenBuildI(AppTokens[_ATID]).CreateAppTokenContract(_name, _symbol, _crowdsale, PMFund, _dev);
 
     return AppToken;
   }
