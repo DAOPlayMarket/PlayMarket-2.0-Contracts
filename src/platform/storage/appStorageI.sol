@@ -22,6 +22,8 @@ interface AppStorageI {
   // _state: true - buy, false - yet not buyed or cancel buy
   function getBuyObject(uint _app, address _user, uint _obj) external view returns (bool _state);
   function getTimeSubscription(uint _app, address _user, uint _obj) external view  returns (uint _endTime);
+  
+  function updateAgentStorage(address _agent, uint32 _store, bool _state) external;
   /************************************************************************* 
   // Apps getters
   **************************************************************************/

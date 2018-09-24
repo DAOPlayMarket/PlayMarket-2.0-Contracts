@@ -35,5 +35,5 @@ interface ICOListI {
   // confirm ICO and add token to DAO PlayMarket 2.0 Exchange (DAOPEX)
   function setConfirmation(address _dev, uint _app, bool _state) external returns (address);
 
-  function updateAgentStorage(address _agent, uint32 _store, bool _state);
+  function updateAgentStorage(address _agent, uint32 _store, bool _state) external;
 }

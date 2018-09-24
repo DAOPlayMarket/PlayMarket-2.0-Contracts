@@ -12,8 +12,8 @@ interface DAORepositoryI {
 
   function vote(uint _propID, address _voter, uint _numberOfVotes) external returns (bool);
 
-  function getBalance(address _owner) public returns (uint);
-  function getNotLockedBalance(address _owner) public returns (uint);
+  function getBalance(address _owner) external returns (uint);
+  function getNotLockedBalance(address _owner) external returns (uint);
   
   // make deposit PMT
   // make sure, approve to this contract first

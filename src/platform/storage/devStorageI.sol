@@ -12,6 +12,8 @@ interface DevStorageI {
   function buyObject(address _dev) payable external;
     // collect the accumulated amount
   function collect(address _dev) external;
+
+  function updateAgentStorage(address _agent, uint32 _store, bool _state) external;
   /************************************************************************* 
   // Devs getters
   **************************************************************************/

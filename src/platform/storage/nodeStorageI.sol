@@ -24,6 +24,8 @@ interface NodeStorageI {
   function requestRefund(address _node) external;
   // refund deposit
   function refund(address _node) external;
+
+  function updateAgentStorage(address _agent, uint32 _store, bool _state) external;
   /************************************************************************* 
   // Nodes getters
   **************************************************************************/

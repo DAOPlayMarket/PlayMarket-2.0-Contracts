@@ -31,7 +31,8 @@ interface LogStorageI {
   //Reviews events
   function feedbackRatingEvent(address voter, uint _app, uint vote, string description, bytes32 txIndex, uint blocktimestamp) external;
 
-
+  function updateAgentStorage(address _agent, uint32 _store, bool _state) external;
+  
   //ICO events  
   //function releaseICOEvent(address adrDev, uint _app, bool release, address ICO) external;
   //function newContractEvent(string name, string symbol, address adrDev, uint _app) external;
