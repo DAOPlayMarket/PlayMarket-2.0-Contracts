@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import '../../common/Ownable.sol';
 import '../../common/SafeMath.sol';
 import '../../common/ERC20.sol';
-import '../../common/RateI.sol';
+import '../../common/RateContractI.sol';
 import '../../exchange/PEXI.sol';
 
 /**

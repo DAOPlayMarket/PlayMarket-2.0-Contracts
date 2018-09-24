@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import '../../common/SafeMath.sol';
 import '../../common/AgentStorage.sol';
-import '../../common/RateI.sol';
+import '../../common/RateContractI.sol';
 import '../../exchange/PEXI.sol';
 import './ICOListI.sol';
 import './CrowdSaleI.sol';
