@@ -60,13 +60,15 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
   }
 
   function cleanProposal() external onlyAgent {
-    _Proposal[] p; 
-    for (uint k = 0; k < Proposals.length; k++) {
+    uint k = 0;
+    while (k < Proposals.length) {
       if (Proposals[k].endTime > now + guardInterval) {
-        p.push(Proposals[k]);
+        Proposals[k] = Proposals[Proposals.length-1];
+        Proposals.length = Proposals.length-1;       
+      } else {
+        k++;
       }
     }
-    Proposals = p;
   }
 
   function vote(uint _propID, address _voter, uint _numberOfVotes) external onlyOwner returns (bool) {

@@ -25,8 +25,16 @@ interface LogStorageI {
   
   //Node events  
   function addNodeEvent(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external;
-  function confirmationNodeEvent(address _node, bool value) external;
   function changeInfoNodeEvent(address _node,  string _hash, uint32 _hashType, string _ip, string _coordinates) external;
+  function requestCollectNodeEvent(address _node) external;
+  function collectNodeEvent(address _node, uint _amount) external;
+  function makeDepositNodeEvent(address _from, address _node, uint _ETH, uint _PMT) external;
+  function makeDepositETHNodeEvent(address _from, address _node, uint _value) external;
+  function makeDepositPMTNodeEvent(address _from, address _node, uint _value) external;
+  function requestRefundNodeEvent(address _node, uint _refundTime) external;
+  function refundNodeEvent(address _node) external;
+  function setConfirmationNodeEvent(address _node, bool _state, address _moderator) external;
+  function setDepositLimitsNodeEvent(address _node, uint _ETH, uint _PMT, address _moderator) external;
   
   //Reviews events
   function feedbackRatingEvent(address voter, uint _app, uint vote, string description, bytes32 txIndex, uint blocktimestamp) external;
@@ -34,6 +42,7 @@ interface LogStorageI {
   function updateAgentStorage(address _agent, uint32 _store, bool _state) external;
   
   //ICO events  
-  //function releaseICOEvent(address adrDev, uint _app, bool release, address ICO) external;
-  //function newContractEvent(string name, string symbol, address adrDev, uint _app) external;
+  function icoCreateEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string hash, uint32 hashType) external;
+  function icoDeleteEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType) external;
+  function icoConfirmationEvent(address _dev, uint _app, bool _state) external;
 }

@@ -11,15 +11,15 @@ interface NodeStorageI {
   // request a collect the accumulated amount
   function requestCollect(address _node) external;
   // collect the accumulated amount
-  function collect(address _node) external;
+  function collect(address _node) external returns (uint);
   // make an insurance deposit ETH and PMT
   // make sure, approve to this contract first
-  function makeDeposit(address _node, address _from, uint256 _value) payable external;
+  function makeDeposit(address _node, address _from, uint _value) payable external;
   // make an insurance deposit ETH
   function makeDepositETH(address _node) payable external;
   // make an insurance deposit PMT
   // make sure, approve to this contract first
-  function makeDepositPMT(address _node, address _from, uint256 _value) payable external;
+  function makeDepositPMT(address _node, address _from, uint _value) payable external;
   // request a deposit refund
   function requestRefund(address _node) external;
   // refund deposit
@@ -40,11 +40,12 @@ interface NodeStorageI {
   function getHash(address _node) external view returns (string);
   function getIP(address _node) external view returns (string);
   function getCoordinates(address _node) external view returns (string);
-  function getRevenue(address _node) external view returns (uint256);
-  function getDeposit(address _node) external view returns (uint256, uint256, uint256, uint256, uint256, bool);
-  function getDefETH() external view returns (uint256);
-  function getDefPMT() external view returns (uint256);
-  function getDefRefundTime() external view returns (uint256);
+  function getNodeInfo(address _node) external view returns (uint32, bool, uint, string, string, string);
+  function getRevenue(address _node) external view returns (uint);
+  function getDeposit(address _node) external view returns (uint, uint, uint, uint, uint, bool);
+  function getDefETH() external view returns (uint);
+  function getDefPMT() external view returns (uint);
+  function getDefRefundTime() external view returns (uint);
   /************************************************************************* 
   // Nodes setters
   **************************************************************************/
@@ -58,8 +59,8 @@ interface NodeStorageI {
   function setHash(address _node, string _hash) external ;
   function setIP(address _node, string _ip) external ;
   function setCoordinates(address _node, string _coordinates) external ;
-  function setDepositLimits(address _node, uint256 _ETH, uint256 _PMT) external;
-  function setDefETH(uint256 _ETH) external;
-  function setDefPMT(uint256 _PMT) external;
-  function setDefRefundTime(uint256 _refundTime) external;
+  function setDepositLimits(address _node, uint _ETH, uint _PMT) external;
+  function setDefETH(uint _ETH) external;
+  function setDefPMT(uint _PMT) external;
+  function setDefRefundTime(uint _refundTime) external;
 }

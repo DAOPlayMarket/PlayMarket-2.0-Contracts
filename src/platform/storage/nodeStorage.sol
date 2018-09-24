@@ -89,7 +89,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   }
 
   // collect the accumulated amount
-  function collect(address _node) external onlyAgentStore(Nodes[_node].store) {
+  function collect(address _node) external onlyAgentStore(Nodes[_node].store) returns (uint) {
     assert(Nodes[_node].state);
     assert(Nodes[_node].collectState);
     assert(block.timestamp > NodesDeposit[_node].refundTime);
@@ -100,6 +100,8 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     assert(amount > 0);
     NodesRevenue[_node] = 0;
     _node.transfer(amount);
+
+    return amount;
   }  
 
   // make an insurance deposit ETH and PMT
@@ -212,6 +214,15 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
 
   function getCoordinates(address _node) external view onlyAgentStore(Nodes[_node].store) returns (string) {
     return Nodes[_node].coordinates;
+  }
+
+  function getNodeInfo(address _node) external view onlyAgentStore(Nodes[_node].store) returns (uint32, bool, uint, string, string, string) {
+    return (Nodes[_node].hashType,      
+      Nodes[_node].collectState, 
+      Nodes[_node].collectTime,
+      Nodes[_node].hash,
+      Nodes[_node].ip,
+      Nodes[_node].coordinates);
   }
 
   function getRevenue(address _node) external view onlyAgentStore(Nodes[_node].store) returns (uint) {

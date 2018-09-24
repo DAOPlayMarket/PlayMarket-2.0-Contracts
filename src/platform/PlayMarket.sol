@@ -125,6 +125,8 @@ contract PlayMarket is App, Dev, Node {
     uint targetInUSD;
     address token;
     address crowdsale;
+    string hash;
+    uint32 hashType;
     bool confirmation;
   }
 
@@ -149,8 +151,10 @@ contract PlayMarket is App, Dev, Node {
     ico.startsAt = _startsAt;
     ico.duration = _duration;
     ico.targetInUSD = _targetInUSD;
+    ico.hash = _hash;
+    ico.hashType = _hashType;
     
-    AppStorage.addAppICO(_app, _hash, _hashType);
+    AppStorage.addAppICO(_app, _hash, _hashType);    
   }
 
   function addAppICOContracts(uint _app, address _multisigWallet, uint _CSID, uint _ATID) external {
@@ -166,7 +170,26 @@ contract PlayMarket is App, Dev, Node {
     ico.token = ICOList.CreateAppToken(ico.name, ico.symbol, ico.crowdsale, _ATID, _app, _dev);
     // create ICO
     ICOList.CreateICO(ico.name, ico.symbol, ico.decimals, ico.startsAt, ico.duration, ico.targetInUSD, ico.crowdsale, ico.token, _app, _dev);
-  }    
+    // generate event about create contract
+    LogStorage.icoCreateEvent(_dev, _app, ico.name, ico.symbol, ico.decimals, ico.crowdsale, ico.hash, ico.hashType);
+  }
+
+  function delAppICO(uint _app) external {
+    address _dev = AppStorage.getDeveloper(_app);
+    require(msg.sender == _dev);
+    require(!DevStorage.getStoreBlocked(_dev));
+
+    _ICO storage ico = ICOs[_app];
+    ICOList.DeleteICO(_app, msg.sender);
+    LogStorage.icoDeleteEvent(_dev, _app, ico.name, ico.symbol, ico.decimals, ico.crowdsale, ico.hash, ico.hashType);
+  }
+
+  function setConfirmationICO(address _dev, uint _app, bool _state) external onlyAgent {
+    _ICO storage ico = ICOs[_app];
+    require(ico.crowdsale != address(0));
+    ICOList.setConfirmation(_dev, _app, _state);
+    LogStorage.icoConfirmationEvent(_dev, _app, _state);
+  }
 
   /************************************************************************* 
   // default params setters (onlyOwner => DAO)

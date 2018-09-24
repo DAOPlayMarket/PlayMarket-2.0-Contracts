@@ -37,15 +37,15 @@ contract Node is Agent, SafeMath, Base {
     require(!NodeStorage.getState(msg.sender));
     require(block.timestamp > NodeStorage.getCollectTime(msg.sender));
     NodeStorage.requestCollect(msg.sender);
-    // ++ LogStorage
+    LogStorage.requestCollectNodeEvent(msg.sender);
   }
 
   // collect the accumulated amount
   function collectNode() external {
     require(!NodeStorage.getState(msg.sender));    
     require(block.timestamp > NodeStorage.getCollectTime(msg.sender));
-    NodeStorage.collect(msg.sender);
-    // ++ LogStorage
+    uint amount = NodeStorage.collect(msg.sender);
+    LogStorage.collectNodeEvent(msg.sender, amount);
   }
 
   // make an insurance deposit ETH and PMT
@@ -54,6 +54,7 @@ contract Node is Agent, SafeMath, Base {
     require(!NodeStorage.getState(_node));
     require(msg.value > 0 && _value > 0);
     require(address(NodeStorage).call.value(msg.value)(abi.encodeWithSignature("makeDeposit(address,address,uint)", _node, msg.sender, _value)));
+    LogStorage.makeDepositNodeEvent(msg.sender, _node, msg.value, _value);
   }  
 
   // make an insurance deposit ETH
@@ -61,6 +62,7 @@ contract Node is Agent, SafeMath, Base {
     require(!NodeStorage.getState(_node));
     require(msg.value > 0);
     require(address(NodeStorage).call.value(msg.value)(abi.encodeWithSignature("makeDepositETH(address)", _node)));
+    LogStorage.makeDepositETHNodeEvent(msg.sender, _node, msg.value);
   }    
 
   // make an insurance deposit PMT
@@ -69,6 +71,7 @@ contract Node is Agent, SafeMath, Base {
     require(!NodeStorage.getState(_node));
     require(_value > 0);
     require(address(NodeStorage).call.value(0)(abi.encodeWithSignature("makeDepositPMT(address,address,uint)", _node, msg.sender, _value)));
+    LogStorage.makeDepositPMTNodeEvent(msg.sender, _node, _value);
   }
 
   // request a deposit refund
@@ -78,7 +81,7 @@ contract Node is Agent, SafeMath, Base {
     (,,,,_refundTime,)=NodeStorage.getDeposit(msg.sender);
     require(block.timestamp > _refundTime);
     NodeStorage.requestRefund(msg.sender);
-    // ++ LogStorage
+    LogStorage.requestRefundNodeEvent(msg.sender, _refundTime);
   }
 
   // request a deposit refund
@@ -88,13 +91,13 @@ contract Node is Agent, SafeMath, Base {
     (,,,,_refundTime,)=NodeStorage.getDeposit(msg.sender);
     require(block.timestamp > _refundTime);
     NodeStorage.refund(msg.sender);
-    // ++ LogStorage
+    LogStorage.refundNodeEvent(msg.sender);
   }
 
   function setConfirmationNode(address _node, bool _state) external onlyAgent {
     require(!NodeStorage.getState(_node));
     NodeStorage.setConfirmation(_node, _state);
-    // ++ LogStorage     
+    LogStorage.setConfirmationNodeEvent(_node, _state, msg.sender); // msg.sender - moderator
   }
 
   function setDepositLimitsNode(address _node, uint _ETH, uint _PMT) external onlyAgent {
@@ -102,5 +105,57 @@ contract Node is Agent, SafeMath, Base {
     require(_ETH > NodeStorage.getDefETH());
     require(_PMT > NodeStorage.getDefPMT());
     NodeStorage.setDepositLimits(_node, _ETH, _PMT);
+    LogStorage.setDepositLimitsNodeEvent(_node, _ETH, _PMT, msg.sender); // msg.sender - moderator
+  }
+
+  /************************************************************************* 
+  // Nodes getters
+  **************************************************************************/
+  function getHashType() external view returns (uint32) {
+    return NodeStorage.getHashType(msg.sender);
+  }
+
+  function getState() external view returns (bool) {
+    return NodeStorage.getState(msg.sender);
+  }
+
+  function getConfirmation() external view returns (bool) {
+    return NodeStorage.getConfirmation(msg.sender);
+  }
+
+  function getCollectState() external view returns (bool) {
+    return NodeStorage.getCollectState(msg.sender);
+  }
+
+  function getCollectTime() external view returns (uint) {
+    return NodeStorage.getCollectTime(msg.sender);
+  }
+
+  function getReserv() external view returns (bytes21) {
+    return NodeStorage.getReserv(msg.sender);
+  }
+
+  function getHash() external view returns (string) {
+    return NodeStorage.getHash(msg.sender);
+  }
+
+  function getIP() external view returns (string) {
+    return NodeStorage.getIP(msg.sender);
+  }
+
+  function getCoordinates() external view returns (string) {
+    return NodeStorage.getCoordinates(msg.sender);
+  }
+
+  function getNodeInfo() external view returns (uint32, bool, uint, string, string, string) {
+    return NodeStorage.getNodeInfo(msg.sender);
+  }
+
+  function getRevenue() external view returns (uint) {
+    return NodeStorage.getRevenue(msg.sender);
+  }
+
+  function getDeposit() external view returns (uint, uint, uint, uint, uint, bool) {
+    return NodeStorage.getDeposit(msg.sender);
   }
 }
