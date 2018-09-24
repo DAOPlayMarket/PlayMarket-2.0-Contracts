@@ -5,9 +5,11 @@ pragma solidity ^0.4.24;
  */
 interface NodeStorageI {
   
-  function addNode(address _node, uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external;
+  function addNode(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external;
   function changeInfo(address _node, string _hash, uint32 _hashType, string _ip, string _coordinates) external;
   function buyObject(address _node) payable external;
+  // request a collect the accumulated amount
+  function requestCollect(address _node) external;
   // collect the accumulated amount
   function collect(address _node) external;
   // make an insurance deposit ETH and PMT
@@ -30,7 +32,9 @@ interface NodeStorageI {
   function getStore(address _node) external view returns (uint32);
   function getState(address _node) external view returns (bool);
   function getConfirmation(address _node) external view returns (bool);
-  function getReserv(address _node) external view returns (bytes24);
+  function getCollectState(address _node) external view returns (bool);
+  function getCollectTime(address _node) external view returns (uint);
+  function getReserv(address _node) external view returns (bytes21);
   function getHash(address _node) external view returns (string);
   function getIP(address _node) external view returns (string);
   function getCoordinates(address _node) external view returns (string);
@@ -46,7 +50,9 @@ interface NodeStorageI {
   function setHashType(address _node, uint32 _hashType) external;
   function setStore(address _node, uint32 _store) external;
   function setConfirmation(address _node, bool _state) external;
-  function setReserv(address _node, bytes24 _reserv) external ;
+  function setCollectState(address _node, bool _state) external;
+  function setCollectTime(address _node, uint _time) external;
+  function setReserv(address _node, bytes21 _reserv) external ;
   function setHash(address _node, string _hash) external ;
   function setIP(address _node, string _ip) external ;
   function setCoordinates(address _node, string _coordinates) external ;

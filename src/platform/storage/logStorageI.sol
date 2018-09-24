@@ -24,7 +24,7 @@ interface LogStorageI {
   function setRatingDevEvent(address _dev, int _rating) external;
   
   //Node events  
-  function addNodeEvent(address _node, uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external;
+  function addNodeEvent(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external;
   function confirmationNodeEvent(address _node, bool value) external;
   function changeInfoNodeEvent(address _node,  string _hash, uint32 _hashType, string _ip, string _coordinates) external;
   

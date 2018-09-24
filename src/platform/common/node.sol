@@ -21,7 +21,7 @@ contract Node is Agent, SafeMath, Base {
     emit setStorageContractEvent(_contract);
   }
 
-  function addNode(uint32 _hashType, bytes24 _reserv, string _hash, string _ip, string _coordinates) external {
+  function addNode(uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external {
     NodeStorage.addNode(msg.sender, _hashType, _reserv, _hash, _ip, _coordinates);
     LogStorage.addNodeEvent(msg.sender, _hashType, _reserv, _hash, _ip, _coordinates);
   }
@@ -32,10 +32,21 @@ contract Node is Agent, SafeMath, Base {
     LogStorage.changeInfoNodeEvent(msg.sender, _hash, _hashType, _ip, _coordinates);
   }  
 
-  function collectNode() external {
+  // request a collect the accumulated amount
+  function requestCollectNode() external {
     require(!NodeStorage.getState(msg.sender));
+    require(block.timestamp > NodeStorage.getCollectTime(msg.sender));
+    NodeStorage.requestCollect(msg.sender);
+    // ++ LogStorage
+  }
+
+  // collect the accumulated amount
+  function collectNode() external {
+    require(!NodeStorage.getState(msg.sender));    
+    require(block.timestamp > NodeStorage.getCollectTime(msg.sender));
     NodeStorage.collect(msg.sender);
-  }  
+    // ++ LogStorage
+  }
 
   // make an insurance deposit ETH and PMT
   // make sure, approve PMT to this contract first from address msg.sender
