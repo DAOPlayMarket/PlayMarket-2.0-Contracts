@@ -115,32 +115,8 @@ contract Node is Agent, SafeMath, Base {
     return NodeStorage.getConfirmation(_node);
   }
 
-  function getCollectStateNode(address _node) external view returns (bool) {
-    return NodeStorage.getCollectState(_node);
-  }
-
-  function getCollectTimeNode(address _node) external view returns (uint) {
-    return NodeStorage.getCollectTime(_node);
-  }
-
   function getReservNode(address _node) external view returns (bytes21) {
     return NodeStorage.getReserv(_node);
-  }
-
-  function getHashNode(address _node) external view returns (string) {
-    return NodeStorage.getHash(_node);
-  }
-
-  function getHashTypeNode(address _node) external view returns (uint32) {
-    return NodeStorage.getHashType(_node);
-  }
-
-  function getIPNode(address _node) external view returns (string) {
-    return NodeStorage.getIP(_node);
-  }
-
-  function getCoordinatesNode(address _node) external view returns (string) {
-    return NodeStorage.getCoordinates(_node);
   }
 
   function getInfoNode(address _node) external view returns (uint32, bool, uint, string, string, string) {
