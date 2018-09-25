@@ -111,47 +111,47 @@ contract Node is Agent, SafeMath, Base {
   /************************************************************************* 
   // Nodes getters
   **************************************************************************/
-  function getConfirmationNode() external view returns (bool) {
-    return NodeStorage.getConfirmation(msg.sender);
+  function getConfirmationNode(address _node) external view returns (bool) {
+    return NodeStorage.getConfirmation(_node);
   }
 
-  function getCollectStateNode() external view returns (bool) {
-    return NodeStorage.getCollectState(msg.sender);
+  function getCollectStateNode(address _node) external view returns (bool) {
+    return NodeStorage.getCollectState(_node);
   }
 
-  function getCollectTimeNode() external view returns (uint) {
-    return NodeStorage.getCollectTime(msg.sender);
+  function getCollectTimeNode(address _node) external view returns (uint) {
+    return NodeStorage.getCollectTime(_node);
   }
 
-  function getReservNode() external view returns (bytes21) {
-    return NodeStorage.getReserv(msg.sender);
+  function getReservNode(address _node) external view returns (bytes21) {
+    return NodeStorage.getReserv(_node);
   }
 
-  function getHashNode() external view returns (string) {
-    return NodeStorage.getHash(msg.sender);
+  function getHashNode(address _node) external view returns (string) {
+    return NodeStorage.getHash(_node);
   }
 
-  function getHashTypeNode() external view returns (uint32) {
-    return NodeStorage.getHashType(msg.sender);
+  function getHashTypeNode(address _node) external view returns (uint32) {
+    return NodeStorage.getHashType(_node);
   }
 
-  function getIPNode() external view returns (string) {
-    return NodeStorage.getIP(msg.sender);
+  function getIPNode(address _node) external view returns (string) {
+    return NodeStorage.getIP(_node);
   }
 
-  function getCoordinatesNode() external view returns (string) {
-    return NodeStorage.getCoordinates(msg.sender);
+  function getCoordinatesNode(address _node) external view returns (string) {
+    return NodeStorage.getCoordinates(_node);
   }
 
-  function getInfoNode() external view returns (uint32, bool, uint, string, string, string) {
-    return NodeStorage.getNodeInfo(msg.sender);
+  function getInfoNode(address _node) external view returns (uint32, bool, uint, string, string, string) {
+    return NodeStorage.getNodeInfo(_node);
   }
 
-  function getRevenueNode() external view returns (uint) {
-    return NodeStorage.getRevenue(msg.sender);
+  function getRevenueNode(address _node) external view returns (uint) {
+    return NodeStorage.getRevenue(_node);
   }
 
-  function getDepositNode() external view returns (uint, uint, uint, uint, uint, bool) {
-    return NodeStorage.getDeposit(msg.sender);
+  function getDepositNode(address _node) external view returns (uint, uint, uint, uint, uint, bool) {
+    return NodeStorage.getDeposit(_node);
   }
 }

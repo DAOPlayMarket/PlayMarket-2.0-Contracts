@@ -57,32 +57,32 @@ contract Dev is Agent, SafeMath, Base {
   /************************************************************************* 
   // Devs getters
   **************************************************************************/
-  function getNameDev() external view returns (bytes32) {
-    return DevStorage.getName(msg.sender);
+  function getNameDev(address _dev) external view returns (bytes32) {
+    return DevStorage.getName(_dev);
   }
 
-  function getInfoDev() external view returns (bytes32) {
-    return DevStorage.getInfo(msg.sender);
+  function getInfoDev(address _dev) external view returns (bytes32) {
+    return DevStorage.getInfo(_dev);
   }
 
-  function getStateDev() external view returns (bool) {
-    return DevStorage.getState(msg.sender);
+  function getStateDev(address _dev) external view returns (bool) {
+    return DevStorage.getState(_dev);
   }
 
-  function getReservDev() external view returns (bytes27) {
-    return DevStorage.getReserv(msg.sender);
+  function getReservDev(address _dev) external view returns (bytes27) {
+    return DevStorage.getReserv(_dev);
   }
 
-  function getStoreBlockedDev() external view returns (bool) {
-    return DevStorage.getStoreBlocked(msg.sender);
+  function getStoreBlockedDev(address _dev) external view returns (bool) {
+    return DevStorage.getStoreBlocked(_dev);
   }
   
-  function getRatingDev() external view returns (int256) {
-    return DevStorage.getRating(msg.sender);
+  function getRatingDev(address _dev) external view returns (int256) {
+    return DevStorage.getRating(_dev);
   }
 
-  function getRevenueDev() external view returns (uint256) {
-    return DevStorage.getRevenue(msg.sender);
+  function getRevenueDev(address _dev) external view returns (uint256) {
+    return DevStorage.getRevenue(_dev);
   }  
 
   /************************************************************************* 

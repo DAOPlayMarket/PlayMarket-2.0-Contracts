@@ -47,7 +47,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     PMTContract = ERC20I(_PMT);
   }
   
-  function addNode(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external onlyAgentStore(Nodes[_node].store) {
+  function addNode(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external onlyAgentStorage() {
     assert(!Nodes[_node].state);
     Nodes[_node]=_Node({
       hashType: _hashType,
@@ -64,6 +64,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   }
 
   function changeInfo(address _node, string _hash, uint32 _hashType, string _ip, string _coordinates) external onlyAgentStore(Nodes[_node].store) {
+    assert(Nodes[_node].state);
     Nodes[_node].hash = _hash;
     Nodes[_node].hashType = _hashType;
     Nodes[_node].ip = _ip;
@@ -73,7 +74,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   function buyObject(address _node) payable external onlyAgentStore(Nodes[_node].store) {
     assert(Nodes[_node].state);
     assert(msg.value > 0);
-    if (NodesDeposit[_node].ETH > NodesDeposit[_node].minETH && NodesDeposit[_node].PMT > NodesDeposit[_node].minPMT) {
+    if (NodesDeposit[_node].ETH >= NodesDeposit[_node].minETH && NodesDeposit[_node].PMT >= NodesDeposit[_node].minPMT) {
       NodesRevenue[_node] = safeAdd(NodesRevenue[_node], msg.value);  
     } else {
       Nodes[_node].confirmation = false;
@@ -294,8 +295,6 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   }
 
   function setDepositLimits(address _node, uint _ETH, uint _PMT) external onlyAgentStore(Nodes[_node].store) {
-    assert(_ETH > defETH);
-    assert(_PMT > defPMT);
     NodesDeposit[_node].minETH = _ETH;
     NodesDeposit[_node].minPMT = _PMT;
   }

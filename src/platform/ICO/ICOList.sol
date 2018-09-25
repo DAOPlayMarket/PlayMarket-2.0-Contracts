@@ -47,7 +47,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
    * @dev Create CrowdSale contract
    * @param _CSID - CrowdSale ID in array CrowdSales;
    */
-  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _targetInUSD, uint _CSID, uint _app, address _dev) external onlyAgent returns (address) {
+  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _targetInUSD, uint _CSID, uint _app, address _dev) external onlyAgentStorage() returns (address) {
     require(_CSID > 0);
     require(CrowdSales[_CSID] != address(0));
     require(_multisigWallet != address(0));
@@ -63,7 +63,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
    * @dev Create AppToken contract   
    * @param _ATID - AppToken ID in array AppTokens;
    */
-  function CreateAppToken(string _name, string _symbol, address _crowdsale, uint _ATID, uint _app, address _dev) external onlyAgent returns (address) {
+  function CreateAppToken(string _name, string _symbol, address _crowdsale, uint _ATID, uint _app, address _dev) external onlyAgentStorage() returns (address) {
     require(_ATID > 0);
     require(AppTokens[_ATID] != address(0));    
     require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
@@ -77,7 +77,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
   /**
    * @dev CreateICO 
    */
-  function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external onlyAgent {
+  function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external onlyAgentStorage() {
     require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
 
     CrowdSaleI(_crowdsale).setTokenContract(address(_apptoken));
@@ -98,7 +98,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
   /**
    * @dev DeleteICO 
    */
-  function DeleteICO(uint _app, address _dev) external onlyAgent {
+  function DeleteICO(uint _app, address _dev) external onlyAgentStorage() {
     // ICO must be confirmed
     require(ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
     // and finished
@@ -139,7 +139,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
   }
   
   // confirm ICO and add token to DAO PlayMarket 2.0 Exchange (DAOPEX)
-  function setConfirmation(address _dev, uint _app, bool _state) external onlyAgent returns (address) {
+  function setConfirmation(address _dev, uint _app, bool _state) external onlyAgentStorage() returns (address) {
     uint32 store = Agents[msg.sender].store;
     require(ICOs[store][_dev][_app].token != address(0));
     require(ICOs[store][_dev][_app].crowdsale != address(0));

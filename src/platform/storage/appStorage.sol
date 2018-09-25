@@ -37,7 +37,7 @@ contract AppStorage is AppStorageI, AgentStorage {
   mapping (uint => mapping (address => mapping (uint => bool))) private AppsPurchases; // AppsPurchases[_app][_user][_obj] = true/false;
   mapping (uint => mapping (address => mapping (uint => uint))) private AppsSubscriptions; // AppsSubscription[_app][_user][_obj] = end time subscription;
 
-  function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, address _dev, string _hash) external onlyAgent() returns (uint) {
+  function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, address _dev, string _hash) external onlyAgentStorage() returns (uint) {
     Apps.push(_App({
       hashType: _hashType,
       appType: _appType,

@@ -50,38 +50,38 @@ contract LogStorage is LogStorageI, AgentStorage {
   /** 
   ** Applications events 
   **/
-  function addAppEvent(uint _app, uint32 _hashType, uint32 _appType, uint _price, bool _publish, address _dev, string _hash) external onlyAgentLog {
+  function addAppEvent(uint _app, uint32 _hashType, uint32 _appType, uint _price, bool _publish, address _dev, string _hash) external onlyAgentStorage() {
     emit AddAppEvent(Agents[msg.sender].store, _app, _hashType, _appType, _price, _publish, _dev, _hash);
   }
 
-  function setConfirmationAppEvent(uint _app, bool _state, address _moderator) external onlyAgentLog {
+  function setConfirmationAppEvent(uint _app, bool _state, address _moderator) external onlyAgentStorage() {
     emit SetConfirmationAppEvent(Agents[msg.sender].store, _app, _state, _moderator);
   }
   
-  function changeHashAppEvent(uint _app, string _hash, uint32 _hashType) external onlyAgentLog {
+  function changeHashAppEvent(uint _app, string _hash, uint32 _hashType) external onlyAgentStorage() {
     emit ChangeHashAppEvent(Agents[msg.sender].store, _app, _hash, _hashType);
   }
   
-  function changePublishEvent(uint _app, bool _publish) external onlyAgentLog {
+  function changePublishEvent(uint _app, bool _publish) external onlyAgentStorage() {
     emit ChangePublishEvent(Agents[msg.sender].store, _app, _publish);
   }
   
-  function setPriceEvent(uint _app, uint _obj, uint _price) external onlyAgentLog {
+  function setPriceEvent(uint _app, uint _obj, uint _price) external onlyAgentStorage() {
     emit SetPriceEvent(Agents[msg.sender].store, _obj, _app, _price);
   }
   
-  function buyAppEvent(address _user, address _dev, uint _app, uint _obj, address _node, uint _price) external onlyAgentLog {
+  function buyAppEvent(address _user, address _dev, uint _app, uint _obj, address _node, uint _price) external onlyAgentStorage() {
     emit BuyAppEvent(Agents[msg.sender].store, _user, _dev, _app, _obj, _node, _price);
   }
   
   /** 
   ** Applications ICO events 
   **/
-  function addAppICOEvent(uint _app, string _hash, uint32 _hashType) external onlyAgentLog {
+  function addAppICOEvent(uint _app, string _hash, uint32 _hashType) external onlyAgentStorage() {
     emit AddAppICOEvent(Agents[msg.sender].store, _app, _hash, _hashType);
   }
   
-  function changeHashAppICOEvent(uint _app, string hash, uint32 hashType) external onlyAgentLog {
+  function changeHashAppICOEvent(uint _app, string hash, uint32 hashType) external onlyAgentStorage() {
     emit ChangeHashAppICOEvent(Agents[msg.sender].store, _app, hash, hashType);
   }
 
@@ -89,87 +89,87 @@ contract LogStorage is LogStorageI, AgentStorage {
   /** 
   ** Developers events 
   **/  
-  function addDevEvent(address _dev, bytes32 name, bytes32 info) external onlyAgentLog {
+  function addDevEvent(address _dev, bytes32 name, bytes32 info) external onlyAgentStorage() {
     emit AddDevEvent(Agents[msg.sender].store, _dev, name, info);
   }
   
-  function changeNameDevEvent(address _dev, bytes32 name, bytes32 info) external onlyAgentLog {
+  function changeNameDevEvent(address _dev, bytes32 name, bytes32 info) external onlyAgentStorage() {
     emit ChangeNameDevEvent(Agents[msg.sender].store, _dev, name, info);
   }
   
-  function setStoreBlockedDevEvent(address _dev, bool _state) external onlyAgentLog {
+  function setStoreBlockedDevEvent(address _dev, bool _state) external onlyAgentStorage() {
     emit SetStoreBlockedDevEvent(Agents[msg.sender].store, _dev, _state);
   }
   
-  function setRatingDevEvent(address _dev, int _rating) external onlyAgentLog {
+  function setRatingDevEvent(address _dev, int _rating) external onlyAgentStorage() {
     emit SetRatingDevEvent(Agents[msg.sender].store, _dev, _rating);
   }
   /** 
   ** Nodes events 
   **/  
-  function addNodeEvent(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external onlyAgentLog {
+  function addNodeEvent(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external onlyAgentStorage() {
     emit AddNodeEvent(Agents[msg.sender].store, _node, _hashType, _reserv, _hash, _ip, _coordinates);
   }
   
-  function changeInfoNodeEvent(address _node,  string _hash, uint32 _hashType, string _ip, string _coordinates) external onlyAgentLog {
+  function changeInfoNodeEvent(address _node,  string _hash, uint32 _hashType, string _ip, string _coordinates) external onlyAgentStorage() {
     emit ChangeInfoNodeEvent(Agents[msg.sender].store, _node, _hash, _hashType, _ip, _coordinates);
   }
 
-  function requestCollectNodeEvent(address _node) external onlyAgentLog {
+  function requestCollectNodeEvent(address _node) external onlyAgentStorage() {
     emit RequestCollectNodeEvent(Agents[msg.sender].store, _node);
   }
 
-  function collectNodeEvent(address _node, uint _amount) external onlyAgentLog {
+  function collectNodeEvent(address _node, uint _amount) external onlyAgentStorage() {
     emit CollectNodeEvent(Agents[msg.sender].store, _node, _amount);
   }
 
-  function makeDepositNodeEvent(address _from, address _node, uint _ETH, uint _PMT) external onlyAgentLog {
+  function makeDepositNodeEvent(address _from, address _node, uint _ETH, uint _PMT) external onlyAgentStorage() {
     emit MakeDepositNodeEvent(Agents[msg.sender].store, _from, _node, _ETH, _PMT);
   }
 
-  function makeDepositETHNodeEvent(address _from, address _node, uint _value) external onlyAgentLog {
+  function makeDepositETHNodeEvent(address _from, address _node, uint _value) external onlyAgentStorage() {
     emit MakeDepositETHNodeEvent(Agents[msg.sender].store, _from, _node, _value);
   }
 
-  function makeDepositPMTNodeEvent(address _from, address _node, uint _value) external onlyAgentLog {
+  function makeDepositPMTNodeEvent(address _from, address _node, uint _value) external onlyAgentStorage() {
     emit MakeDepositPMTNodeEvent(Agents[msg.sender].store, _from, _node, _value);
   }
 
-  function requestRefundNodeEvent(address _node, uint _refundTime) external onlyAgentLog {
+  function requestRefundNodeEvent(address _node, uint _refundTime) external onlyAgentStorage() {
     emit RequestRefundNodeEvent(Agents[msg.sender].store, _node, _refundTime);
   }
 
-  function refundNodeEvent(address _node) external onlyAgentLog {
+  function refundNodeEvent(address _node) external onlyAgentStorage() {
     emit RefundNodeEvent(Agents[msg.sender].store, _node);
   }
 
-  function setConfirmationNodeEvent(address _node, bool _state, address _moderator) external onlyAgentLog {
+  function setConfirmationNodeEvent(address _node, bool _state, address _moderator) external onlyAgentStorage() {
     emit SetConfirmationNodeEvent(Agents[msg.sender].store, _node, _state, _moderator);
   }
 
-  function setDepositLimitsNodeEvent(address _node, uint _ETH, uint _PMT, address _moderator) external onlyAgentLog {
+  function setDepositLimitsNodeEvent(address _node, uint _ETH, uint _PMT, address _moderator) external onlyAgentStorage() {
     emit SetDepositLimitsNodeEvent(Agents[msg.sender].store, _node, _ETH, _PMT, _moderator);
   }
 
   /** 
   ** ICO event
   **/
-  function icoCreateEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType) external onlyAgentLog {
+  function icoCreateEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType) external onlyAgentStorage() {
     emit ICOCreateEvent(Agents[msg.sender].store, _dev, _app, _name, _symbol, _decimals, _crowdsale, _hash, _hashType);
   }
   
-  function icoDeleteEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType) external onlyAgentLog {
+  function icoDeleteEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType) external onlyAgentStorage() {
     emit ICODeleteEvent(Agents[msg.sender].store, _dev, _app, _name, _symbol, _decimals, _crowdsale, _hash, _hashType);
   }
   
-  function icoConfirmationEvent(address _dev, uint _app, bool _state) external onlyAgentLog {
+  function icoConfirmationEvent(address _dev, uint _app, bool _state) external onlyAgentStorage() {
     emit ICOConfirmationEvent(Agents[msg.sender].store, _dev, _app, _state);
   }  
   
   /** 
   ** Feedback Rating event
   **/
-  function feedbackRatingEvent(address voter, uint _app, uint vote, string description, bytes32 txIndex, uint blocktimestamp) external onlyAgentLog {
+  function feedbackRatingEvent(address voter, uint _app, uint vote, string description, bytes32 txIndex, uint blocktimestamp) external onlyAgentStorage() {
     emit FeedbackRatingEvent(Agents[msg.sender].store, voter, _app, vote, description, txIndex, blocktimestamp);
   }
 }

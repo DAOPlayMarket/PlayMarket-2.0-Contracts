@@ -27,7 +27,7 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     _;
   }
   
-  function addDev(address _dev, bytes32 _name, bytes32 _info, bytes27 _reserv) external onlyAgentDev() {
+  function addDev(address _dev, bytes32 _name, bytes32 _info, bytes27 _reserv) external onlyAgentStorage() {
     assert(!Devs[_dev].state);
     Devs[_dev]=_Dev({
       name: _name,
@@ -38,20 +38,20 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     });
   }
 
-  function changeName(address _dev, bytes32 _name, bytes32 _info) external onlyAgentDev() CheckBlock(_dev) {
+  function changeName(address _dev, bytes32 _name, bytes32 _info) external onlyAgentStorage() CheckBlock(_dev) {
     assert(Devs[_dev].state);
     Devs[_dev].name = _name;
     Devs[_dev].info = _info;
   }
 
-  function buyObject(address _dev) payable external onlyAgentDev() CheckBlock(_dev){
+  function buyObject(address _dev) payable external onlyAgentStorage() CheckBlock(_dev){
     assert(Devs[_dev].state);
     assert(msg.value > 0);
     DevsRevenue[_dev] = safeAdd(DevsRevenue[_dev], msg.value);
   }
 
   // collect the accumulated amount
-  function collect(address _dev) external onlyAgentDev() CheckBlock(_dev){
+  function collect(address _dev) external onlyAgentStorage() CheckBlock(_dev){
     assert(Devs[_dev].state);
     uint256 amount = DevsRevenue[_dev];
     assert(amount > 0);
@@ -62,47 +62,47 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
   /************************************************************************* 
   // Devs getters
   **************************************************************************/
-  function getName(address _dev) external view onlyAgentDev() returns (bytes32) {
+  function getName(address _dev) external view onlyAgentStorage() returns (bytes32) {
     return Devs[_dev].name;
   }
 
-  function getInfo(address _dev) external view onlyAgentDev() returns (bytes32) {
+  function getInfo(address _dev) external view onlyAgentStorage() returns (bytes32) {
     return Devs[_dev].info;
   }
 
-  function getState(address _dev) external view onlyAgentDev() returns (bool) {
+  function getState(address _dev) external view onlyAgentStorage() returns (bool) {
     return Devs[_dev].state;
   }
 
-  function getStore(address _dev) external view onlyAgentDev() returns (uint32) {
+  function getStore(address _dev) external view onlyAgentStorage() returns (uint32) {
     return Devs[_dev].store;
   }
   
-  function getReserv(address _dev) external view onlyAgentDev() returns (bytes27) {
+  function getReserv(address _dev) external view onlyAgentStorage() returns (bytes27) {
     return Devs[_dev].reserv;
   }
 
-  function getStoreBlocked(address _dev) external view onlyAgentDev() returns (bool) {
+  function getStoreBlocked(address _dev) external view onlyAgentStorage() returns (bool) {
     return DevsStoreBlocked[Agents[msg.sender].store][_dev];
   }
   
-  function getRating(address _dev) external view onlyAgentDev() returns (int256) {
+  function getRating(address _dev) external view onlyAgentStorage() returns (int256) {
     return DevsRating[Agents[msg.sender].store][_dev];
   }
 
-  function getRevenue(address _dev) external view onlyAgentDev() returns (uint256) {
+  function getRevenue(address _dev) external view onlyAgentStorage() returns (uint256) {
     return DevsRevenue[_dev];
   }
 
   /************************************************************************* 
   // Devs setters
   **************************************************************************/
-  function setName(address _dev, bytes32 _name) external onlyAgentDev() {
+  function setName(address _dev, bytes32 _name) external onlyAgentStorage() {
     //require(Devs[_dev].state);
     Devs[_dev].name = _name;
   }
 
-  function setInfo(address _dev, bytes32 _info) external onlyAgentDev() {
+  function setInfo(address _dev, bytes32 _info) external onlyAgentStorage() {
     //require(Devs[_dev].state);
     Devs[_dev].info = _info;
   }
@@ -112,17 +112,17 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     Devs[_dev].store = _store;
   }
 
-  function setReserv(address _dev, bytes27 _reserv) external onlyAgentDev() {
+  function setReserv(address _dev, bytes27 _reserv) external onlyAgentStorage() {
    //require(Devs[_dev].state);
     Devs[_dev].reserv = _reserv;
   }
   
-  function setStoreBlocked(address _dev, bool _state) external onlyAgentDev() {
+  function setStoreBlocked(address _dev, bool _state) external onlyAgentStorage() {
     //require(Devs[_dev].state);
     DevsStoreBlocked[Agents[msg.sender].store][_dev] = _state;
   }
 
-  function setRating(address _dev, int _rating) external onlyAgentDev() {
+  function setRating(address _dev, int _rating) external onlyAgentStorage() {
     //require(Devs[_dev].state);
     DevsRating[Agents[msg.sender].store][_dev] = _rating;
   }
