@@ -1,0 +1,125 @@
+pragma solidity ^0.4.24;
+
+import '../Base.sol';
+import '../common/Agent.sol';
+import './ICO/ICOListI.sol';
+import './storage/appStorageI.sol';
+import './storage/devStorageI.sol';
+
+/**
+ * @title PlayMarket contract - basic ICO contract DAO PlayMarket 2.0
+ */
+contract ICO is Agent, Base {
+
+  bytes32 public version = "1.0.0";
+
+  ICOListI public ICOList;
+  AppStorageI public AppStorage;
+  DevStorageI public DevStorage;
+
+  event setICOListContractEvent(address _ICOList);       
+  event setAppStorageContractEvent(address _contract);  
+  event setDevStorageContractEvent(address _contract);
+
+  struct _ICO {
+    string name;
+    string symbol;
+    uint decimals;    
+    uint startsAt;
+    uint duration;
+    uint targetInUSD;
+    address token;
+    address crowdsale;
+    string hash;
+    uint32 hashType;
+    bool confirmation;
+  }
+
+  mapping (uint => _ICO) public ICOs;
+
+  constructor (address _appStorage, address _devStorage, address _logStorage, address _ICOList) public {
+    require(_ICOList  != address(0));    
+    setICOListContract(_ICOList);
+    setAppStorageContract(_appStorage);
+    setDevStorageContract(_devStorage);
+    setLogStorageContract(_logStorage);
+  }
+
+  // link to ICOList contract
+  function setICOListContract(address _contract) public onlyOwner {
+    ICOList = ICOListI(_contract);
+    emit setICOListContractEvent(_contract);
+  }
+
+  // link to dev storage
+  function setDevStorageContract(address _contract) public onlyOwner {
+    DevStorage = DevStorageI(_contract);
+    emit setDevStorageContractEvent(_contract);
+  }
+
+  // link to app storage
+  function setAppStorageContract(address _contract) public onlyOwner {
+    AppStorage = AppStorageI(_contract);
+    emit setAppStorageContractEvent(_contract);
+  }
+
+  function addAppICOInfo(uint _app, string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, string _hash, uint32 _hashType) external {
+    address _dev = AppStorage.getDeveloper(_app);
+    require(msg.sender == _dev);
+    require(!DevStorage.getStoreBlocked(_dev));
+
+    _ICO storage ico = ICOs[_app];
+    
+    ico.name = _name;
+    ico.symbol = _symbol;
+    ico.decimals = _decimals;
+    ico.startsAt = _startsAt;
+    ico.duration = _duration;
+    ico.targetInUSD = _targetInUSD;
+    ico.hash = _hash;
+    ico.hashType = _hashType;
+    
+    AppStorage.addAppICO(_app, _hash, _hashType);
+    LogStorage.addAppICOEvent(_app, _hash, _hashType);
+  }
+
+  function changeHashAppICO(uint _app, string _hash, uint32 _hashType) external onlyAgent {
+    require(AppStorage.getDeveloper(_app) == msg.sender);
+    AppStorage.changeHashAppICO(_app, _hash, _hashType);
+    LogStorage.changeHashAppICOEvent(_app, _hash, _hashType);
+  }
+
+  function addAppICOContracts(uint _app, address _multisigWallet, uint _CSID, uint _ATID) external {
+    address _dev = AppStorage.getDeveloper(_app);
+    require(msg.sender == _dev);
+    require(!DevStorage.getStoreBlocked(_dev));
+
+    _ICO storage ico = ICOs[_app];
+
+    // create CrowdSale contract from CrowdSale Build contract
+    ico.crowdsale = ICOList.CreateCrowdSale(_multisigWallet, ico.startsAt, ico.targetInUSD, _CSID, _app, _dev);
+    // create AppToken contract from AppToken Build contract
+    ico.token = ICOList.CreateAppToken(ico.name, ico.symbol, ico.crowdsale, _ATID, _app, _dev);
+    // create ICO
+    ICOList.CreateICO(ico.name, ico.symbol, ico.decimals, ico.startsAt, ico.duration, ico.targetInUSD, ico.crowdsale, ico.token, _app, _dev);
+    // generate event about create contract
+    LogStorage.icoCreateEvent(_dev, _app, ico.name, ico.symbol, ico.decimals, ico.crowdsale, ico.hash, ico.hashType);
+  }
+
+  function delAppICO(uint _app) external {
+    address _dev = AppStorage.getDeveloper(_app);
+    require(msg.sender == _dev);
+    require(!DevStorage.getStoreBlocked(_dev));
+
+    _ICO storage ico = ICOs[_app];
+    ICOList.DeleteICO(_app, msg.sender);
+    LogStorage.icoDeleteEvent(_dev, _app, ico.name, ico.symbol, ico.decimals, ico.crowdsale, ico.hash, ico.hashType);
+  }
+
+  function setConfirmationICO(address _dev, uint _app, bool _state) external onlyAgent {
+    _ICO storage ico = ICOs[_app];
+    require(ico.crowdsale != address(0));
+    ICOList.setConfirmation(_dev, _app, _state);
+    LogStorage.icoConfirmationEvent(_dev, _app, _state);
+  }
+}

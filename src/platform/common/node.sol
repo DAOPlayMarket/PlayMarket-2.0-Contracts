@@ -111,51 +111,47 @@ contract Node is Agent, SafeMath, Base {
   /************************************************************************* 
   // Nodes getters
   **************************************************************************/
-  function getHashType() external view returns (uint32) {
-    return NodeStorage.getHashType(msg.sender);
-  }
-
-  function getState() external view returns (bool) {
-    return NodeStorage.getState(msg.sender);
-  }
-
-  function getConfirmation() external view returns (bool) {
+  function getConfirmationNode() external view returns (bool) {
     return NodeStorage.getConfirmation(msg.sender);
   }
 
-  function getCollectState() external view returns (bool) {
+  function getCollectStateNode() external view returns (bool) {
     return NodeStorage.getCollectState(msg.sender);
   }
 
-  function getCollectTime() external view returns (uint) {
+  function getCollectTimeNode() external view returns (uint) {
     return NodeStorage.getCollectTime(msg.sender);
   }
 
-  function getReserv() external view returns (bytes21) {
+  function getReservNode() external view returns (bytes21) {
     return NodeStorage.getReserv(msg.sender);
   }
 
-  function getHash() external view returns (string) {
+  function getHashNode() external view returns (string) {
     return NodeStorage.getHash(msg.sender);
   }
 
-  function getIP() external view returns (string) {
+  function getHashTypeNode() external view returns (uint32) {
+    return NodeStorage.getHashType(msg.sender);
+  }
+
+  function getIPNode() external view returns (string) {
     return NodeStorage.getIP(msg.sender);
   }
 
-  function getCoordinates() external view returns (string) {
+  function getCoordinatesNode() external view returns (string) {
     return NodeStorage.getCoordinates(msg.sender);
   }
 
-  function getNodeInfo() external view returns (uint32, bool, uint, string, string, string) {
+  function getInfoNode() external view returns (uint32, bool, uint, string, string, string) {
     return NodeStorage.getNodeInfo(msg.sender);
   }
 
-  function getRevenue() external view returns (uint) {
+  function getRevenueNode() external view returns (uint) {
     return NodeStorage.getRevenue(msg.sender);
   }
 
-  function getDeposit() external view returns (uint, uint, uint, uint, uint, bool) {
+  function getDepositNode() external view returns (uint, uint, uint, uint, uint, bool) {
     return NodeStorage.getDeposit(msg.sender);
   }
 }

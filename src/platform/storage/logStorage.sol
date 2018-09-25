@@ -12,12 +12,12 @@ contract LogStorage is LogStorageI, AgentStorage {
   event AddAppEvent(uint32 indexed _store, uint indexed _app, uint32 _hashType, uint32 indexed _appType, uint _price, bool _publish, address _dev, string _hash);
   event SetConfirmationAppEvent(uint32 indexed _store, uint indexed _app, bool _state, address _moderator);
   event ChangeHashAppEvent(uint32 indexed _store, uint indexed _app, string _hash, uint32 _hashType);
-  event ChangePublishEvent(uint32 indexed _store, uint indexed _app, bool publish);
-  event SetPriceEvent(uint32 indexed _store, uint indexed _app, uint _obj ,uint price);
+  event ChangePublishEvent(uint32 indexed _store, uint indexed _app, bool _state);
+  event SetPriceEvent(uint32 indexed _store, uint indexed _app, uint _obj, uint _price);
   event BuyAppEvent(uint32 indexed _store, address indexed _user, address indexed _dev, uint _app, uint _obj, address _node, uint price);
   
-  //Ico App events 
-  event AddAppICOEvent(uint32 indexed _store, uint _app, string hash, uint32 _hashType);
+  //Ico App events
+  event AddAppICOEvent(uint32 indexed _store, uint _app, string _hash, uint32 _hashType);
   event ChangeHashAppICOEvent(uint32 indexed _store, uint indexed _app, string hash, uint32 _hashType);
 
   //ICO events 

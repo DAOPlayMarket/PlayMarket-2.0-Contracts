@@ -13,9 +13,9 @@ interface LogStorageI {
   function setPriceEvent(uint _app, uint _obj, uint _price) external;
   function buyAppEvent(address _user, address _dev, uint _app, uint _obj, address _node, uint _price) external;
   
-  //ICO App events 
-  function addAppICOEvent(uint _app, string hash, uint32 hashType) external;
-  function changeHashAppICOEvent(uint _app, string hash, uint32 hashType) external;
+  //ICO App events   
+  function addAppICOEvent(uint _app, string _hash, uint32 _hashType) external;
+  function changeHashAppICOEvent(uint _app, string _hash, uint32 _hashType) external;
   
   //Developer events 
   function addDevEvent(address _dev, bytes32 name, bytes32 info) external;

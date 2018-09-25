@@ -75,12 +75,6 @@ contract App is Agent, SafeMath, Base {
     AppStorage.setDuration(_app, _arrObj, _price);
   }
   
-  function changeHashAppICO(uint _app, string _hash, uint32 _hashType) external onlyAgent {
-    require(AppStorage.getDeveloper(_app) == msg.sender);
-    AppStorage.changeHashAppICO(_app, _hash, _hashType);
-    LogStorage.changeHashAppICOEvent(_app, _hash, _hashType);
-  }
-
   function getDeveloper(uint _app) external view returns (address) {
     return AppStorage.getDeveloper(_app);
   }
