@@ -54,7 +54,7 @@ contract SafeMath {
         
         uint256 z = x * y;
         assert(z / x == y);    
-        z = z / 100;
+        z = z / 10000; // percent to hundredths
         return z;
     }
 

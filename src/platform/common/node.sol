@@ -26,7 +26,7 @@ contract Node is Agent, SafeMath, Base {
     LogStorage.addNodeEvent(msg.sender, _hashType, _hash, _ip, _coordinates);
   }
 
-  function changeNodeInfo(string _hash, uint32 _hashType, string _ip, string _coordinates) external {
+  function changeInfoNode(string _hash, uint32 _hashType, string _ip, string _coordinates) external {
     require(NodeStorage.getState(msg.sender));
     NodeStorage.changeInfo(msg.sender, _hash, _hashType, _ip, _coordinates);
     LogStorage.changeInfoNodeEvent(msg.sender, _hash, _hashType, _ip, _coordinates);
@@ -116,7 +116,7 @@ contract Node is Agent, SafeMath, Base {
   }
 
   function getInfoNode(address _node) external view returns (uint32, bool, uint, string, string, string) {
-    return NodeStorage.getNodeInfo(_node);
+    return NodeStorage.getInfo(_node);
   }
 
   function getRevenueNode(address _node) external view returns (uint) {

@@ -11,7 +11,7 @@ contract PlayMarket is App, Dev, Node {
 
   bytes32 public version = "1.0.0";
 
-  uint32 public percNode = 1; // all that's left, will go to the developer
+  uint32 public percNode = 100; // 1% (percent to hundredths) - all that's left, will go to the developer
   
   constructor (address _appStorage, address _devStorage, address _nodeStorage, address _logStorage) public {
     require(_appStorage  != address(0));
@@ -20,7 +20,7 @@ contract PlayMarket is App, Dev, Node {
     require(_logStorage  != address(0));
 
     setAppStorageContract(_appStorage);
-    setDevStorageContract(_devStorage);    
+    setDevStorageContract(_devStorage);
     setNodeStorageContract(_nodeStorage);
     setLogStorageContract(_logStorage);
   }
@@ -36,9 +36,15 @@ contract PlayMarket is App, Dev, Node {
     require(!DevStorage.getStoreBlocked(_dev));
 
     AppStorage.buyObject(_app, msg.sender, _obj, true);
-    uint revNode = safePerc(msg.value, percNode);
+    // type of percNode => uint32 and max value 100%. [0-10000]
+    // example msg.value = 1000 wei, percNode = 0%: 1000 * 0 / 10000 = 0  => 0 wei to Node, 1000 - 0 = 1000 to Developer
+    // example msg.value = 1000 wei, percNode = 1%: 1000 * 100 / 10000 = 10 => 10 wei to Node, 1000 - 10 = 990 to Developer
+    // example msg.value = 1000 wei, percNode = 51%: 1000 * 5100 / 10000 = 510 => 510 wei to Node, 1000 - 510 = 410 to Developer
+    // example msg.value = 1000 wei, percNode = 100%: 1000 * 10000 / 10000 = 1000 => 1000 wei to Node, 1000 - 1000 = 0 to Developer
+    // so can use the usual subtraction (not safeSub)
+    uint revNode = safePerc(msg.value, percNode); 
     require(address(NodeStorage).call.value(revNode)(abi.encodeWithSignature("buyObject(address)", _node)));
-    require(address(DevStorage).call.value(safeSub(msg.value, revNode))(abi.encodeWithSignature("buyObject(address)", _dev)));
+    require(address(DevStorage).call.value(msg.value - revNode)(abi.encodeWithSignature("buyObject(address)", _dev)));
 
     LogStorage.buyAppEvent(msg.sender, _dev, _app, _obj, _node, msg.value);
   }
@@ -52,7 +58,7 @@ contract PlayMarket is App, Dev, Node {
     AppStorage.buyObject(_app, msg.sender, _obj, true, _price);
     uint revNode = safePerc(msg.value, percNode);
     require(address(NodeStorage).call.value(revNode)(abi.encodeWithSignature("buyObject(address)", _node)));
-    require(address(DevStorage).call.value(safeSub(msg.value, revNode))(abi.encodeWithSignature("buyObject(address)", _dev)));
+    require(address(DevStorage).call.value(msg.value - revNode)(abi.encodeWithSignature("buyObject(address)", _dev)));
 
     LogStorage.buyAppEvent(msg.sender, _dev, _app, _obj, _node, msg.value);
   }
@@ -71,7 +77,7 @@ contract PlayMarket is App, Dev, Node {
     AppStorage.buySubscription(_app, msg.sender, _obj, timeEnd);
     uint revNode = safePerc(msg.value, percNode);
     require(address(NodeStorage).call.value(revNode)(abi.encodeWithSignature("buyObject(address)", _node)));
-    require(address(DevStorage).call.value(safeSub(msg.value, revNode))(abi.encodeWithSignature("buyObject(address)", _dev)));
+    require(address(DevStorage).call.value(msg.value - revNode)(abi.encodeWithSignature("buyObject(address)", _dev)));
 
     LogStorage.buyAppEvent(msg.sender, _dev, _app, _obj, _node, msg.value);
   }
@@ -90,7 +96,7 @@ contract PlayMarket is App, Dev, Node {
     AppStorage.buySubscription(_app, msg.sender, _obj, timeEnd, _price);
     uint revNode = safePerc(msg.value, percNode);
     require(address(NodeStorage).call.value(revNode)(abi.encodeWithSignature("buyObject(address)", _node)));
-    require(address(DevStorage).call.value(safeSub(msg.value, revNode))(abi.encodeWithSignature("buyObject(address)", _dev)));
+    require(address(DevStorage).call.value(msg.value - revNode)(abi.encodeWithSignature("buyObject(address)", _dev)));
 
     LogStorage.buyAppEvent(msg.sender, _dev, _app, _obj, _node, msg.value);
   }
@@ -101,7 +107,7 @@ contract PlayMarket is App, Dev, Node {
 
     uint revNode = safePerc(msg.value, percNode);
     require(address(NodeStorage).call.value(revNode)(abi.encodeWithSignature("buyObject(address)", _node)));
-    require(address(DevStorage).call.value(safeSub(msg.value, revNode))(abi.encodeWithSignature("buyObject(address)", _dev)));
+    require(address(DevStorage).call.value(msg.value - revNode)(abi.encodeWithSignature("buyObject(address)", _dev)));
 
     LogStorage.buyAppEvent(msg.sender, _dev, _app, _obj, _node, msg.value);
   }
@@ -110,6 +116,7 @@ contract PlayMarket is App, Dev, Node {
   // default params setters (onlyOwner => DAO)
   **************************************************************************/
   function setPercNode(uint32 _proc) public onlyOwner {
+    require(_proc <= 10000);
     percNode = _proc;
   }
 }

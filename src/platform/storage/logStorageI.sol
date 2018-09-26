@@ -7,7 +7,7 @@ interface LogStorageI {
   
   //App events 
   function addAppEvent(uint _app, uint32 _hashType, uint32 _appType, uint _price, bool _publish, address _dev, string _hash) external;
-  function setConfirmationAppEvent(uint _app, bool _state, address _moderator) external;
+  function setConfirmationAppEvent(uint _app, bool _state, address _moderator, uint32 _hashType, string _hash) external;
   function changeHashAppEvent(uint _app, string _hash, uint32 _hashType) external;
   function changePublishEvent(uint _app, bool _publish) external;
   function setPriceEvent(uint _app, uint _obj, uint _price) external;

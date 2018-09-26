@@ -10,7 +10,7 @@ contract LogStorage is LogStorageI, AgentStorage {
 
   //App events 
   event AddAppEvent(uint32 indexed _store, uint indexed _app, uint32 _hashType, uint32 indexed _appType, uint _price, bool _publish, address _dev, string _hash);
-  event SetConfirmationAppEvent(uint32 indexed _store, uint indexed _app, bool _state, address _moderator);
+  event SetConfirmationAppEvent(uint32 indexed _store, uint indexed _app, bool _state, address _moderator, uint32 _hashType, string _hash);
   event ChangeHashAppEvent(uint32 indexed _store, uint indexed _app, string _hash, uint32 _hashType);
   event ChangePublishEvent(uint32 indexed _store, uint indexed _app, bool _state);
   event SetPriceEvent(uint32 indexed _store, uint indexed _app, uint _obj, uint _price);
@@ -54,8 +54,8 @@ contract LogStorage is LogStorageI, AgentStorage {
     emit AddAppEvent(Agents[msg.sender].store, _app, _hashType, _appType, _price, _publish, _dev, _hash);
   }
 
-  function setConfirmationAppEvent(uint _app, bool _state, address _moderator) external onlyAgentStorage() {
-    emit SetConfirmationAppEvent(Agents[msg.sender].store, _app, _state, _moderator);
+  function setConfirmationAppEvent(uint _app, bool _state, address _moderator, uint32 _hashType, string _hash) external onlyAgentStorage() {
+    emit SetConfirmationAppEvent(Agents[msg.sender].store, _app, _state, _moderator, _hashType, _hash);
   }
   
   function changeHashAppEvent(uint _app, string _hash, uint32 _hashType) external onlyAgentStorage() {

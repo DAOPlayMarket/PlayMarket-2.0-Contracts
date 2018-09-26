@@ -39,7 +39,7 @@ interface NodeStorageI {
   function getHash(address _node) external view returns (string);
   function getIP(address _node) external view returns (string);
   function getCoordinates(address _node) external view returns (string);
-  function getNodeInfo(address _node) external view returns (uint32, bool, uint, string, string, string);
+  function getInfo(address _node) external view returns (uint32, bool, uint, string, string, string);
   function getRevenue(address _node) external view returns (uint);
   function getDeposit(address _node) external view returns (uint, uint, uint, uint, uint, bool);
   function getDefETH() external view returns (uint);

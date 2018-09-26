@@ -26,9 +26,9 @@ contract App is Agent, SafeMath, Base {
     LogStorage.addAppEvent(app, _hashType, _appType, _price, _publish, msg.sender, _hash);
   }
   
-  function setAppConfirmation(uint _app, bool _state) external onlyAgent {
+  function setAppConfirmation(uint _app, bool _state, uint32 _hashType, string _hash) external onlyAgent {
     AppStorage.setConfirmation(_app, _state);
-    LogStorage.setConfirmationAppEvent(_app, _state, msg.sender); // msg.sender - moderator
+    LogStorage.setConfirmationAppEvent(_app, _state, msg.sender, _hashType, _hash); // msg.sender - moderator
   }
   
   // after change hash application - confirmation sets to false
@@ -87,6 +87,14 @@ contract App is Agent, SafeMath, Base {
   // check objects buy
   function getTimeSubscription(uint _app, address _user, uint _obj) external view returns (uint _endTime) {
     return AppStorage.getTimeSubscription(_app, _user, _obj);
+  }
+
+  function getInfoApp(uint _app) external view returns (uint32, uint32, bool, bool, address, string) {
+    return AppStorage.getInfo(_app);
+  }
+
+  function getInfoAppICO(uint _app) external view returns (uint32, bool, string) {
+    return AppStorage.getInfoICO(_app);
   }
   
   /**

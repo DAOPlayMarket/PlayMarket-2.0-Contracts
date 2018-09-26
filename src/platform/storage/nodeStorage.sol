@@ -216,7 +216,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     return Nodes[_node].coordinates;
   }
 
-  function getNodeInfo(address _node) external view onlyAgentStore(Nodes[_node].store) returns (uint32, bool, uint, string, string, string) {
+  function getInfo(address _node) external view onlyAgentStore(Nodes[_node].store) returns (uint32, bool, uint, string, string, string) {
     return (Nodes[_node].hashType,      
       Nodes[_node].collectState, 
       Nodes[_node].collectTime,
