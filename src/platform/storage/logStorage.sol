@@ -32,7 +32,7 @@ contract LogStorage is LogStorageI, AgentStorage {
   event SetRatingDevEvent(uint32 indexed _store, address indexed _dev, int _rating);
   
   //Node events  
-  event AddNodeEvent(uint32 indexed _store, address indexed _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates);
+  event AddNodeEvent(uint32 indexed _store, address indexed _node, uint32 _hashType, string _hash, string _ip, string _coordinates);
   event ChangeInfoNodeEvent(uint32 indexed _store, address _node, string _hash, uint32 _hashType, string _ip, string _coordinates);
   event RequestCollectNodeEvent(uint32 indexed _store, address _node);
   event CollectNodeEvent(uint32 indexed _store, address _node, uint _amount);
@@ -107,8 +107,8 @@ contract LogStorage is LogStorageI, AgentStorage {
   /** 
   ** Nodes events 
   **/  
-  function addNodeEvent(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external onlyAgentStorage() {
-    emit AddNodeEvent(Agents[msg.sender].store, _node, _hashType, _reserv, _hash, _ip, _coordinates);
+  function addNodeEvent(address _node, uint32 _hashType, string _hash, string _ip, string _coordinates) external onlyAgentStorage() {
+    emit AddNodeEvent(Agents[msg.sender].store, _node, _hashType, _hash, _ip, _coordinates);
   }
   
   function changeInfoNodeEvent(address _node,  string _hash, uint32 _hashType, string _ip, string _coordinates) external onlyAgentStorage() {

@@ -60,9 +60,9 @@ contract App is Agent, SafeMath, Base {
     AppStorage.setPrice(_app, _arrObj, _price);
   }
   
-  function setDuration(uint _app, uint _obj, uint _price) external {
+  function setDuration(uint _app, uint _obj, uint _duration) external {
     require(AppStorage.getDeveloper(_app) == msg.sender);
-    AppStorage.setDuration(_app, _obj, _price);
+    AppStorage.setDuration(_app, _obj, _duration);
   }
 
   function setDuration(uint _app, uint[] _arrObj, uint[] _arrPrice) external {

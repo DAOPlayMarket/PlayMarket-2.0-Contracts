@@ -1,10 +1,12 @@
 pragma solidity ^0.4.24;
- import './common/Agent.sol';
+import './common/Agent.sol';
  
- contract Proxy is Agent {
-     struct Version {
-        // main contract address
-        address mainAddress;
+contract Proxy is Agent {
+    struct Version {
+        // DAO PlayMarket 2.0 platform contract address
+        address PlayMarket;
+        // DAO PlayMarket 2.0 platform ICO contract address
+        address ICO;        
         // version PM 2.0
         bytes32 version;
         //support end time (0 - indefinite)
@@ -13,44 +15,46 @@ pragma solidity ^0.4.24;
     
     Version[] public versions;
     
-    event addVersionLog(address mainAddress, bytes32 version, uint256 timestamp, uint256 i);
-    event changeVersionLog(address mainAddress, bytes32 version, uint256 timestamp, uint256 i);
+    event addVersionLog(address PlayMarket, address ICO, bytes32 version, uint256 timestamp, uint256 i);
+    event changeVersionLog(address PlayMarket, address ICO, bytes32 version, uint256 timestamp, uint256 i);
     event lastVersionLog(bytes32 version, uint256 i);
     
-    constructor(address _mainAddress, bytes32 _version, uint256 _timestamp) public {
-        require(_mainAddress != address(0));
-        versions.push(Version( _mainAddress, _version, _timestamp));
-        emit addVersionLog(_mainAddress, _version, _timestamp, versions.length);
+    constructor(address _PlayMarket, address _ICO, bytes32 _version, uint256 _timestamp) public {
+        require(_PlayMarket != address(0) && _ICO != address(0));
+        versions.push(Version( _PlayMarket, _ICO, _version, _timestamp));
+        emit addVersionLog(_PlayMarket, _ICO, _version, _timestamp, versions.length);
         emit lastVersionLog(_version, versions.length);
     }
-     function addVersion(address _mainAddress, bytes32 _version, uint256 _timestamp) public onlyAgent {
-        require(_mainAddress != address(0));
-        versions.push(Version( _mainAddress, _version, _timestamp));
-        emit addVersionLog(_mainAddress, _version, _timestamp, versions.length);
+
+     function addVersion(address _PlayMarket, address _ICO, bytes32 _version, uint256 _timestamp) public onlyAgent {
+        require(_PlayMarket != address(0) && _ICO != address(0));
+        versions.push(Version( _PlayMarket, _ICO, _version, _timestamp));
+        emit addVersionLog(_PlayMarket, _ICO, _version, _timestamp, versions.length);
         emit lastVersionLog(_version, versions.length);
     }
-     function changeVersion(address _mainAddress, bytes32 _version, uint256 _timestamp, uint256 _i) public onlyAgent {
-        require(_mainAddress != address(0));
-        versions[_i] = (Version( _mainAddress, _version, _timestamp));
-        emit changeVersionLog(_mainAddress, _version, _timestamp, _i);
+
+     function changeVersion(address _PlayMarket, address _ICO, bytes32 _version, uint256 _timestamp, uint256 _i) public onlyAgent {
+        require(_PlayMarket != address(0) && _ICO != address(0));
+        versions[_i] = (Version( _PlayMarket, _ICO, _version, _timestamp));
+        emit changeVersionLog(_PlayMarket, _ICO, _version, _timestamp, _i);
     }
     
     function getLastVersion() public view returns(address, bytes32, uint256, uint256){
         for(uint i = versions.length-1; i >0; i--) {
             if(versions[i].timestamp == 0 || versions[i].timestamp> block.timestamp){
-                return (versions[i].mainAddress, versions[i].version, versions[i].timestamp, i);
+                return (versions[i].PlayMarket, versions[i].version, versions[i].timestamp, i);
             }
         }
-        return (versions[0].mainAddress, versions[0].version, versions[0].timestamp, i);
+        return (versions[0].PlayMarket, versions[0].version, versions[0].timestamp, i);
     }
     
     function getVersion(bytes32 _version) public view returns(address, bytes32, uint256, uint256){
         if(versions[0].version == _version) {
-             return (versions[0].mainAddress, versions[0].version, versions[0].timestamp, i);
+             return (versions[0].PlayMarket, versions[0].version, versions[0].timestamp, i);
         }
         for(uint i = versions.length-1; i >0; i--) {
             if(versions[i].version == _version) {
-                return (versions[i].mainAddress, versions[i].version, versions[i].timestamp, i);
+                return (versions[i].PlayMarket, versions[i].version, versions[i].timestamp, i);
             }
         }
     }

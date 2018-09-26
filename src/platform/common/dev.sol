@@ -23,9 +23,9 @@ contract Dev is Agent, SafeMath, Base {
     emit setDevStorageContractEvent(_contract);
   }
   
-  function addDev(bytes32 _name, bytes32 _info, bytes27 _reserv) public {
+  function addDev(bytes32 _name, bytes32 _info) public {
     require(!DevStorage.getState(msg.sender));
-    DevStorage.addDev(msg.sender, _name, _info, _reserv);
+    DevStorage.addDev(msg.sender, _name, _info);
     DevStorage.setRating(msg.sender, defRating);
     LogStorage.addDevEvent(msg.sender, _name, _info);
   }
@@ -67,10 +67,6 @@ contract Dev is Agent, SafeMath, Base {
 
   function getStateDev(address _dev) external view returns (bool) {
     return DevStorage.getState(_dev);
-  }
-
-  function getReservDev(address _dev) external view returns (bytes27) {
-    return DevStorage.getReserv(_dev);
   }
 
   function getStoreBlockedDev(address _dev) external view returns (bool) {

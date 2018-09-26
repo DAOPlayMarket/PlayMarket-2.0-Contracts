@@ -13,12 +13,11 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     bytes32 name;      // developer name
     bytes32 info;      // developer info
     bool state;        // service variable to determine the state of the structure
-    uint32 store;      // default 1
-    bytes27 reserv;
+    uint32 store;      // default 1    
   }
 
   mapping (address => _Dev) private Devs;
-  mapping(uint32 => mapping(address => bool)) private DevsStoreBlocked;
+  mapping (uint32 => mapping(address => bool)) private DevsStoreBlocked;
   mapping (uint32 => mapping (address => int256)) private DevsRating;
   mapping (address => uint256) private DevsRevenue;
   
@@ -27,14 +26,13 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     _;
   }
   
-  function addDev(address _dev, bytes32 _name, bytes32 _info, bytes27 _reserv) external onlyAgentStorage() {
+  function addDev(address _dev, bytes32 _name, bytes32 _info) external onlyAgentStorage() {
     assert(!Devs[_dev].state);
     Devs[_dev]=_Dev({
       name: _name,
       info: _info,
       state: true,
-      store: Agents[msg.sender].store,
-      reserv: _reserv
+      store: Agents[msg.sender].store      
     });
   }
 
@@ -78,10 +76,6 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     return Devs[_dev].store;
   }
   
-  function getReserv(address _dev) external view onlyAgentStorage() returns (bytes27) {
-    return Devs[_dev].reserv;
-  }
-
   function getStoreBlocked(address _dev) external view onlyAgentStorage() returns (bool) {
     return DevsStoreBlocked[Agents[msg.sender].store][_dev];
   }
@@ -112,11 +106,6 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     Devs[_dev].store = _store;
   }
 
-  function setReserv(address _dev, bytes27 _reserv) external onlyAgentStorage() {
-   //require(Devs[_dev].state);
-    Devs[_dev].reserv = _reserv;
-  }
-  
   function setStoreBlocked(address _dev, bool _state) external onlyAgentStorage() {
     //require(Devs[_dev].state);
     DevsStoreBlocked[Agents[msg.sender].store][_dev] = _state;

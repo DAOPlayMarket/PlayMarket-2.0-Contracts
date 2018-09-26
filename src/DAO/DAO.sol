@@ -210,16 +210,6 @@ contract DAOPM is Ownable {
     }
 
     /**
-     * External call for executeProposal (msg.sender = DAO)
-     *
-     * @param _proposalID proposal number
-     * @param _transactionByteCode optional: if the transaction contained a bytecode, you need to send it
-     */
-    function execute(uint _proposalID, bytes _transactionByteCode) public {
-        this.executeProposal(_proposalID, _transactionByteCode);
-    }
-
-    /**
     * @dev Allows the DAO to transfer control of the _contract to a _newOwner.
     * @param _newOwner The address to transfer ownership to.
     */
@@ -232,10 +222,11 @@ contract DAOPM is Ownable {
      */
     function acceptOwnership(address _contract) public onlyOwner {
         CommonI(_contract).acceptOwnership();
+        //address(_contract).call.value(0).(abi.encodeWithSignature("acceptOwnership()"));
     }
 
     function updateAgent(address _contract, address _agent, bool _state) public onlyOwner {
-        CommonI(_contract).updateAgent(_agent, _state);
+        CommonI(_contract).updateAgent(_agent, _state);        
     }
 
     function updateAgentStorage(address _contract, address _agent, uint32 _store, bool _state) public onlyOwner {

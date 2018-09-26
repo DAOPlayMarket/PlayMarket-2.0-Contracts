@@ -15,8 +15,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     uint32  store;      // default 1
     bool state;         // service variable to determine the state of the structure
     bool confirmation;  // decides platform    
-    bool collectState;  // true if the node requested a collect the accumulated amount
-    bytes21 reserv;
+    bool collectState;  // true if the node requested a collect the accumulated amount    
     uint collectTime;   // after this time Node may collect the accumulated amount
     string hash;        // connect string
     string ip;          // IP address node
@@ -24,17 +23,17 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   }
 
   struct _InsuranceDeposit {
-    uint ETH;        // current Node insurance deposit in ETH
-    uint PMT;        // current Node insurance deposit in PMT
-    uint minETH;     // current minimal insurance deposit in ETH for a specific Node
-    uint minPMT;     // current minimal insurance deposit in PMT for a specific Node
-    uint refundTime; // after this time Node may get back insurance deposit (both)
+    uint ETH;           // current Node insurance deposit in ETH
+    uint PMT;           // current Node insurance deposit in PMT
+    uint minETH;        // current minimal insurance deposit in ETH for a specific Node
+    uint minPMT;        // current minimal insurance deposit in PMT for a specific Node
+    uint refundTime;    // after this time Node may get back insurance deposit (both)
     bool refundState;   // true if the node requested a refund deposit (can be a false, if the managing contract decides)
   }
 
-  uint private defETH = 10 * 1 ether;        // default minimum deposit 10 ETH
-  uint private defPMT = 5000 * 10**4;        // default minimum deposit 5000 PMT  
-  uint private defRefundTime = 30 * 1 days;  // default time, after which you can refund deposit
+  uint private defETH = 10 * 1 ether;         // default minimum deposit 10 ETH
+  uint private defPMT = 5000 * 10**4;         // default minimum deposit 5000 PMT  
+  uint private defRefundTime = 30 * 1 days;   // default time, after which you can refund deposit
   uint private defCollectTime = 15 * 1 days;  // default time, after which you can collect the accumulated amount
 
   ERC20I private PMTContract;
@@ -47,20 +46,24 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     PMTContract = ERC20I(_PMT);
   }
   
-  function addNode(address _node, uint32 _hashType, bytes21 _reserv, string _hash, string _ip, string _coordinates) external onlyAgentStorage() {
+  function addNode(address _node, uint32 _hashType, string _hash, string _ip, string _coordinates) external onlyAgentStorage() {
     assert(!Nodes[_node].state);
     Nodes[_node]=_Node({
       hashType: _hashType,
       store: Agents[msg.sender].store,
       state: true,
       confirmation: false,
-      collectState: false,
-      reserv: _reserv,
+      collectState: false,      
       collectTime: 0,
       hash: _hash,
       ip: _ip,
       coordinates: _coordinates
     });
+
+    // set the minimum insurance to default deposit
+    _InsuranceDeposit storage dep = NodesDeposit[_node];
+    dep.minETH = defETH;
+    dep.minPMT = defPMT;
   }
 
   function changeInfo(address _node, string _hash, uint32 _hashType, string _ip, string _coordinates) external onlyAgentStore(Nodes[_node].store) {
@@ -72,7 +75,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   }
 
   function buyObject(address _node) payable external onlyAgentStore(Nodes[_node].store) {
-    assert(Nodes[_node].state);
+    assert(Nodes[_node].confirmation);
     assert(msg.value > 0);
     if (NodesDeposit[_node].ETH >= NodesDeposit[_node].minETH && NodesDeposit[_node].PMT >= NodesDeposit[_node].minPMT) {
       NodesRevenue[_node] = safeAdd(NodesRevenue[_node], msg.value);  
@@ -201,10 +204,6 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     return Nodes[_node].collectTime;
   }
 
-  function getReserv(address _node) external view onlyAgentStore(Nodes[_node].store) returns (bytes21) {
-    return Nodes[_node].reserv;
-  }
-
   function getHash(address _node) external view onlyAgentStore(Nodes[_node].store) returns (string) {
     return Nodes[_node].hash;
   }
@@ -276,10 +275,6 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
 
   function setCollectTime(address _node, uint _time) external onlyAgentStore(Nodes[_node].store) {    
     Nodes[_node].collectTime = _time;
-  }
-
-  function setReserv(address _node, bytes21 _reserv) external onlyAgentStore(Nodes[_node].store) {
-    Nodes[_node].reserv = _reserv;
   }
 
   function setHash(address _node, string _hash) external onlyAgentStore(Nodes[_node].store) {
