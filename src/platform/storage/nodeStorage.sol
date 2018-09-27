@@ -302,7 +302,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   }
 
   function setDefPMT(uint _PMT) external onlyOwner {
-    defETH = _PMT;
+    defPMT = _PMT;
   }
 
   function setDefRefundTime(uint _refundTime) external onlyOwner{
