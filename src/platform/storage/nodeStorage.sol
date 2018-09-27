@@ -154,7 +154,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     NodesDeposit[_node].PMT = 0;
 
     _node.transfer(amountETH);
-    PMTContract.approve(_node, amountPMT);
+    PMTContract.transfer(_node, amountPMT);
   }
 
   // redress of damage, call only by DAO
