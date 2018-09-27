@@ -103,8 +103,8 @@ contract Node is Agent, SafeMath, Base {
 
   function setDepositLimitsNode(address _node, uint _ETH, uint _PMT) external onlyAgent {
     require(NodeStorage.getState(_node));
-    require(_ETH > NodeStorage.getDefETH());
-    require(_PMT > NodeStorage.getDefPMT());
+    require(_ETH >= NodeStorage.getDefETH());
+    require(_PMT >= NodeStorage.getDefPMT());
     // if the new limits are less than the specified limits for the node, then the node is deactivated
     NodeStorage.setDepositLimits(_node, _ETH, _PMT);
     LogStorage.setDepositLimitsNodeEvent(_node, _ETH, _PMT, msg.sender); // msg.sender - moderator
