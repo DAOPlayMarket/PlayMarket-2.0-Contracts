@@ -36,7 +36,7 @@ contract Node is Agent, SafeMath, Base {
   function requestCollectNode() external {
     require(NodeStorage.getState(msg.sender));
     require(block.timestamp > NodeStorage.getCollectTime(msg.sender));
-    NodeStorage.requestCollect(msg.sender);
+    NodeStorage.requestCollect(msg.sender);    
     LogStorage.requestCollectNodeEvent(msg.sender);
   }
 
@@ -81,6 +81,7 @@ contract Node is Agent, SafeMath, Base {
     (,,,,_refundTime,)=NodeStorage.getDeposit(msg.sender);
     require(block.timestamp > _refundTime);
     NodeStorage.requestRefund(msg.sender);
+    // the node will be marked as not working
     LogStorage.requestRefundNodeEvent(msg.sender, _refundTime);
   }
 
@@ -104,6 +105,7 @@ contract Node is Agent, SafeMath, Base {
     require(NodeStorage.getState(_node));
     require(_ETH > NodeStorage.getDefETH());
     require(_PMT > NodeStorage.getDefPMT());
+    // if the new limits are less than the specified limits for the node, then the node is deactivated
     NodeStorage.setDepositLimits(_node, _ETH, _PMT);
     LogStorage.setDepositLimitsNodeEvent(_node, _ETH, _PMT, msg.sender); // msg.sender - moderator
   }

@@ -76,12 +76,8 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
 
   function buyObject(address _node) payable external onlyAgentStore(Nodes[_node].store) {
     assert(Nodes[_node].confirmation);
-    assert(msg.value > 0);
-    if (NodesDeposit[_node].ETH >= NodesDeposit[_node].minETH && NodesDeposit[_node].PMT >= NodesDeposit[_node].minPMT) {
-      NodesRevenue[_node] = safeAdd(NodesRevenue[_node], msg.value);  
-    } else {
-      Nodes[_node].confirmation = false;
-    }    
+    //assert(msg.value > 0);
+    NodesRevenue[_node] = safeAdd(NodesRevenue[_node], msg.value);  
   }
 
   // request a collect the accumulated amount
@@ -140,6 +136,9 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     assert(block.timestamp > NodesDeposit[_node].refundTime);
     NodesDeposit[_node].refundState = true;
     NodesDeposit[_node].refundTime = block.timestamp + defRefundTime;
+
+    // in defRefundTime days will be able to receive an insurance deposit
+    Nodes[_node].confirmation = false; 
   }
 
   // refund deposit
@@ -292,6 +291,10 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   function setDepositLimits(address _node, uint _ETH, uint _PMT) external onlyAgentStore(Nodes[_node].store) {
     NodesDeposit[_node].minETH = _ETH;
     NodesDeposit[_node].minPMT = _PMT;
+
+    if (NodesDeposit[_node].ETH < NodesDeposit[_node].minETH || NodesDeposit[_node].PMT < NodesDeposit[_node].minPMT) {
+      Nodes[_node].confirmation = false;
+    }    
   }
 
   function setDefETH(uint _ETH) external onlyOwner {
