@@ -75,12 +75,12 @@ contract Node is Agent, SafeMath, Base {
   }
 
   // request a deposit refund
-  function requestRefund() external {
+  function requestRefund(uint _ETH, uint _PMT) external {
     require(NodeStorage.getState(msg.sender));
     uint _refundTime;
     (,,,,_refundTime,)=NodeStorage.getDeposit(msg.sender);
     require(block.timestamp > _refundTime);
-    NodeStorage.requestRefund(msg.sender);
+    NodeStorage.requestRefund(msg.sender, _ETH, _PMT);
     // the node will be marked as not working
     LogStorage.requestRefundNodeEvent(msg.sender, _refundTime);
   }

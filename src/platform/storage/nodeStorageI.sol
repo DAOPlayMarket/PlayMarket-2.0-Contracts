@@ -21,7 +21,7 @@ interface NodeStorageI {
   // make sure, approve to this contract first
   function makeDepositPMT(address _node, address _from, uint _value) payable external;
   // request a deposit refund
-  function requestRefund(address _node) external;
+  function requestRefund(address _node, uint _requestETH, uint _requestPMT) external;
   // refund deposit
   function refund(address _node) external;
 

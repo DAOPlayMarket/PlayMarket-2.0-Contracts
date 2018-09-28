@@ -9,16 +9,9 @@ import './common/node.sol';
  */
 contract PlayMarket is App, Dev, Node {
 
-  bytes32 public version = "1.0.0";
-
   uint32 public percNode = 100; // 1% (percent to hundredths) - all that's left, will go to the developer
   
   constructor (address _appStorage, address _devStorage, address _nodeStorage, address _logStorage) public {
-    require(_appStorage  != address(0));
-    require(_devStorage  != address(0));    
-    require(_nodeStorage != address(0));
-    require(_logStorage  != address(0));
-
     setAppStorageContract(_appStorage);
     setDevStorageContract(_devStorage);
     setNodeStorageContract(_nodeStorage);
@@ -28,6 +21,13 @@ contract PlayMarket is App, Dev, Node {
   /** 
   // Application function
   **/
+  
+  function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, string _hash) external {
+    // developer must be registered and not blocked in this store
+    require(DevStorage.getState(msg.sender) && !DevStorage.getStoreBlocked(msg.sender));
+    uint app = AppStorage.addApp(_hashType, _appType, _price, _publish, msg.sender, _hash);
+    LogStorage.addAppEvent(app, _hashType, _appType, _price, _publish, msg.sender, _hash);
+  }  
 
   // buy object without check price
   function buyAppObj(uint _app, address _node, uint _obj) public payable {

@@ -27,6 +27,8 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     uint PMT;           // current Node insurance deposit in PMT
     uint minETH;        // current minimal insurance deposit in ETH for a specific Node
     uint minPMT;        // current minimal insurance deposit in PMT for a specific Node
+    uint requestETH;    // requested ETH
+    uint requestPMT;    // requested PMT
     uint refundTime;    // after this time Node may get back insurance deposit (both)
     bool refundState;   // true if the node requested a refund deposit (can be a false, if the managing contract decides)
   }
@@ -131,14 +133,20 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   }
 
   // request a deposit refund
-  function requestRefund(address _node) external onlyAgentStore(Nodes[_node].store) {
+  function requestRefund(address _node, uint _requestETH, uint _requestPMT) external onlyAgentStore(Nodes[_node].store) {
     assert(Nodes[_node].state);
     assert(block.timestamp > NodesDeposit[_node].refundTime);
+    assert(_requestETH <= NodesDeposit[_node].ETH && _requestPMT <= NodesDeposit[_node].PMT);
     NodesDeposit[_node].refundState = true;
     NodesDeposit[_node].refundTime = block.timestamp + defRefundTime;
+    NodesDeposit[_node].requestETH = _requestETH;
+    NodesDeposit[_node].requestPMT = _requestPMT;
 
     // in defRefundTime days will be able to receive an insurance deposit
-    Nodes[_node].confirmation = false; 
+    // If the deposit is less than the minimum value - the node will be marked as not working
+    if (safeSub(NodesDeposit[_node].ETH, _requestETH) < NodesDeposit[_node].minETH || safeSub(NodesDeposit[_node].PMT, _requestPMT) < NodesDeposit[_node].minPMT) {
+      Nodes[_node].confirmation = false; 
+    }
   }
 
   // refund deposit
@@ -146,12 +154,15 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     assert(Nodes[_node].state);
     assert(NodesDeposit[_node].refundState);
     assert(block.timestamp > NodesDeposit[_node].refundTime);
+    assert(NodesDeposit[_node].requestETH <= NodesDeposit[_node].ETH && NodesDeposit[_node].requestPMT <= NodesDeposit[_node].PMT);
 
     NodesDeposit[_node].refundState = false;
-    uint amountETH = NodesDeposit[_node].ETH;
-    uint amountPMT = NodesDeposit[_node].PMT;
-    NodesDeposit[_node].ETH = 0;
-    NodesDeposit[_node].PMT = 0;
+    uint amountETH = NodesDeposit[_node].requestETH;
+    uint amountPMT = NodesDeposit[_node].requestPMT;
+    NodesDeposit[_node].ETH = safeSub(NodesDeposit[_node].ETH, amountETH);
+    NodesDeposit[_node].PMT = safeSub(NodesDeposit[_node].PMT, amountPMT);
+    NodesDeposit[_node].requestETH = 0;
+    NodesDeposit[_node].requestPMT = 0;
 
     _node.transfer(amountETH);
     PMTContract.transfer(_node, amountPMT);

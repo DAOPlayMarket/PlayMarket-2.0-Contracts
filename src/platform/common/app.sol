@@ -21,11 +21,6 @@ contract App is Agent, SafeMath, Base {
     emit setAppStorageContractEvent(_contract);
   }
 
-  function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, string _hash) external {
-    uint app = AppStorage.addApp(_hashType, _appType, _price, _publish, msg.sender, _hash);
-    LogStorage.addAppEvent(app, _hashType, _appType, _price, _publish, msg.sender, _hash);
-  }
-  
   function setAppConfirmation(uint _app, bool _state, uint32 _hashType, string _hash) external onlyAgent {
     AppStorage.setConfirmation(_app, _state);
     LogStorage.setConfirmationAppEvent(_app, _state, msg.sender, _hashType, _hash); // msg.sender - moderator
