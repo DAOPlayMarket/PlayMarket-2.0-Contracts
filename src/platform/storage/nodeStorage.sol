@@ -27,10 +27,10 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
     uint PMT;           // current Node insurance deposit in PMT
     uint minETH;        // current minimal insurance deposit in ETH for a specific Node
     uint minPMT;        // current minimal insurance deposit in PMT for a specific Node
-    uint requestETH;    // requested ETH
-    uint requestPMT;    // requested PMT
     uint refundTime;    // after this time Node may get back insurance deposit (both)
     bool refundState;   // true if the node requested a refund deposit (can be a false, if the managing contract decides)
+    uint requestETH;    // requested ETH
+    uint requestPMT;    // requested PMT
   }
 
   uint private defETH = 10 * 1 ether;         // default minimum deposit 10 ETH
@@ -240,7 +240,9 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   }
 
   function getDeposit(address _node) external view onlyAgentStore(Nodes[_node].store) returns (uint, uint, uint, uint, uint, bool) {
-    return (NodesDeposit[_node].ETH, NodesDeposit[_node].PMT, NodesDeposit[_node].minETH, NodesDeposit[_node].minPMT, NodesDeposit[_node].refundTime, NodesDeposit[_node].refundState);
+    return (NodesDeposit[_node].ETH, NodesDeposit[_node].PMT, 
+      NodesDeposit[_node].minETH, NodesDeposit[_node].minPMT, 
+      NodesDeposit[_node].refundTime, NodesDeposit[_node].refundState);
   }
 
   function getDefETH() external view onlyOwner returns (uint) {

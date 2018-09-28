@@ -75,14 +75,23 @@ contract Node is Agent, SafeMath, Base {
   }
 
   // request a deposit refund
-  function requestRefund(uint _ETH, uint _PMT) external {
-    require(NodeStorage.getState(msg.sender));
-    uint _refundTime;
-    (,,,,_refundTime,)=NodeStorage.getDeposit(msg.sender);
-    require(block.timestamp > _refundTime);
-    NodeStorage.requestRefund(msg.sender, _ETH, _PMT);
-    // the node will be marked as not working
-    LogStorage.requestRefundNodeEvent(msg.sender, _refundTime);
+  function requestRefund(uint _requestETH, uint _requestPMT) external {
+    require(NodeStorage.getState(msg.sender));    
+    uint ETH;
+    uint PMT;
+    uint minETH;
+    uint minPMT;
+    uint refundTime;
+    (ETH,PMT,minETH,minPMT,refundTime,)=NodeStorage.getDeposit(msg.sender);
+    require(block.timestamp > refundTime);
+    require(_requestETH <= ETH && _requestPMT <= PMT);
+    NodeStorage.requestRefund(msg.sender, _requestETH, _requestPMT);    
+    LogStorage.requestRefundNodeEvent(msg.sender, refundTime);
+
+    // If the deposit is less than the minimum value - the node will be marked as not working
+    if (safeSub(ETH, _requestETH) < minETH || safeSub(PMT, _requestPMT) < minPMT) {
+      LogStorage.setConfirmationNodeEvent(msg.sender, false, msg.sender); // msg.sender - moderator
+    }
   }
 
   // request a deposit refund
