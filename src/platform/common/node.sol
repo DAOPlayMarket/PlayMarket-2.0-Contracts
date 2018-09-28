@@ -53,7 +53,7 @@ contract Node is Agent, SafeMath, Base {
   function makeDeposit(address _node, uint _value) external payable {
     require(NodeStorage.getState(_node));
     require(msg.value > 0 && _value > 0);
-    require(address(NodeStorage).call.value(msg.value)(abi.encodeWithSignature("makeDeposit(address,address,uint)", _node, msg.sender, _value)));
+    require(address(NodeStorage).call.value(msg.value)(abi.encodeWithSignature("makeDeposit(address,address,uint256)", _node, msg.sender, _value)));
     LogStorage.makeDepositNodeEvent(msg.sender, _node, msg.value, _value);
   }  
 
@@ -70,7 +70,7 @@ contract Node is Agent, SafeMath, Base {
   function makeDepositPMT(address _node, uint _value) external payable {
     require(NodeStorage.getState(_node));
     require(_value > 0);
-    require(address(NodeStorage).call.value(0)(abi.encodeWithSignature("makeDepositPMT(address,address,uint)", _node, msg.sender, _value)));
+    require(address(NodeStorage).call.value(0)(abi.encodeWithSignature("makeDepositPMT(address,address,uint256)", _node, msg.sender, _value)));
     LogStorage.makeDepositPMTNodeEvent(msg.sender, _node, _value);
   }
 
