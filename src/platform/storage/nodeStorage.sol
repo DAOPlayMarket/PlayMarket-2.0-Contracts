@@ -92,7 +92,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   function collect(address _node) external onlyAgentStore(Nodes[_node].store) returns (uint) {
     assert(Nodes[_node].state);
     assert(Nodes[_node].collectState);
-    assert(block.timestamp > NodesDeposit[_node].refundTime);
+    assert(block.timestamp > NodesDeposit[_node].collectTime);
 
     Nodes[_node].collectState = false;
 
