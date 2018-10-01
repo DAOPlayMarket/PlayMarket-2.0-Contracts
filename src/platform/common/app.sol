@@ -84,7 +84,7 @@ contract App is Agent, SafeMath, Base {
     return AppStorage.getTimeSubscription(_app, _user, _obj);
   }
 
-  function getInfoApp(uint _app) external view returns (uint32, uint32, bool, bool, address, string) {
+  function getInfoApp(uint _app) external view returns (uint32, uint32, bool, bool, uint, string) {
     return AppStorage.getInfo(_app);
   }
 

@@ -26,8 +26,8 @@ contract LogStorage is LogStorageI, AgentStorage {
   event ICOConfirmationEvent(uint32 indexed _store, address _dev, uint _app, bool _state);  
   
   //Developer events 
-  event AddDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _info);
-  event ChangeNameDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _info);
+  event AddDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _desc);
+  event ChangeNameDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _desc);
   event SetStoreBlockedDevEvent(uint32 indexed _store, address indexed _dev, bool _state);
   event SetRatingDevEvent(uint32 indexed _store, address indexed _dev, int _rating);
   
@@ -89,12 +89,12 @@ contract LogStorage is LogStorageI, AgentStorage {
   /** 
   ** Developers events 
   **/  
-  function addDevEvent(address _dev, bytes32 name, bytes32 info) external onlyAgentStorage() {
-    emit AddDevEvent(Agents[msg.sender].store, _dev, name, info);
+  function addDevEvent(address _dev, bytes32 _name, bytes32 _desc) external onlyAgentStorage() {
+    emit AddDevEvent(Agents[msg.sender].store, _dev, _name, _desc);
   }
   
-  function changeNameDevEvent(address _dev, bytes32 name, bytes32 info) external onlyAgentStorage() {
-    emit ChangeNameDevEvent(Agents[msg.sender].store, _dev, name, info);
+  function changeNameDevEvent(address _dev, bytes32 _name, bytes32 _desc) external onlyAgentStorage() {
+    emit ChangeNameDevEvent(Agents[msg.sender].store, _dev, _name, _desc);
   }
   
   function setStoreBlockedDevEvent(address _dev, bool _state) external onlyAgentStorage() {

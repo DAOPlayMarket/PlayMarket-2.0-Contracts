@@ -36,7 +36,7 @@ interface AppStorageI {
   function getConfirmation(uint _app) external view returns (bool);
   function getDeveloper(uint _app) external view returns (address);
   function getHash(uint _app) external view returns (string);
-  function getInfo(uint _app) external view returns (uint32, uint32, bool, bool, address, string);
+  function getInfo(uint _app) external view returns (uint32, uint32, bool, bool, uint, string);
   // AppsICO getters
   function getHashTypeICO(uint _app) external view returns (uint32);
   function getConfirmationICO(uint _app) external view returns (bool);

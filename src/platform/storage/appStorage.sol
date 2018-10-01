@@ -153,12 +153,12 @@ contract AppStorage is AppStorageI, AgentStorage {
     return AppsICO[_app].hash;
   }
 
-  function getInfo(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint32, uint32, bool, bool, address, string) {
+  function getInfo(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint32, uint32, bool, bool, uint, string) {
     return (Apps[_app].hashType,      
       Apps[_app].appType, 
       Apps[_app].publish,
       Apps[_app].confirmation,
-      Apps[_app].developer,
+      AppsOBJprice[_app][0],
       Apps[_app].hash);
   }
 

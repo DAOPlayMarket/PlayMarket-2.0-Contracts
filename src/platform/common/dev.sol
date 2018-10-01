@@ -23,17 +23,17 @@ contract Dev is Agent, SafeMath, Base {
     emit setDevStorageContractEvent(_contract);
   }
   
-  function addDev(bytes32 _name, bytes32 _info) public {
+  function addDev(bytes32 _name, bytes32 _desc) public {
     require(!DevStorage.getState(msg.sender));
-    DevStorage.addDev(msg.sender, _name, _info);
+    DevStorage.addDev(msg.sender, _name, _desc);
     DevStorage.setRating(msg.sender, defRating);
-    LogStorage.addDevEvent(msg.sender, _name, _info);
+    LogStorage.addDevEvent(msg.sender, _name, _desc);
   }
 	
-  function changeNameDev(bytes32 _name, bytes32 _info) public {
+  function changeNameDev(bytes32 _name, bytes32 _desc) public {
     require(DevStorage.getState(msg.sender));
-    DevStorage.changeName(msg.sender,_name, _info);
-    LogStorage.changeNameDevEvent(msg.sender, _name, _info);
+    DevStorage.changeName(msg.sender,_name, _desc);
+    LogStorage.changeNameDevEvent(msg.sender, _name, _desc);
   }
   
   // collect the accumulated amount
@@ -61,14 +61,6 @@ contract Dev is Agent, SafeMath, Base {
     return DevStorage.getName(_dev);
   }
 
-  function getInfoDev(address _dev) external view returns (bytes32) {
-    return DevStorage.getInfo(_dev);
-  }
-
-  function getStateDev(address _dev) external view returns (bool) {
-    return DevStorage.getState(_dev);
-  }
-
   function getStoreBlockedDev(address _dev) external view returns (bool) {
     return DevStorage.getStoreBlocked(_dev);
   }
@@ -80,6 +72,10 @@ contract Dev is Agent, SafeMath, Base {
   function getRevenueDev(address _dev) external view returns (uint256) {
     return DevStorage.getRevenue(_dev);
   }  
+
+  function getInfoDev(address _dev) external view returns (bytes32, bytes32, bool, uint32) {
+    return DevStorage.getInfo(_dev);
+  }
 
   /************************************************************************* 
   // default params setters (onlyOwner => DAO)

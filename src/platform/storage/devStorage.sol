@@ -11,7 +11,7 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
 
   struct _Dev {    
     bytes32 name;      // developer name
-    bytes32 info;      // developer info
+    bytes32 desc;      // developer description
     bool state;        // service variable to determine the state of the structure
     uint32 store;      // default 1    
   }
@@ -26,20 +26,20 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     _;
   }
   
-  function addDev(address _dev, bytes32 _name, bytes32 _info) external onlyAgentStorage() {
+  function addDev(address _dev, bytes32 _name, bytes32 _desc) external onlyAgentStorage() {
     assert(!Devs[_dev].state);
     Devs[_dev]=_Dev({
       name: _name,
-      info: _info,
+      desc: _desc,
       state: true,
       store: Agents[msg.sender].store      
     });
   }
 
-  function changeName(address _dev, bytes32 _name, bytes32 _info) external onlyAgentStorage() CheckBlock(_dev) {
+  function changeName(address _dev, bytes32 _name, bytes32 _desc) external onlyAgentStorage() CheckBlock(_dev) {
     assert(Devs[_dev].state);
     Devs[_dev].name = _name;
-    Devs[_dev].info = _info;
+    Devs[_dev].desc = _desc;
   }
 
   function buyObject(address _dev) payable external onlyAgentStorage() CheckBlock(_dev){
@@ -64,8 +64,8 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     return Devs[_dev].name;
   }
 
-  function getInfo(address _dev) external view onlyAgentStorage() returns (bytes32) {
-    return Devs[_dev].info;
+  function getDesc(address _dev) external view onlyAgentStorage() returns (bytes32) {
+    return Devs[_dev].desc;
   }
 
   function getState(address _dev) external view onlyAgentStorage() returns (bool) {
@@ -88,6 +88,13 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     return DevsRevenue[_dev];
   }
 
+  function getInfo(address _dev) external view onlyAgentStorage() returns (bytes32, bytes32, bool, uint32) {
+    return (Devs[_dev].name,      
+      Devs[_dev].desc, 
+      Devs[_dev].state,
+      Devs[_dev].store);
+  }
+
   /************************************************************************* 
   // Devs setters
   **************************************************************************/
@@ -96,9 +103,9 @@ contract DevStorage is DevStorageI, AgentStorage, SafeMath {
     Devs[_dev].name = _name;
   }
 
-  function setInfo(address _dev, bytes32 _info) external onlyAgentStorage() {
+  function setDesc(address _dev, bytes32 _desc) external onlyAgentStorage() {
     //require(Devs[_dev].state);
-    Devs[_dev].info = _info;
+    Devs[_dev].desc = _desc;
   }
 
   function setStore(address _dev, uint32 _store) external onlyOwner {
