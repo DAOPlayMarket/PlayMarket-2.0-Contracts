@@ -20,7 +20,8 @@ contract AppToken is ERC20, Ownable {
   /** Name and symbol were updated. */
   event UpdatedTokenInformation(string _name, string _symbol);
 
-  constructor(string _name, string _symbol, address _CrowdSale, address _PMFund, address _dev) public {
+  constructor(string _name, string _symbol, address _CrowdSale, address _PMFund, address _dev, address _owner) public {
+    owner = _owner;
     name = _name;
     symbol = _symbol;
 

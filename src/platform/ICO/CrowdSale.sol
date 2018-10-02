@@ -74,7 +74,8 @@ contract CrowdSale is Ownable, SafeMath {
   /**
    * @dev Constructor sets default parameters
    */
-  constructor(uint _initialSupply, uint _decimals, address _multisigWallet, uint _startsAt, uint _targetInUSD, address _RateContract, address _dev) public {
+  constructor(uint _initialSupply, uint _decimals, address _multisigWallet, uint _startsAt, uint _targetInUSD, address _RateContract, address _dev, address _owner) public {
+    owner =_owner;
     decimals = _decimals;
     multiplier = 10 ** decimals;
     multisigWallet =_multisigWallet;
