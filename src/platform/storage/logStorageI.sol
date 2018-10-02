@@ -18,8 +18,8 @@ interface LogStorageI {
   function changeHashAppICOEvent(uint _app, string _hash, uint32 _hashType) external;
   
   //Developer events 
-  function addDevEvent(address _dev, bytes32 _name, bytes32 _desc) external;
-  function changeNameDevEvent(address _dev, bytes32 _name, bytes32 _desc) external;
+  function addDevEvent(address _dev, bytes32 name, bytes32 info) external;
+  function changeNameDevEvent(address _dev, bytes32 name, bytes32 info) external;
   function setStoreBlockedDevEvent(address _dev, bool _state) external;
   function setRatingDevEvent(address _dev, int _rating) external;
   
@@ -37,7 +37,7 @@ interface LogStorageI {
   function setDepositLimitsNodeEvent(address _node, uint _ETH, uint _PMT, address _moderator) external;
   
   //Reviews events
-  function feedbackRatingEvent(address voter, uint _app, uint vote, string description, bytes32 txIndex, uint blocktimestamp) external;
+  function feedbackRatingEvent(address _voter, uint _app, uint _vote, string _description, bytes32 _txIndex, uint _blocktimestamp) external;
 
   function updateAgentStorage(address _agent, uint32 _store, bool _state) external;
   
