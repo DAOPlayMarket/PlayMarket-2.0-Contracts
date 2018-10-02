@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import '../../common/Ownable.sol';
-import './AppToken.sol';
+import './AppTokenERC223.sol';
 
 /**
  * @title AppToken build contract (for apps ICO)
