@@ -186,7 +186,7 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
   /************************************************************************* 
   // Nodes getters
   **************************************************************************/
-  function getPMTContract() external view onlyOwner returns (address) {
+  function getPMTContract() external view returns (address) {
     return PMTContract;
   }  
 
@@ -245,19 +245,19 @@ contract NodeStorage is NodeStorageI, AgentStorage, SafeMath {
       NodesDeposit[_node].refundTime, NodesDeposit[_node].refundState);
   }
 
-  function getDefETH() external view onlyOwner returns (uint) {
+  function getDefETH() external view returns (uint) {
     return defETH;
   }
 
-  function getDefPMT() external view onlyOwner returns (uint) {
+  function getDefPMT() external view returns (uint) {
     return defPMT;
   }
 
-  function getDefRefundTime() external view onlyOwner returns (uint) {
+  function getDefRefundTime() external view returns (uint) {
     return defRefundTime;
   }
 
-  function getDefCollectTime() external view onlyOwner returns (uint) {
+  function getDefCollectTime() external view returns (uint) {
     return defCollectTime;
   }
 
