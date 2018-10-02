@@ -9,43 +9,43 @@ import './logStorageI.sol';
 contract LogStorage is LogStorageI, AgentStorage {
 
   //App events 
-  event AddAppEvent(uint32 indexed _store, uint indexed _app, uint32 _hashType, uint32 indexed _appType, uint _price, bool _publish, address _dev, string _hash);
-  event SetConfirmationAppEvent(uint32 indexed _store, uint indexed _app, bool _state, address _moderator, uint32 _hashType, string _hash);
-  event ChangeHashAppEvent(uint32 indexed _store, uint indexed _app, string _hash, uint32 _hashType);
-  event ChangePublishEvent(uint32 indexed _store, uint indexed _app, bool _state);
-  event SetPriceEvent(uint32 indexed _store, uint indexed _app, uint _obj, uint _price);
-  event BuyAppEvent(uint32 indexed _store, address indexed _user, address indexed _dev, uint _app, uint _obj, address _node, uint price);
+  event AddAppEvent(uint32 indexed store, uint indexed app, uint32 hashType, uint32 indexed appType, uint price, bool publish, address dev, string hash);
+  event SetConfirmationAppEvent(uint32 indexed store, uint indexed app, bool state, address moderator, uint32 hashType, string hash);
+  event ChangeHashAppEvent(uint32 indexed store, uint indexed app, string hash, uint32 hashType);
+  event ChangePublishEvent(uint32 indexed store, uint indexed app, bool state);
+  event SetPriceEvent(uint32 indexed store, uint indexed app, uint obj, uint price);
+  event BuyAppEvent(uint32 indexed store, address indexed user, address indexed dev, uint app, uint obj, address node, uint price);
   
   //Ico App events
-  event AddAppICOEvent(uint32 indexed _store, uint _app, string _hash, uint32 _hashType);
-  event ChangeHashAppICOEvent(uint32 indexed _store, uint indexed _app, string hash, uint32 _hashType);
+  event AddAppICOEvent(uint32 indexed store, uint app, string hash, uint32 hashType);
+  event ChangeHashAppICOEvent(uint32 indexed store, uint indexed app, string hash, uint32 hashType);
 
   //ICO events 
-  event ICOCreateEvent(uint32 indexed _store, address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType);
-  event ICODeleteEvent(uint32 indexed _store, address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType);
-  event ICOConfirmationEvent(uint32 indexed _store, address _dev, uint _app, bool _state);  
+  event ICOCreateEvent(uint32 indexed store, address dev, uint app, string name, string symbol, uint decimals, address crowdsale, string hash, uint32 hashType);
+  event ICODeleteEvent(uint32 indexed store, address dev, uint app, string name, string symbol, uint decimals, address crowdsale, string hash, uint32 hashType);
+  event ICOConfirmationEvent(uint32 indexed store, address dev, uint app, bool state);  
   
   //Developer events 
-  event AddDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _desc);
-  event ChangeNameDevEvent(uint32 indexed _store, address indexed _dev, bytes32 _name, bytes32 _desc);
-  event SetStoreBlockedDevEvent(uint32 indexed _store, address indexed _dev, bool _state);
-  event SetRatingDevEvent(uint32 indexed _store, address indexed _dev, int _rating);
+  event AddDevEvent(uint32 indexed store, address indexed dev, bytes32 name, bytes32 desc);
+  event ChangeNameDevEvent(uint32 indexed store, address indexed dev, bytes32 name, bytes32 desc);
+  event SetStoreBlockedDevEvent(uint32 indexed store, address indexed dev, bool state);
+  event SetRatingDevEvent(uint32 indexed store, address indexed dev, int rating);
   
   //Node events  
-  event AddNodeEvent(uint32 indexed _store, address indexed _node, uint32 _hashType, string _hash, string _ip, string _coordinates);
-  event ChangeInfoNodeEvent(uint32 indexed _store, address _node, string _hash, uint32 _hashType, string _ip, string _coordinates);
-  event RequestCollectNodeEvent(uint32 indexed _store, address _node);
-  event CollectNodeEvent(uint32 indexed _store, address _node, uint _amount);
-  event MakeDepositNodeEvent(uint32 indexed _store, address _from, address _node, uint _ETH, uint _PMT);
-  event MakeDepositETHNodeEvent(uint32 indexed _store, address _from, address _node, uint _value);
-  event MakeDepositPMTNodeEvent(uint32 indexed _store, address _from, address _node, uint _value);
-  event RequestRefundNodeEvent(uint32 indexed _store, address _node, uint _refundTime);
-  event RefundNodeEvent(uint32 indexed _store, address _node);
-  event SetConfirmationNodeEvent(uint32 indexed _store, address indexed _node, bool _state, address _moderator);
-  event SetDepositLimitsNodeEvent(uint32 indexed _store, address _node, uint _ETH, uint _PMT, address _moderator);
+  event AddNodeEvent(uint32 indexed store, address indexed node, uint32 hashType, string hash, string ip, string coordinates);
+  event ChangeInfoNodeEvent(uint32 indexed store, address node, string hash, uint32 hashType, string ip, string coordinates);
+  event RequestCollectNodeEvent(uint32 indexed store, address node);
+  event CollectNodeEvent(uint32 indexed store, address node, uint amount);
+  event MakeDepositNodeEvent(uint32 indexed store, address from, address node, uint ETH, uint PMT);
+  event MakeDepositETHNodeEvent(uint32 indexed store, address from, address node, uint value);
+  event MakeDepositPMTNodeEvent(uint32 indexed store, address from, address node, uint value);
+  event RequestRefundNodeEvent(uint32 indexed store, address node, uint refundTime);
+  event RefundNodeEvent(uint32 indexed store, address node);
+  event SetConfirmationNodeEvent(uint32 indexed store, address indexed node, bool state, address moderator);
+  event SetDepositLimitsNodeEvent(uint32 indexed store, address node, uint ETH, uint PMT, address moderator);
   
   //Reviews events  
-  event FeedbackRatingEvent(uint32 indexed _store, address _voter, uint indexed _app, uint vote, string description, bytes32 txIndex, uint blocktimestamp);
+  event FeedbackRatingEvent(uint32 indexed store, address voter, uint indexed app, uint vote, string description, bytes32 txIndex, uint blocktimestamp);
   
   /** 
   ** Applications events 
@@ -81,8 +81,8 @@ contract LogStorage is LogStorageI, AgentStorage {
     emit AddAppICOEvent(Agents[msg.sender].store, _app, _hash, _hashType);
   }
   
-  function changeHashAppICOEvent(uint _app, string hash, uint32 hashType) external onlyAgentStorage() {
-    emit ChangeHashAppICOEvent(Agents[msg.sender].store, _app, hash, hashType);
+  function changeHashAppICOEvent(uint _app, string _hash, uint32 _hashType) external onlyAgentStorage() {
+    emit ChangeHashAppICOEvent(Agents[msg.sender].store, _app, _hash, _hashType);
   }
 
 
@@ -169,7 +169,7 @@ contract LogStorage is LogStorageI, AgentStorage {
   /** 
   ** Feedback Rating event
   **/
-  function feedbackRatingEvent(address voter, uint _app, uint vote, string description, bytes32 txIndex, uint blocktimestamp) external onlyAgentStorage() {
-    emit FeedbackRatingEvent(Agents[msg.sender].store, voter, _app, vote, description, txIndex, blocktimestamp);
+  function feedbackRatingEvent(address _voter, uint _app, uint _vote, string _description, bytes32 _txIndex, uint _blocktimestamp) external onlyAgentStorage() {
+    emit FeedbackRatingEvent(Agents[msg.sender].store, _voter, _app, _vote, _description, _txIndex, _blocktimestamp);
   }
 }
