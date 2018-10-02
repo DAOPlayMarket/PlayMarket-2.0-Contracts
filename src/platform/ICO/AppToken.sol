@@ -2,7 +2,6 @@ pragma solidity ^0.4.24;
 
 import '../../common/Ownable.sol';
 import '../../common/ERC20.sol';
-import '../../fund/PMFundI.sol';
 
 /**
  * @title Application Token based on ERC20 token
@@ -33,8 +32,6 @@ contract AppToken is ERC20, Ownable {
     uint value = safePerc(totalSupply_,500);
     balances[_CrowdSale] = safeSub(balances[_CrowdSale], value);
     balances[_PMFund] = value;
-    // inform the fund about new tokens
-    PMFundI(_PMFund).makeDeposit(address(this));
     emit Transfer(_CrowdSale, _PMFund, balances[_PMFund]);  
 
     // send 10% - to developer for the organization AirDrop/Bounty etc.
