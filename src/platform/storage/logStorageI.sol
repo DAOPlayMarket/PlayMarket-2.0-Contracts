@@ -18,8 +18,8 @@ interface LogStorageI {
   function changeHashAppICOEvent(uint _app, string _hash, uint32 _hashType) external;
   
   //Developer events 
-  function addDevEvent(address _dev, bytes32 name, bytes32 info) external;
-  function changeNameDevEvent(address _dev, bytes32 name, bytes32 info) external;
+  function addDevEvent(address _dev, bytes32 _name, bytes32 _desc) external;
+  function changeNameDevEvent(address _dev, bytes32 _name, bytes32 _desc) external;
   function setStoreBlockedDevEvent(address _dev, bool _state) external;
   function setRatingDevEvent(address _dev, int _rating) external;
   
