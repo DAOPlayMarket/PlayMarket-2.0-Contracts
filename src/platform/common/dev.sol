@@ -73,7 +73,7 @@ contract Dev is Agent, SafeMath, Base {
     return DevStorage.getRevenue(_dev);
   }  
 
-  function getInfoDev(address _dev) external view returns (bytes32, bytes32, bool, uint32) {
+  function getInfoDev(address _dev) external view returns (bytes32 name, bytes32 desc, bool state, uint32 store) {
     return DevStorage.getInfo(_dev);
   }
 

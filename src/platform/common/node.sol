@@ -126,7 +126,7 @@ contract Node is Agent, SafeMath, Base {
     return NodeStorage.getConfirmation(_node);
   }
 
-  function getInfoNode(address _node) external view returns (uint32, bool, uint, string, string, string) {
+  function getInfoNode(address _node) external view returns (uint32 hashType, bool collectState, uint collectTime, string hash, string ip, string coordinates) {
     return NodeStorage.getInfo(_node);
   }
 
@@ -134,7 +134,7 @@ contract Node is Agent, SafeMath, Base {
     return NodeStorage.getRevenue(_node);
   }
 
-  function getDepositNode(address _node) external view returns (uint, uint, uint, uint, uint, bool) {
+  function getDepositNode(address _node) external view returns (uint ETH, uint PMT, uint minETH, uint minPMT, uint refundTime, bool refundState) {
     return NodeStorage.getDeposit(_node);
   }
 }

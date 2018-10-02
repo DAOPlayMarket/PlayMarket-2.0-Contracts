@@ -75,20 +75,20 @@ contract App is Agent, SafeMath, Base {
   }
 
   // check objects buy
-  function getBuyObject(uint _app, address _user, uint _obj) external view returns (bool success) {
+  function getBuyObject(uint _app, address _user, uint _obj) external view returns (bool) {
     return AppStorage.getBuyObject(_app, _user, _obj);
   }
   
   // check objects buy
-  function getTimeSubscription(uint _app, address _user, uint _obj) external view returns (uint _endTime) {
+  function getTimeSubscription(uint _app, address _user, uint _obj) external view returns (uint) {
     return AppStorage.getTimeSubscription(_app, _user, _obj);
   }
 
-  function getInfoApp(uint _app) external view returns (uint32, uint32, bool, bool, uint, string) {
+  function getInfoApp(uint _app) external view returns (uint32 hashType, uint32 appType, bool publish, bool confirmation, uint price, string hash) {
     return AppStorage.getInfo(_app);
   }
 
-  function getInfoAppICO(uint _app) external view returns (uint32, bool, string) {
+  function getInfoAppICO(uint _app) external view returns (uint32 hashType, bool confirmation, string hash) {
     return AppStorage.getInfoICO(_app);
   }
   
