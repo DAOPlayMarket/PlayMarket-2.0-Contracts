@@ -4,6 +4,7 @@ import '../../common/SafeMath.sol';
 import '../../common/AgentStorage.sol';
 import '../../common/RateContractI.sol';
 import '../../exchange/PEXI.sol';
+import '../../fund/PMFundI.sol';
 import './ICOListI.sol';
 import './CrowdSaleI.sol';
 import './AppTokenBuildI.sol';
@@ -70,7 +71,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
 
     // create AppToken contract _ATID type and set _CrowdSale as owner
     address AppToken = AppTokenBuildI(AppTokens[_ATID]).CreateAppTokenContract(_name, _symbol, _crowdsale, PMFund, _dev);
-
+    PMFundI(PMFund).makeDeposit(address(AppToken));
     return AppToken;
   }
   

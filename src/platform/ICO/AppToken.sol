@@ -30,7 +30,7 @@ contract AppToken is ERC20, Ownable {
     emit Transfer(0x0, _CrowdSale, balances[_CrowdSale]);
 
     // send 5% - to DAO PlayMArket 2.0 Foundation
-    uint value = safePerc(totalSupply_,5);
+    uint value = safePerc(totalSupply_,500);
     balances[_CrowdSale] = safeSub(balances[_CrowdSale], value);
     balances[_PMFund] = value;
     // inform the fund about new tokens
@@ -38,7 +38,7 @@ contract AppToken is ERC20, Ownable {
     emit Transfer(_CrowdSale, _PMFund, balances[_PMFund]);  
 
     // send 10% - to developer for the organization AirDrop/Bounty etc.
-    value = safePerc(totalSupply_,10);
+    value = safePerc(totalSupply_,1000);
     balances[_CrowdSale] = safeSub(balances[_CrowdSale], value);
     balances[_dev] = value;
     emit Transfer(_CrowdSale, _dev, balances[_dev]);  

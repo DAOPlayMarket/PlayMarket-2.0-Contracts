@@ -86,9 +86,9 @@ contract CrowdSale is Ownable, SafeMath {
     
     dev = _dev;
     uint _price = safeDiv(_targetInUSD,40500000);
-    price[0] = safePerc(_price,85);
-    price[1] = safePerc(_price,90);
-    price[2] = safePerc(_price,95);
+    price[0] = safePerc(_price,8500);
+    price[1] = safePerc(_price,9000);
+    price[2] = safePerc(_price,9500);
 
     m15 = 15*10**(6+decimals);
     m30 = 30*10**(6+decimals);
@@ -165,7 +165,7 @@ contract CrowdSale is Ownable, SafeMath {
     }
     uint difference = safeSub(countNow,countUse);
     require(difference > 0);
-    uint sumToken = safeDiv((safeMul(safeSub(safePerc(totalSupply,85),tokensSold),difference*10)),100);
+    uint sumToken = safeDiv((safeMul(safeSub(safePerc(totalSupply,8500),tokensSold),difference*10)),100);
     ERC20.transfer(msg.sender, sumToken);
     countUse = safeAdd(countUse,difference);
   }
