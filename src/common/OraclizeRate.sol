@@ -11,13 +11,14 @@ import './RateContractI.sol';
 contract OraclizeRateContract is Agent, usingOraclize {
 
     RateContractI RateContract;
-    bytes32 oraclize_id;    
-    string oraclize_url;
-    bytes8 oraclize_curr;    
+    bytes32 oraclize_id;
+    string  oraclize_url;
+    bytes32 oraclize_curr;
+    uint    decimals = 2;
 
     event oraclizeQueryEvent(bool _status, string _comment);
     event oraclizeUpdateURLEvent(string _URL);
-    event oraclizeUpdateCurrEvent(bytes8 _curr);
+    event oraclizeUpdateCurrEvent(bytes32 _curr);
     event oraclizeUpdateRateContractAddressEvent(address _contract);
 
     constructor() public {
@@ -36,7 +37,7 @@ contract OraclizeRateContract is Agent, usingOraclize {
         if (msg.sender != oraclize_cbAddress()) revert();
         if (oraclize_id != _id) revert();
 
-        uint _rate = parseInt(_result, 2);
+        uint _rate = parseInt(_result, decimals);
         RateContract.updateRate(oraclize_curr, _rate);        
     }
     
@@ -57,16 +58,21 @@ contract OraclizeRateContract is Agent, usingOraclize {
     }
 
     // oraclize update Currency
-    function updateCurrOraclize(bytes8 _curr) public onlyAgent {
+    function updateCurrOraclize(bytes32 _curr) public onlyAgent {
         oraclize_curr = _curr;
         emit oraclizeUpdateCurrEvent(_curr);
     }
 
     // oraclize update Currency and URL
-    function updateParamsOraclize(string _URL, bytes8 _curr) public onlyAgent {        
+    function updateParamsOraclize(string _URL, bytes32 _curr) public onlyAgent {        
         oraclize_url = _URL;
         oraclize_curr = _curr;
         emit oraclizeUpdateURLEvent(_URL);
         emit oraclizeUpdateCurrEvent(_curr);
+    }
+
+    // execute function by owner if ERC20 token get stuck in this contract
+    function execute(address _to, uint _value, bytes _data) external onlyOwner {
+        require(_to.call.value(_value)(_data));        
     }
 }
