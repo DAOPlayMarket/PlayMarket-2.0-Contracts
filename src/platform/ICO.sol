@@ -32,7 +32,6 @@ contract ICO is Agent, Base {
     address crowdsale;
     string hash;
     uint32 hashType;
-    bool confirmation;
   }
 
   mapping (uint => _ICO) public ICOs;
@@ -64,9 +63,9 @@ contract ICO is Agent, Base {
   }
 
   function addAppICOInfo(uint _app, string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, string _hash, uint32 _hashType) external {
-    address _dev = AppStorage.getDeveloper(_app);
-    require(msg.sender == _dev);
-    require(!DevStorage.getStoreBlocked(_dev));
+    address dev = AppStorage.getDeveloper(_app);
+    require(msg.sender == dev);
+    require(!DevStorage.getStoreBlocked(dev));
 
     _ICO storage ico = ICOs[_app];
     
@@ -79,13 +78,15 @@ contract ICO is Agent, Base {
     ico.hash = _hash;
     ico.hashType = _hashType;
     
-    AppStorage.addAppICO(_app, _hash, _hashType);
+    ICOList.addHashAppICO(_app, dev, _hash, _hashType);
     LogStorage.addAppICOEvent(_app, _hash, _hashType);
   }
 
-  function changeHashAppICO(uint _app, string _hash, uint32 _hashType) external onlyAgent {
-    require(AppStorage.getDeveloper(_app) == msg.sender);
-    AppStorage.changeHashAppICO(_app, _hash, _hashType);
+  function changeHashAppICO(uint _app, string _hash, uint32 _hashType) external {
+    address dev = AppStorage.getDeveloper(_app);
+    require(msg.sender == dev);
+    require(!DevStorage.getStoreBlocked(dev));
+    ICOList.changeHashAppICO(_app, dev, _hash, _hashType);
     LogStorage.changeHashAppICOEvent(_app, _hash, _hashType);
   }
 
@@ -116,7 +117,7 @@ contract ICO is Agent, Base {
     LogStorage.icoDeleteEvent(_dev, _app, ico.name, ico.symbol, ico.decimals, ico.crowdsale, ico.hash, ico.hashType);
   }
 
-  function setConfirmationICO(address _dev, uint _app, bool _state) external onlyAgent {
+  function setConfirmationICO(address _dev, uint _app, bool _state) external onlyAgent() {
     _ICO storage ico = ICOs[_app];
     require(ico.crowdsale != address(0));
     ICOList.setConfirmation(_dev, _app, _state);

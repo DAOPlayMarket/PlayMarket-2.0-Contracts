@@ -18,17 +18,8 @@ contract AppStorage is AppStorageI, AgentStorage {
     string hash;        // hash of content in storage system
   }
 
-  struct _AppICO {    
-    uint32 hashType;    // default 0 - IPFS
-    bool confirmation;  // decides platform, after verification (Nodes and mobile application display only approved and published Apps)
-    string hash;        // hash of content in storage system
-  }
-
   // array of Applications
   _App[] private Apps;
-
-  // array of Application ICO's
-  mapping (uint => _AppICO) private AppsICO;
 
   // array of Applications Objects
   mapping (uint => mapping (uint => uint)) private AppsOBJprice; // AppsOBJ[_app][_obj] = price; (in virtual units (PMC))
@@ -52,25 +43,11 @@ contract AppStorage is AppStorageI, AgentStorage {
     return Apps.length-1;
   }
 
-  function addAppICO(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
-    assert(Apps[_app].developer != address(0));
-    AppsICO[_app].hash =_hash;
-    AppsICO[_app].hashType = _hashType;
-    AppsICO[_app].confirmation = false;
-  }
-
   function changeHashApp(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
     assert(Apps[_app].developer != address(0));
     Apps[_app].hash = _hash;
     Apps[_app].hashType = _hashType;
     Apps[_app].confirmation = false;
-  }
-
-  function changeHashAppICO(uint _app, string _hash, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
-    assert(Apps[_app].developer != address(0));
-    AppsICO[_app].hash =_hash;
-    AppsICO[_app].hashType =_hashType;
-    AppsICO[_app].confirmation = false;
   }
 
   // _obj = 0 - application
@@ -140,19 +117,6 @@ contract AppStorage is AppStorageI, AgentStorage {
     return Apps[_app].hash;
   }
 
-  // AppsICO getters
-  function getHashTypeICO(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint32) {
-    return AppsICO[_app].hashType;
-  }
-
-  function getConfirmationICO(uint _app) external view onlyAgentStore(Apps[_app].store) returns (bool) {
-    return AppsICO[_app].confirmation;
-  }
-
-  function getHashICO(uint _app) external view onlyAgentStore(Apps[_app].store) returns (string) {
-    return AppsICO[_app].hash;
-  }
-
   function getInfo(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint32, uint32, bool, bool, uint, string) {
     return (Apps[_app].hashType,      
       Apps[_app].appType, 
@@ -160,12 +124,6 @@ contract AppStorage is AppStorageI, AgentStorage {
       Apps[_app].confirmation,
       AppsOBJprice[_app][0],
       Apps[_app].hash);
-  }
-
-  function getInfoICO(uint _app) external view onlyAgentStore(Apps[_app].store) returns (uint32, bool, string) {
-    return (AppsICO[_app].hashType,      
-      AppsICO[_app].confirmation,     
-      AppsICO[_app].hash);
   }
 
   /************************************************************************* 
@@ -231,17 +189,4 @@ contract AppStorage is AppStorageI, AgentStorage {
   function setHash(uint _app, string _hash) external onlyAgentStore(Apps[_app].store) {
     Apps[_app].hash = _hash;
   }
-
-  // AppsICO setters
-  function setHashTypeICO(uint _app, uint32 _hashType) external onlyAgentStore(Apps[_app].store) {
-    AppsICO[_app].hashType = _hashType;
-  }
-
-  function setConfirmationICO(uint _app, bool _state) external onlyAgentStore(Apps[_app].store) {
-    AppsICO[_app].confirmation = _state;
-  }
-
-  function setHashICO(uint _app, string _hash) external onlyAgentStore(Apps[_app].store) {
-    AppsICO[_app].hash = _hash;
-  }    
 }

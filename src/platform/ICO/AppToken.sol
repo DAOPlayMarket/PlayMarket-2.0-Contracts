@@ -28,7 +28,7 @@ contract AppToken is ERC20, Ownable {
     balances[_CrowdSale] = totalSupply_;    
     emit Transfer(0x0, _CrowdSale, balances[_CrowdSale]);
 
-    // send 5% - to DAO PlayMArket 2.0 Foundation
+    // send 5% - to DAO PlayMarket 2.0 Foundation
     uint value = safePerc(totalSupply_,500);
     balances[_CrowdSale] = safeSub(balances[_CrowdSale], value);
     balances[_PMFund] = value;

@@ -24,13 +24,15 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
     uint targetInUSD;
     address token;
     address crowdsale;
+    string hash;
+    uint32 hashType;
     bool confirmation;
   }
 
   address public PMFund;        // DAO PlayMarket 2.0 Foundation address
   PEXI public PEXContract;      // DAO PlayMarket 2.0 Exchange address
 
-  mapping (uint => mapping (address => mapping (uint => _ICO))) public ICOs;
+  mapping (uint => mapping (address => mapping (uint => _ICO))) public ICOs; // ICOs[store][dev][app]
   
   mapping (uint => address) public AppTokens;
   mapping (uint => address) public CrowdSales;
@@ -42,6 +44,25 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
   constructor (address _PMFund, address _PEXContract) public {
     PMFund      = _PMFund;
     PEXContract = PEXI(_PEXContract);
+  }
+
+  function addHashAppICO(uint _app, address _dev, string _hash, uint32 _hashType) external onlyAgentStorage() {  
+    uint32 store = Agents[msg.sender].store;
+    require(!ICOs[store][_dev][_app].confirmation);
+
+    _ICO storage ico = ICOs[store][_dev][_app];
+    
+    ico.hash = _hash;
+    ico.hashType = _hashType;  
+  }
+
+  function changeHashAppICO(uint _app, address _dev, string _hash, uint32 _hashType) external onlyAgentStorage() {    
+    uint32 store = Agents[msg.sender].store;
+
+    _ICO storage ico = ICOs[store][_dev][_app];
+    
+    ico.hash = _hash;
+    ico.hashType = _hashType;      
   }
 
   /**
@@ -71,6 +92,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
 
     // create AppToken contract _ATID type and set _CrowdSale as owner
     address AppToken = AppTokenBuildI(AppTokens[_ATID]).CreateAppTokenContract(_name, _symbol, _crowdsale, PMFund, _dev);
+    // inform the fund about new tokens
     PMFundI(PMFund).makeDeposit(address(AppToken));
     return AppToken;
   }
@@ -79,21 +101,22 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
    * @dev CreateICO 
    */
   function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external onlyAgentStorage() {
-    require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
+    uint32 store = Agents[msg.sender].store;
+    require(!ICOs[store][_dev][_app].confirmation);
 
     CrowdSaleI(_crowdsale).setTokenContract(address(_apptoken));
 
-    ICOs[Agents[msg.sender].store][_dev][_app] = _ICO({
-        name: _name,
-        symbol: _symbol,
-        decimals: _decimals,        
-        startsAt: _startsAt,
-        duration: _duration,
-        targetInUSD: _targetInUSD,
-        token: _apptoken,
-        crowdsale: _crowdsale,
-        confirmation: false
-    });
+    _ICO storage ico = ICOs[store][_dev][_app];
+    
+    ico.name = _name;
+    ico.symbol = _symbol;
+    ico.decimals = _decimals;
+    ico.startsAt = _startsAt;
+    ico.duration = _duration;
+    ico.targetInUSD = _targetInUSD;
+    ico.token = _apptoken;
+    ico.crowdsale = _crowdsale;
+    ico.confirmation = false;
   }
 
   /**
@@ -114,6 +137,8 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
         targetInUSD: 0,
         token: address(0),
         crowdsale: address(0),
+        hash: "",
+        hashType: 0,
         confirmation: false
     });    
   }

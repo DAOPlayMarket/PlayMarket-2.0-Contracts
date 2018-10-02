@@ -88,10 +88,6 @@ contract App is Agent, SafeMath, Base {
     return AppStorage.getInfo(_app);
   }
 
-  function getInfoAppICO(uint _app) external view returns (uint32 hashType, bool confirmation, string hash) {
-    return AppStorage.getInfoICO(_app);
-  }
-  
   /**
    * @dev We do not store the data in the contract, but generate the event. This allows you to make feedback as cheap as possible. The event generation costs 8 wei for 1 byte, and data storage in the contract 20,000 wei for 32 bytes
    * @param _app voice application identifier

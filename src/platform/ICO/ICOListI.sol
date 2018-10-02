@@ -4,6 +4,9 @@ pragma solidity ^0.4.24;
  * @title ICOList contract interface
  */
 interface ICOListI {
+
+  function addHashAppICO(uint _app, address _dev, string _hash, uint32 _hashType) external;
+  function changeHashAppICO(uint _app, address _dev, string _hash, uint32 _hashType) external;
   
   /**
    * @dev Create CrowdSale contract

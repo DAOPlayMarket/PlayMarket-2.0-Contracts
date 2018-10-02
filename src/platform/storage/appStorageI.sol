@@ -6,9 +6,7 @@ pragma solidity ^0.4.24;
 interface AppStorageI {
   
   function addApp(uint32 _hashType, uint32 _appType, uint _price, bool _publish, address _dev, string _hash) external returns (uint);
-  function addAppICO(uint _app, string _hash, uint32 _hashType) external;
   function changeHashApp(uint _app,  string _hash, uint32 _hashType) external;
-  function changeHashAppICO(uint _app, string _hash, uint32 _hashType) external;
   // _obj = 0 - application
   // _state: true - buy, false - cancel buy
   function buyObject(uint _app, address _user, uint _obj, bool _state) external;
@@ -37,11 +35,6 @@ interface AppStorageI {
   function getDeveloper(uint _app) external view returns (address);
   function getHash(uint _app) external view returns (string);
   function getInfo(uint _app) external view returns (uint32, uint32, bool, bool, uint, string);
-  // AppsICO getters
-  function getHashTypeICO(uint _app) external view returns (uint32);
-  function getConfirmationICO(uint _app) external view returns (bool);
-  function getHashICO(uint _app) external view returns (string);
-  function getInfoICO(uint _app) external view returns (uint32, bool, string);
 
   /************************************************************************* 
   // Apps setters
@@ -63,8 +56,4 @@ interface AppStorageI {
   function setConfirmation(uint _app, bool _state) external;
   function setDeveloper(uint _app, address _developer) external;
   function setHash(uint _app, string _hash) external;
-  // AppsICO setters
-  function setHashTypeICO(uint _app, uint32 _hashType) external;
-  function setConfirmationICO(uint _app, bool _state) external;
-  function setHashICO(uint _app, string _hash) external;
 }
