@@ -14,7 +14,7 @@ contract ERC223 is ERC223I, SafeMath {
   
   string public name;
   string public symbol;
-  uint8 public decimals;
+  uint256 public decimals;
   uint256 public totalSupply;
   
   function name() public view returns (string _name) {
@@ -25,7 +25,7 @@ contract ERC223 is ERC223I, SafeMath {
     return symbol;
   }
 
-  function decimals() public view returns (uint8 _decimals) {
+  function decimals() public view returns (uint256 _decimals) {
     return decimals;
   }
 

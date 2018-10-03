@@ -10,7 +10,7 @@ interface ERC223I {
   
   function name() external view returns (string _name);
   function symbol() external view returns (string _symbol);
-  function decimals() external view returns (uint8 _decimals);
+  function decimals() external view returns (uint256 _decimals);
   function totalSupply() external view returns (uint256 supply);
 
   function transfer(address to, uint value) external returns (bool ok);

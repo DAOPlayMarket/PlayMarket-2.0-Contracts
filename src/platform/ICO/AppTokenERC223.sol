@@ -21,7 +21,7 @@ contract AppToken is ERC223, Ownable {
     decimals = 8;
 
     bytes memory empty;    
-    totalSupply = initialSupply*uint(10)**decimals;
+    totalSupply = initialSupply*10**decimals;
     // creating initial tokens
     balances[_CrowdSale] = totalSupply;    
     emit Transfer(0x0, _CrowdSale, balances[_CrowdSale], empty);
