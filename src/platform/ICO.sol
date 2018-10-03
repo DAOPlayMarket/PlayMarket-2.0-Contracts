@@ -24,8 +24,8 @@ contract ICO is Agent, Base {
   struct _ICO {
     string name;
     string symbol;
-    uint decimals;    
     uint startsAt;
+    uint number;
     uint duration;
     uint targetInUSD;
     address token;
@@ -62,7 +62,7 @@ contract ICO is Agent, Base {
     emit setAppStorageContractEvent(_contract);
   }
 
-  function addAppICOInfo(uint _app, string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, string _hash, uint32 _hashType) external {
+  function addAppICOInfo(uint _app, string _name, string _symbol, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, string _hash, uint32 _hashType) external {
     address dev = AppStorage.getDeveloper(_app);
     require(msg.sender == dev);
     require(!DevStorage.getStoreBlocked(dev));
@@ -71,9 +71,9 @@ contract ICO is Agent, Base {
     
     ico.name = _name;
     ico.symbol = _symbol;
-    ico.decimals = _decimals;
     ico.startsAt = _startsAt;
-    ico.duration = _duration;
+    ico.number = _numberOfPeriods;
+    ico.duration = _durationOfPeriod;
     ico.targetInUSD = _targetInUSD;
     ico.hash = _hash;
     ico.hashType = _hashType;
@@ -90,7 +90,7 @@ contract ICO is Agent, Base {
     LogStorage.changeHashAppICOEvent(_app, _hash, _hashType);
   }
 
-  function addAppICOContracts(uint _app, address _multisigWallet, uint _CSID, uint _ATID) external {
+  function addAppICO(uint _app, address _multisigWallet, uint _CSID, uint _ATID) external {
     address _dev = AppStorage.getDeveloper(_app);
     require(msg.sender == _dev);
     require(!DevStorage.getStoreBlocked(_dev));
@@ -98,13 +98,11 @@ contract ICO is Agent, Base {
     _ICO storage ico = ICOs[_app];
 
     // create CrowdSale contract from CrowdSale Build contract
-    ico.crowdsale = ICOList.CreateCrowdSale(_multisigWallet, ico.startsAt, ico.targetInUSD, _CSID, _app, _dev);
+    ico.crowdsale = ICOList.CreateCrowdSale(_multisigWallet, ico.startsAt, ico.number, ico.duration, ico.targetInUSD, _CSID, _app, _dev);
     // create AppToken contract from AppToken Build contract
-    ico.token = ICOList.CreateAppToken(ico.name, ico.symbol, ico.crowdsale, _ATID, _app, _dev);
-    // create ICO
-    ICOList.CreateICO(ico.name, ico.symbol, ico.decimals, ico.startsAt, ico.duration, ico.targetInUSD, ico.crowdsale, ico.token, _app, _dev);
+    ico.token = ICOList.CreateAppToken(ico.name, ico.symbol, _ATID, _app, _dev);
     // generate event about create contract
-    LogStorage.icoCreateEvent(_dev, _app, ico.name, ico.symbol, ico.decimals, ico.crowdsale, ico.hash, ico.hashType);
+    LogStorage.icoCreateEvent(_dev, _app, ico.name, ico.symbol, ico.crowdsale, ico.token, ico.hash, ico.hashType);
   }
 
   function delAppICO(uint _app) external {
@@ -114,11 +112,12 @@ contract ICO is Agent, Base {
 
     _ICO storage ico = ICOs[_app];
     ICOList.DeleteICO(_app, msg.sender);
-    LogStorage.icoDeleteEvent(_dev, _app, ico.name, ico.symbol, ico.decimals, ico.crowdsale, ico.hash, ico.hashType);
+    LogStorage.icoDeleteEvent(_dev, _app, ico.name, ico.symbol, ico.crowdsale, ico.token, ico.hash, ico.hashType);
   }
 
   function setConfirmationICO(address _dev, uint _app, bool _state) external onlyAgent() {
     _ICO storage ico = ICOs[_app];
+    require(ico.token != address(0));
     require(ico.crowdsale != address(0));
     ICOList.setConfirmation(_dev, _app, _state);
     LogStorage.icoConfirmationEvent(_dev, _app, _state);

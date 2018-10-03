@@ -20,8 +20,7 @@ contract CrowdSale is Ownable, SafeMath {
   ERC20I public ERC20;
 
   address public dev;
-  uint public countUse;
-  uint public currentPeriod;
+  uint public countUse;  
   uint public totalSupply;  
   bool public SoftCap;
   uint public targetInUSD;
@@ -74,7 +73,11 @@ contract CrowdSale is Ownable, SafeMath {
   /**
    * @dev Constructor sets default parameters
    */
-  constructor(uint _initialSupply, uint _decimals, address _multisigWallet, uint _startsAt, uint _targetInUSD, address _RateContract, address _dev, address _owner) public {
+  constructor(uint _initialSupply, uint _decimals, address _multisigWallet, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, address _RateContract, address _dev, address _owner) public {
+
+    require(_numberOfPeriods == 3);
+    require(_durationOfPeriod == 30 days);
+
     owner =_owner;
     decimals = _decimals;
     multiplier = 10 ** decimals;
@@ -118,7 +121,7 @@ contract CrowdSale is Ownable, SafeMath {
     uint weiAmount = msg.value;
    
     // Determine in what period we hit
-    currentPeriod = getStage();
+    uint currentPeriod = getStage();
     require(currentPeriod < 3);
     
     // Calculating the number of tokens

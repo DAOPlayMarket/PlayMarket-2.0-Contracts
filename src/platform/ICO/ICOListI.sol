@@ -12,19 +12,14 @@ interface ICOListI {
    * @dev Create CrowdSale contract
    * @param _CSID - CrowdSale ID in array CrowdSales;
    */
-  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _targetInUSD, uint _CSID, uint _app, address _dev) external returns (address);  
+  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, uint _CSID, uint _app, address _dev) external returns (address);  
 
   /**
    * @dev Create AppToken contract   
    * @param _ATID - AppToken ID in array AppTokens;
    */
-  function CreateAppToken(string _name, string _symbol, address _crowdsale, uint _ATID, uint _app, address _dev) external returns (address);
+  function CreateAppToken(string _name, string _symbol, uint _ATID, uint _app, address _dev) external returns (address);
   
-  /**
-   * @dev CreateICO 
-   */
-  function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external;
-
   /**
    * @dev DeleteICO 
    */

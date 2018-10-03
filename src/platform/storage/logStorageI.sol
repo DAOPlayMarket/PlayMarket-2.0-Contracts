@@ -42,7 +42,7 @@ interface LogStorageI {
   function updateAgentStorage(address _agent, uint32 _store, bool _state) external;
   
   //ICO events  
-  function icoCreateEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string hash, uint32 hashType) external;
-  function icoDeleteEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType) external;
+  function icoCreateEvent(address _dev, uint _app, string _name, string _symbol, address _crowdsale, address _token, string hash, uint32 hashType) external;
+  function icoDeleteEvent(address _dev, uint _app, string _name, string _symbol, address _crowdsale, address _token, string hash, uint32 hashType) external;
   function icoConfirmationEvent(address _dev, uint _app, bool _state) external;
 }

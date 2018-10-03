@@ -21,8 +21,8 @@ contract LogStorage is LogStorageI, AgentStorage {
   event ChangeHashAppICOEvent(uint32 indexed store, uint indexed app, string hash, uint32 hashType);
 
   //ICO events 
-  event ICOCreateEvent(uint32 indexed store, address dev, uint app, string name, string symbol, uint decimals, address crowdsale, string hash, uint32 hashType);
-  event ICODeleteEvent(uint32 indexed store, address dev, uint app, string name, string symbol, uint decimals, address crowdsale, string hash, uint32 hashType);
+  event ICOCreateEvent(uint32 indexed store, address dev, uint app, string name, string symbol, address crowdsale, address token, string hash, uint32 hashType);
+  event ICODeleteEvent(uint32 indexed store, address dev, uint app, string name, string symbol, address crowdsale, address token, string hash, uint32 hashType);
   event ICOConfirmationEvent(uint32 indexed store, address dev, uint app, bool state);  
   
   //Developer events 
@@ -154,12 +154,12 @@ contract LogStorage is LogStorageI, AgentStorage {
   /** 
   ** ICO event
   **/
-  function icoCreateEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType) external onlyAgentStorage() {
-    emit ICOCreateEvent(Agents[msg.sender].store, _dev, _app, _name, _symbol, _decimals, _crowdsale, _hash, _hashType);
+  function icoCreateEvent(address _dev, uint _app, string _name, string _symbol, address _crowdsale, address _token, string _hash, uint32 _hashType) external onlyAgentStorage() {
+    emit ICOCreateEvent(Agents[msg.sender].store, _dev, _app, _name, _symbol, _crowdsale, _token, _hash, _hashType);
   }
   
-  function icoDeleteEvent(address _dev, uint _app, string _name, string _symbol, uint _decimals, address _crowdsale, string _hash, uint32 _hashType) external onlyAgentStorage() {
-    emit ICODeleteEvent(Agents[msg.sender].store, _dev, _app, _name, _symbol, _decimals, _crowdsale, _hash, _hashType);
+  function icoDeleteEvent(address _dev, uint _app, string _name, string _symbol, address _crowdsale, address _token, string _hash, uint32 _hashType) external onlyAgentStorage() {
+    emit ICODeleteEvent(Agents[msg.sender].store, _dev, _app, _name, _symbol, _crowdsale, _token, _hash, _hashType);
   }
   
   function icoConfirmationEvent(address _dev, uint _app, bool _state) external onlyAgentStorage() {

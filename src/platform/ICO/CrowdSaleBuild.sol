@@ -10,9 +10,8 @@ contract CrowdSaleBuild is Ownable {
   
   address public RateContract;
 
-  uint public emission = 10000000000000000;
-  uint public decimals = 8;
-  uint public duration = 90 days;
+  uint public emission = 100 * 10**6 * 10**8; // 100 million tokens 
+  uint public decimals = 8;  
 
   constructor (address _RateContract) public {
     RateContract = _RateContract;
@@ -23,10 +22,9 @@ contract CrowdSaleBuild is Ownable {
    * @param _emission how many tokens will be released
    * @param _decimals decimals Tokens
    */
-  function setInfo(uint _emission, uint _decimals, uint _duration) external onlyOwner {
+  function setInfo(uint _emission, uint _decimals) external onlyOwner {
     emission = _emission;
-    decimals = _decimals;
-    duration = _duration;
+    decimals = _decimals;    
   }
 
   /**
@@ -40,8 +38,8 @@ contract CrowdSaleBuild is Ownable {
   /**
    * @dev CreateCrowdSaleContract - create new CrowdSale contract and return him address
    */   
-  function CreateCrowdSaleContract(address _multisigWallet, uint _startsAt, uint _targetInUSD, address _dev) external returns (address) {
-    CrowdSale _contract = new CrowdSale(emission, decimals, _multisigWallet, _startsAt, _targetInUSD, RateContract, _dev, msg.sender);
+  function CreateCrowdSaleContract(address _multisigWallet, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, address _dev) external returns (address) {    
+    CrowdSale _contract = new CrowdSale(emission, decimals, _multisigWallet, _startsAt, _numberOfPeriods, _durationOfPeriod, _targetInUSD, RateContract, _dev, msg.sender);
     return address(_contract);
   }
 }

@@ -18,8 +18,8 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
   struct _ICO {
     string name;
     string symbol;
-    uint decimals;    
     uint startsAt;
+    uint number;
     uint duration;
     uint targetInUSD;
     address token;
@@ -54,6 +54,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
     
     ico.hash = _hash;
     ico.hashType = _hashType;  
+    ico.confirmation = false;
   }
 
   function changeHashAppICO(uint _app, address _dev, string _hash, uint32 _hashType) external onlyAgentStorage() {    
@@ -69,14 +70,22 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
    * @dev Create CrowdSale contract
    * @param _CSID - CrowdSale ID in array CrowdSales;
    */
-  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _targetInUSD, uint _CSID, uint _app, address _dev) external onlyAgentStorage() returns (address) {
+  function CreateCrowdSale(address _multisigWallet, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, uint _CSID, uint _app, address _dev) external onlyAgentStorage() returns (address _CrowdSale) {
     require(_CSID > 0);
     require(CrowdSales[_CSID] != address(0));
     require(_multisigWallet != address(0));
-    require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
+
+    _ICO storage ico = ICOs[Agents[msg.sender].store][_dev][_app];
+
+    require(!ico.confirmation);
 
     // create CrowdSale contract _CSID type
-    address CrowdSale = CrowdSaleBuildI(CrowdSales[_CSID]).CreateCrowdSaleContract(_multisigWallet, _startsAt, _targetInUSD, _dev);
+    address CrowdSale = CrowdSaleBuildI(CrowdSales[_CSID]).CreateCrowdSaleContract(_multisigWallet, _startsAt, _numberOfPeriods, _durationOfPeriod, _targetInUSD, _dev);
+
+    ico.startsAt = _startsAt;
+    ico.number = _numberOfPeriods;
+    ico.duration = _durationOfPeriod;
+    ico.crowdsale = CrowdSale;
 
     return CrowdSale;
   }
@@ -85,38 +94,27 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
    * @dev Create AppToken contract   
    * @param _ATID - AppToken ID in array AppTokens;
    */
-  function CreateAppToken(string _name, string _symbol, address _crowdsale, uint _ATID, uint _app, address _dev) external onlyAgentStorage() returns (address) {
+  function CreateAppToken(string _name, string _symbol, uint _ATID, uint _app, address _dev) external onlyAgentStorage() returns (address _AppToken) {
     require(_ATID > 0);
     require(AppTokens[_ATID] != address(0));    
-    require(!ICOs[Agents[msg.sender].store][_dev][_app].confirmation);
+
+    _ICO storage ico = ICOs[Agents[msg.sender].store][_dev][_app];
+
+    require(!ico.confirmation);
+    require(ico.crowdsale != address(0));
 
     // create AppToken contract _ATID type and set _CrowdSale as owner
-    address AppToken = AppTokenBuildI(AppTokens[_ATID]).CreateAppTokenContract(_name, _symbol, _crowdsale, PMFund, _dev);
+    address AppToken = AppTokenBuildI(AppTokens[_ATID]).CreateAppTokenContract(_name, _symbol, ico.crowdsale, PMFund, _dev);
     // inform the fund about new tokens
     PMFundI(PMFund).makeDeposit(address(AppToken));
-    return AppToken;
-  }
-  
-  /**
-   * @dev CreateICO 
-   */
-  function CreateICO(string _name, string _symbol, uint _decimals, uint _startsAt, uint _duration, uint _targetInUSD, address _crowdsale, address _apptoken, uint _app, address _dev) external onlyAgentStorage() {
-    uint32 store = Agents[msg.sender].store;
-    require(!ICOs[store][_dev][_app].confirmation);
-
-    CrowdSaleI(_crowdsale).setTokenContract(address(_apptoken));
-
-    _ICO storage ico = ICOs[store][_dev][_app];
+    // set token contract in crowdsale
+    CrowdSaleI(ico.crowdsale).setTokenContract(address(AppToken));
     
     ico.name = _name;
-    ico.symbol = _symbol;
-    ico.decimals = _decimals;
-    ico.startsAt = _startsAt;
-    ico.duration = _duration;
-    ico.targetInUSD = _targetInUSD;
-    ico.token = _apptoken;
-    ico.crowdsale = _crowdsale;
-    ico.confirmation = false;
+    ico.symbol = _symbol;    
+    ico.token = AppToken;
+
+    return AppToken;
   }
 
   /**
@@ -130,9 +128,9 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
 
     ICOs[Agents[msg.sender].store][_dev][_app] = _ICO({
         name: "",
-        symbol: "",
-        decimals: 0,
+        symbol: "",        
         startsAt: 0,
+        number: 0,
         duration: 0,
         targetInUSD: 0,
         token: address(0),
@@ -165,15 +163,18 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
   }
   
   // confirm ICO and add token to DAO PlayMarket 2.0 Exchange (DAOPEX)
-  function setConfirmation(address _dev, uint _app, bool _state) external onlyAgentStorage() returns (address) {
+  function setConfirmation(address _dev, uint _app, bool _state) external onlyAgentStorage() returns (address token) {
     uint32 store = Agents[msg.sender].store;
-    require(ICOs[store][_dev][_app].token != address(0));
-    require(ICOs[store][_dev][_app].crowdsale != address(0));
-    require(ICOs[store][_dev][_app].confirmation != _state);
 
-    ICOs[store][_dev][_app].confirmation = _state;
+    _ICO storage ico = ICOs[store][_dev][_app];
+
+    require(ico.token != address(0));
+    require(ico.crowdsale != address(0));
+    require(ico.confirmation != _state);
+
+    ico.confirmation = _state;
     // add to whitelist on DAO PlayMarket 2.0 Exchange (DAOPEX)
-    PEXContract.setWhitelistTokens(ICOs[store][_dev][_app].token, _state, ICOs[store][_dev][_app].startsAt + ICOs[store][_dev][_app].duration);
-    return ICOs[store][_dev][_app].token;
+    PEXContract.setWhitelistTokens(ico.token, _state, ico.startsAt + (ico.number * ico.duration));
+    return ico.token;
   } 
 }

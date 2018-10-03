@@ -21,5 +21,5 @@ interface CrowdSaleBuildI {
   /**
    * @dev CreateCrowdSaleContract - create new CrowdSale contract and return him address
    */   
-  function CreateCrowdSaleContract(address _multisigWallet, uint _startsAt, uint _targetInUSD, address _dev) external returns (address);
+  function CreateCrowdSaleContract(address _multisigWallet, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, address _dev) external returns (address);
 }
