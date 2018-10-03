@@ -6,7 +6,7 @@ import './AppTokenERC223.sol';
 /**
  * @title AppToken build contract (for apps ICO)
  */
-contract AppTokenBuild is Ownable {
+contract AppTokenERC223Build is Ownable {
   
   constructor () public {}
 

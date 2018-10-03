@@ -6,7 +6,7 @@ import './AppTokenERC20.sol';
 /**
  * @title AppToken build contract (for apps ICO)
  */
-contract AppTokenBuild is Ownable {
+contract AppTokenERC20Build is Ownable {
   
   constructor () public {}
 

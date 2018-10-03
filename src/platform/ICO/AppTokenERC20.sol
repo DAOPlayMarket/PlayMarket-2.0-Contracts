@@ -8,7 +8,7 @@ import '../../common/ERC20.sol';
  */
 contract AppToken is ERC20, Ownable {
 	
-  bytes32 public version = "1.0.0";
+  bytes32 public version = "ERC20 1.0.0";
 
   uint public initialSupply = 100 * 10**6;
   uint public decimals = 8;

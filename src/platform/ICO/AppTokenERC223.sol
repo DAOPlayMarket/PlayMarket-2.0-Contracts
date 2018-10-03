@@ -8,7 +8,7 @@ import '../../common/ERC223.sol';
  */
 contract AppToken is ERC223, Ownable {
 	
-  bytes32 public version = "1.0.0";
+  bytes32 public version = "ERC223 1.0.0";
 
   uint public initialSupply = 100 * 10**6;  
 
