@@ -48,7 +48,7 @@ contract PMFund is Agent, SafeMath {
 
     Tokens.push(_Token({
       token: _token,
-      decimals: AppTokenI(_token).getDecimals(),
+      decimals: AppTokenI(_token).decimals(),
       total: fund[_token][address(this)]
     }));
   }
