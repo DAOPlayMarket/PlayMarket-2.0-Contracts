@@ -81,7 +81,7 @@ contract ERC223 is ERC223I, SafeMath {
     if (balanceOf(msg.sender) < _value) revert();
     balances[msg.sender] = safeSub(balances[msg.sender], _value);
     balances[_to] = safeAdd(balances[_to], _value);
-    assert(_to.call.value(0)(abi.encodeWithSignature("tokenFallback(address,uint256,bytes)"), msg.sender, _value, _data));    
+    assert(_to.call.value(0)(abi.encodeWithSignature("tokenFallback(address,uint256,bytes)", msg.sender, _value, _data)));    
     emit Transfer(msg.sender, _to, _value, _data);
     return true;
   }
@@ -92,7 +92,7 @@ contract ERC223 is ERC223I, SafeMath {
       if (balanceOf(msg.sender) < _value) revert();
       balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
       balances[_to] = safeAdd(balanceOf(_to), _value);      
-      assert(_to.call.value(0)(abi.encodeWithSignature(_custom_fallback), msg.sender, _value, _data));    
+      assert(_to.call.value(0)(abi.encodeWithSignature(_custom_fallback, msg.sender, _value, _data)));    
       emit Transfer(msg.sender, _to, _value, _data);
       return true;
     } else {
