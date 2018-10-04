@@ -44,6 +44,7 @@ interface NodeStorageI {
   function getDeposit(address _node) external view returns (uint, uint, uint, uint, uint, bool);
   function getDefETH() external view returns (uint);
   function getDefPMT() external view returns (uint);
+  function getDefCollectTime() external view returns (uint);
   function getDefRefundTime() external view returns (uint);
   /************************************************************************* 
   // Nodes setters

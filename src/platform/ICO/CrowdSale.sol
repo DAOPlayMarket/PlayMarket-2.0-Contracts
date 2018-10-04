@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import '../../common/Ownable.sol';
 import '../../common/SafeMath.sol';
-import '../../common/ERC20.sol';
+import './AppTokenI.sol';
 import '../../common/RateContractI.sol';
 import '../../exchange/PEXI.sol';
 
@@ -17,7 +17,7 @@ contract CrowdSale is Ownable, SafeMath {
   uint public multiplier;
   
   RateContractI public RateContract;
-  ERC20I public ERC20;
+  AppTokenI public AppToken;
 
   address public dev;
   uint public countUse;  
@@ -29,6 +29,8 @@ contract CrowdSale is Ownable, SafeMath {
   
   /* Price in USD * 10**6 */
   uint[3] public price;
+  uint256 public numberOfPeriods;
+  uint256 public durationOfPeriod;
   
   /* How many unique addresses that have invested */
   uint public investorCount = 0;
@@ -86,6 +88,8 @@ contract CrowdSale is Ownable, SafeMath {
     totalSupply = _initialSupply;    
     targetInUSD = _targetInUSD;
     RateContract = RateContractI(_RateContract);
+    numberOfPeriods =_numberOfPeriods;
+    durationOfPeriod = _durationOfPeriod;
     
     dev = _dev;
     uint _price = safeDiv(_targetInUSD,40500000);
@@ -149,7 +153,7 @@ contract CrowdSale is Ownable, SafeMath {
       SoftCap = true;
     }
 
-    ERC20.transfer(receiver, tokenAmount);    
+    AppToken.transfer(receiver, tokenAmount);    
 
     // Tell us invest was success
     emit Invested(receiver, weiAmount, tokenAmount);	
@@ -169,7 +173,7 @@ contract CrowdSale is Ownable, SafeMath {
     uint difference = safeSub(countNow,countUse);
     require(difference > 0);
     uint sumToken = safeDiv((safeMul(safeSub(safePerc(totalSupply,8500),tokensSold),difference*10)),100);
-    ERC20.transfer(msg.sender, sumToken);
+    AppToken.transfer(msg.sender, sumToken);
     countUse = safeAdd(countUse,difference);
   }
   
@@ -232,6 +236,6 @@ contract CrowdSale is Ownable, SafeMath {
   }
 
   function setTokenContract(address _contract) external onlyOwner {
-    ERC20 = ERC20I(_contract);
+    AppToken = AppTokenI(_contract);
   }
 }
