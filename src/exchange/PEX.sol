@@ -124,6 +124,21 @@ contract PEX is SafeMath, Agent {
     }
 
     /**
+    * tokenFallback ERC223.
+    *
+    * @param owner owner token
+    * @param amount Deposit amount
+    * @param data payload  
+    *
+    */
+    function tokenFallback(address owner, uint256 amount, bytes data) external onlyWhitelistTokens(msg.sender, block.timestamp) returns (bool success) {
+        require(data.length == 0);
+        tokens[msg.sender][owner] = safeAdd(tokens[msg.sender][owner], amount);
+        emit Deposit(msg.sender, owner, amount, tokens[msg.sender][owner]);
+        return true;
+    }
+    
+    /**
     * Withdraw token.
     *
     * @param token Token address
