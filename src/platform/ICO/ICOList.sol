@@ -86,6 +86,7 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
     ico.number = _numberOfPeriods;
     ico.duration = _durationOfPeriod;
     ico.crowdsale = CrowdSale;
+    ico.targetInUSD = _targetInUSD;
 
     return CrowdSale;
   }
