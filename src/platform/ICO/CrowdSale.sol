@@ -131,8 +131,8 @@ contract CrowdSale is Ownable, SafeMath {
     // Calculating the number of tokens
     uint tokenAmount = calculateTokens(weiAmount,currentPeriod);
     
-    require(safeAdd(tokenAmount,tokensSold) <= m45);
-    
+    require(safeAdd(tokenAmount,tokensSold) <= m15*(currentPeriod+1));
+
     if(investedAmountOf[receiver] == 0) {
        // A new investor
        investorCount++;
