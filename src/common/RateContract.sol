@@ -41,7 +41,7 @@ contract RateContract is Agent, SafeMath {
     }
 
     // returns the Currency
-    function getCurrency(bytes32 _code) public view returns (string, uint, uint, uint, uint) {
+    function getCurrency(bytes32 _code) public view returns (string name, uint number3, uint decimal, uint timeadd, uint timeupdate) {
         return (currency[_code].name, currency[_code].number3, currency[_code].decimal, currency[_code].timeadd, currency[_code].timeupdate);
     }
 
