@@ -8,6 +8,7 @@ contract PEXI {
     function setWhitelistTokens(address token, bool active, uint256 timestamp) external;
     function withdraw(uint amount) external;
     function depositToken(address token, uint amount) external;
+    function tokenFallback(address owner, uint amount, bytes data) external returns (bool success);
     function withdrawToken(address token, uint amount) external;
     function balanceOf(address token, address user) external view returns (uint);
     
