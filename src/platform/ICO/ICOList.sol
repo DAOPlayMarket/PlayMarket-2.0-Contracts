@@ -105,8 +105,6 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
 
     // create AppToken contract _ATID type and set _CrowdSale as owner
     address AppToken = AppTokenBuildI(AppTokens[_ATID]).CreateAppTokenContract(_name, _symbol, ico.crowdsale, PMFund, _dev);
-    // inform the fund about new tokens
-    PMFundI(PMFund).makeDeposit(address(AppToken));
     // set token contract in crowdsale
     CrowdSaleI(ico.crowdsale).setTokenContract(address(AppToken));
     
@@ -173,6 +171,8 @@ contract ICOList is ICOListI, AgentStorage, SafeMath {
     require(ico.confirmation != _state);
 
     ico.confirmation = _state;
+    // inform the fund about new tokens
+    PMFundI(PMFund).makeDeposit(address(ico.token));
     // add to whitelist on DAO PlayMarket 2.0 Exchange (DAOPEX)
     PEXContract.setWhitelistTokens(ico.token, _state, ico.startsAt + (ico.number * ico.duration));
     return ico.token;

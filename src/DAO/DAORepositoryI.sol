@@ -17,7 +17,7 @@ interface DAORepositoryI {
   
   // make deposit PMT
   // make sure, approve to this contract first
-  function makeDeposit(address _from, uint _value) external;
+  function makeDeposit(uint _value) external;
   // refund deposit
   function changeStateByFund(bool _state) external;
   function setPMTContract(address _contract) external;

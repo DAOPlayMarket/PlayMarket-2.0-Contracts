@@ -90,11 +90,11 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
    * Public access everyone
    */
 
-  function getBalance(address _owner) public returns (uint) {
+  function getBalance(address _owner) public view returns (uint) {
     return repository[_owner];
   }
 
-  function getNotLockedBalance(address _owner) public returns (uint) {
+  function getNotLockedBalance(address _owner) public view returns (uint) {
     uint lock = 0;
     for (uint k = 0; k < Proposals.length; k++) {
       if (Proposals[k].endTime > now + guardInterval) {
@@ -108,25 +108,20 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
 
   // make deposit PMT
   // make sure, approve to this contract first
-  function makeDeposit(address _from, uint _value) external {
-    assert(_from != address(0));
+  function makeDeposit(uint _value) external {
     assert(_value > 0);
-    assert(PMT.transferFrom(_from, address(this), _value));
-    repository[_from] = safeAdd(repository[_from], _value);
+    assert(PMT.transferFrom(msg.sender, address(this), _value));
+    repository[msg.sender] = safeAdd(repository[msg.sender], _value);
   }
 
   // refund deposit
   function refund(uint _value) external {
     require(!WithdrawIsBlockedByFund);
-    //require(PMT.allowance(address(this), msg.sender) == 0);
 
-    assert(msg.sender != address(0));
     uint freeBalance = getNotLockedBalance(msg.sender);
     assert(freeBalance >=_value);
     repository[msg.sender] = safeSub(repository[msg.sender], _value);
-    assert(repository[msg.sender] >= 0);
 
-    //PMT.approve(msg.sender, _value);
     PMT.transfer(msg.sender, _value);
   }
 

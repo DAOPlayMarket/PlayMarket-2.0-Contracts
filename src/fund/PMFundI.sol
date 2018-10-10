@@ -4,7 +4,6 @@ pragma solidity ^0.4.24;
  * @title DAO PlayMarket 2.0 Foundation contract interface
  */
 interface PMFundI {
-
   // make deposit AppTokens on deploy token contract
   // call only one time to one token!
   function makeDeposit(address _token) external;
@@ -14,9 +13,16 @@ interface PMFundI {
   function withdraw(address _token, uint _value) external;
   // withdraw token by DAO
   function withdraw(address _token, address _spender, uint _value) external;
-
+  // withdraw token by DAO
+  function withdrawPMfund(address _token, address _spender, uint _value) external;
+  
   function startFunding() external;
   function stopFunding() external;
 
   function setTotalPMT(uint _value) external;
+  function setMultiplier(uint _value) external;
+  function getMultiplier() external view returns (uint multiplier);
+  function getFund(address _token, address _owner) external view returns (uint fund);
+  function getWithdrawn(address _token, address _owner) external view returns (uint withdrawn);
+  
 }

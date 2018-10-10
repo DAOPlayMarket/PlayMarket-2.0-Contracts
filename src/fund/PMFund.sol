@@ -28,6 +28,8 @@ contract PMFund is Agent, SafeMath {
   DAORepositoryI public DAORepository;
     
   mapping (address => mapping (address => uint)) private fund; // fund[token][user] = balance
+  mapping (address => mapping (address => uint)) private withdrawn;
+  uint private multiplier = 100;
   
   /**
    * @dev Constructor sets default parameters
@@ -55,15 +57,21 @@ contract PMFund is Agent, SafeMath {
 
   // get AppTokens to sender address 
   function getTokens(uint offset, uint limit) external {
-    require (offset < Tokens.length);
+    require (WithdrawIsBlocked);
     require (limit <= Tokens.length);
-
-    for (uint k = offset; k < limit; k++) {
-      if (fund[Tokens[k].token][msg.sender] == 0) {
-        // calc the number of tokens due
-        uint _value = DAORepository.getBalance(msg.sender);      // get User balance in DAO Repository
-        _value = safeDiv(safeMul(_value, 100), TotalPMT);        // calc the percentage of the total PMT
-        _value = safePerc(fund[Tokens[k].token][address(this)], _value);
+    require (offset < limit);
+    uint _value = 0;
+    uint _balance = DAORepository.getBalance(msg.sender);
+    uint k = offset;
+    for (k ; k < limit; k++) {
+      _value = safeSub(_balance, withdrawn[Tokens[k].token][msg.sender]);      // get User balance in DAO Repository
+      if (_value > 0) {
+        withdrawn[Tokens[k].token][msg.sender] = _balance;
+        _value = safeMul(_value,100);
+        _value = safeMul(_value,multiplier);
+        _value = safeDiv(safeMul(_value, 100), TotalPMT); // calc the percentage of the total PMT
+        _value = safePerc(Tokens[k].total, _value);
+        _value = safeDiv(_value, multiplier);
         // transfer balances
         fund[Tokens[k].token][address(this)] = safeSub(fund[Tokens[k].token][address(this)], _value);
         fund[Tokens[k].token][msg.sender] = safeAdd(fund[Tokens[k].token][msg.sender], _value);
@@ -74,8 +82,7 @@ contract PMFund is Agent, SafeMath {
   // withdraw token
   function withdraw(address _token, uint _value) external {
     assert(_token != address(0));
-    require(fund[_token][msg.sender] > 0);
-    require(fund[_token][msg.sender] > _value);
+    require(fund[_token][msg.sender] >= _value);
     fund[_token][msg.sender] = safeSub(fund[_token][msg.sender], _value);
     require(AppTokenI(_token).transfer(msg.sender, _value));    
   }
@@ -83,15 +90,21 @@ contract PMFund is Agent, SafeMath {
   // withdraw token by DAO
   function withdraw(address _token, address _spender, uint _value) external onlyOwner {
     require(_token != address(0));
-    require(fund[_token][_spender] > 0);
-    require(fund[_token][_spender] > _value);
+    require(fund[_token][_spender] >= _value);
     fund[_token][_spender] = safeSub(fund[_token][_spender], _value);
+    require(AppTokenI(_token).transfer(_spender, _value));    
+  }
+  
+  // withdraw token by DAO
+  function withdrawPMfund(address _token, address _spender, uint _value) external onlyOwner {
+    require(_token != address(0));
+    require(fund[_token][address(this)] >= _value);
+    fund[_token][address(this)] = safeSub(fund[_token][address(this)], _value);
     require(AppTokenI(_token).transfer(_spender, _value));    
   }
 
   function startFunding() external onlyAgent {
     require (!WithdrawIsBlocked);
-    Tokens.length = 0;  // just in case
 
     WithdrawIsBlocked = true;
     DAORepository.changeStateByFund(WithdrawIsBlocked);
@@ -109,4 +122,21 @@ contract PMFund is Agent, SafeMath {
     assert(_value > 0);
     TotalPMT = _value;
   }
+  
+  function setMultiplier(uint _value) external onlyOwner {
+    assert(_value > 0);
+    multiplier = _value;
+  }
+  
+  function getMultiplier() external view returns (uint ) {
+    return multiplier;
+  }
+  
+  function getFund(address _token, address _owner) external view returns (uint ) {
+    return fund[_token][_owner];
+  }
+
+  function getWithdrawn(address _token, address _owner) external view returns (uint ) {
+    return withdrawn[_token][_owner];
+  }  
 }
