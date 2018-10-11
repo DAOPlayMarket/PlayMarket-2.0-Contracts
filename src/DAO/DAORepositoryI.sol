@@ -5,13 +5,14 @@ pragma solidity ^0.4.24;
  */
 interface DAORepositoryI {
 
-  function addProposal(uint _propID, uint _endTime) external returns (uint);
+  function addProposal(uint _propID, uint _endTime) external;
   function changeProposal(uint _propID, uint _endTime) external;
-  function delProposal(uint _id) external;
-  function cleanProposal() external;
+  function delProposalActive(uint _id) external;
+  function cleanProposalActive() external;
 
   function vote(uint _propID, address _voter, uint _numberOfVotes) external returns (bool);
-
+  function getVoted(uint _propID, address _voter) external view returns (uint);
+    
   function getBalance(address _owner) external returns (uint);
   function getNotLockedBalance(address _owner) external returns (uint);
   

@@ -19,8 +19,9 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
     uint endTime;         // end time of voting
   }
   
-  _Proposal[] public Proposals;                             // contains active proposals
-
+  _Proposal[] public Proposals;                             // contains all proposals
+  _Proposal[] public ProposalsActive;                       // contains active proposals
+  
   mapping (address => uint) public repository;              // contains PMT balances
   mapping (uint => mapping (address => uint)) public voted; // contains voted PMT on proposals
 
@@ -38,34 +39,49 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
   /**
    * Access only owner (DAO)
    */
-
-  function addProposal(uint _propID, uint _endTime) external onlyOwner returns (uint) {
+  function addProposal(uint _propID, uint _endTime) external onlyOwner {
     Proposals.push(_Proposal({
       propID: _propID,
       endTime: _endTime
     }));
-
-    return Proposals.length-1;
+    
+    ProposalsActive.push(_Proposal({
+      propID: _propID,
+      endTime: _endTime
+    }));
   }
 
   function changeProposal(uint _propID, uint _endTime) external onlyOwner {
-    Proposals[_propID].endTime = _endTime;    
+    Proposals[_propID].endTime = _endTime;
+    uint k = 0;
+    for(k; k < ProposalsActive.length; k++){
+      if(ProposalsActive[k].propID == _propID){
+        ProposalsActive[k].endTime = _endTime;
+      }
+    }
   }  
 
-  function delProposal(uint _id) external onlyOwner {
-    assert(_id >= 0 && _id < Proposals.length);
-    assert(Proposals[_id].endTime > now + guardInterval);
-    Proposals[_id] = Proposals[Proposals.length-1];
-    Proposals.length = Proposals.length-1;
+  function delProposalActive(uint _propID) external onlyOwner {
+    assert(_propID >= 0 && _propID < Proposals.length);
+    uint k = 0;
+    while (k < ProposalsActive.length){
+      if(ProposalsActive[k].propID == _propID){
+        require(ProposalsActive[k].endTime < now + guardInterval);
+        ProposalsActive[k] = ProposalsActive[ProposalsActive.length-1];
+        ProposalsActive.length = ProposalsActive.length-1;   
+      }else{
+        k++;
+      }
+    }
   }
 
-  function cleanProposal() external onlyAgent {
+  function cleanProposalActive() external onlyAgent {
     uint k = 0;
-    while (k < Proposals.length) {
-      if (Proposals[k].endTime > now + guardInterval) {
-        Proposals[k] = Proposals[Proposals.length-1];
-        Proposals.length = Proposals.length-1;       
-      } else {
+    while (k < ProposalsActive.length){
+      if(ProposalsActive[k].endTime < now + guardInterval){
+        ProposalsActive[k] = ProposalsActive[ProposalsActive.length-1];
+        ProposalsActive.length = ProposalsActive.length-1;   
+      }else{
         k++;
       }
     }
@@ -77,6 +93,10 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
     return true;
   }
 
+  function getVoted(uint _propID, address _voter) external view returns (uint) {
+    return voted[_propID][_voter];
+  }
+
   function changeStateByFund(bool _state) external onlyAgent {
     WithdrawIsBlockedByFund = _state;
   } 
@@ -84,7 +104,6 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
   function setPMTContract(address _contract) external onlyOwner {
     PMT = ERC20I(_contract);
   }
-
 
   /**
    * Public access everyone
@@ -96,10 +115,10 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
 
   function getNotLockedBalance(address _owner) public view returns (uint) {
     uint lock = 0;
-    for (uint k = 0; k < Proposals.length; k++) {
-      if (Proposals[k].endTime > now + guardInterval) {
-        if (lock < voted[k][_owner]) {
-          lock = voted[k][_owner];
+    for (uint k = 0; k < ProposalsActive.length; k++) {
+      if (ProposalsActive[k].endTime > now - guardInterval) {
+        if (lock < voted[ProposalsActive[k].propID][_owner]) {
+          lock = voted[ProposalsActive[k].propID][_owner];
         }
       }
     }

@@ -8,7 +8,7 @@ import './DAORepositoryI.sol';
 /**
  * @title Decentralized Autonomous Organization PlayMarket 2.0
  */
-contract DAOPM is Ownable {
+contract DAOPM is Ownable, SafeMath {
 
     DAORepositoryI public DAORepository;
 
@@ -49,13 +49,12 @@ contract DAOPM is Ownable {
     }
 
     _Proposal[] public Proposals;
-    mapping (uint => mapping (address => bool)) public voted;
-    mapping (uint => uint) public ProposalIndex; // temporarely index of Proposal in DAO Repository
 
     event ProposalAdded(uint proposalID, address recipient, uint amount, string description, string fullDescHash);
     event Voted(uint proposalID, bool position, address voter, string justification);
     event ProposalTallied(uint proposalID, uint votesSupport, uint votesAgainst, uint quorum, bool active);    
     event ChangeOfRules(uint newMinimumQuorum, uint newdebatingPeriodDuration, uint newRequisiteMajority);
+    event Payment(address indexed sender, uint amount);
 
     // Modifier that allows only owners of DAO PlayMArket 2.0 PMT tokens to vote and create new proposals
     modifier onlyMembers {
@@ -63,11 +62,15 @@ contract DAOPM is Ownable {
         _;
     }
 
-    constructor (address _DAORepository, uint _minimumQuorum, uint _debatingPeriodDuration, uint _requisiteMajority) payable public {
+    constructor (address _DAORepository, uint _minimumQuorum, uint _debatingPeriodDuration, uint _requisiteMajority) public {
         DAORepository = DAORepositoryI(_DAORepository);
         changeVotingRules(_minimumQuorum, _debatingPeriodDuration, _requisiteMajority);
     }
 
+    function () public payable {
+      emit Payment(msg.sender, msg.value);
+    }
+    
     /**
      * Change voting rules
      *
@@ -117,8 +120,7 @@ contract DAOPM is Ownable {
             fullDescHash: _fullDescHash
         }));
         
-        // save proposal index in temporarely array in DAO Repository
-        ProposalIndex[Proposals.length-1] = DAORepository.addProposal(Proposals.length-1, now + debatingPeriodDuration * 1 minutes);
+        DAORepository.addProposal(Proposals.length-1, now + debatingPeriodDuration * 1 minutes);
 
         emit ProposalAdded(Proposals.length-1, _recipient, _amount, _desc, _fullDescHash);
 
@@ -150,14 +152,11 @@ contract DAOPM is Ownable {
      * @param _justificationText optional justification text
      */
     function vote(uint _proposalID, bool _supportsProposal, string _justificationText) onlyMembers public returns (uint) {      
-        // check if has already voted
-        require(!voted[_proposalID][msg.sender]); 
         // Get the proposal
         _Proposal storage p = Proposals[_proposalID]; 
-        // Set this voter as having voted
-        voted[_proposalID][msg.sender] = true;                          
-        
-        uint votes = DAORepository.getBalance(msg.sender);              // get numbers of votes for msg.sender
+        require(now <= p.endTimeOfVoting);
+
+        uint votes = safeSub(DAORepository.getBalance(msg.sender), DAORepository.getVoted(_proposalID,msg.sender));// get numbers of votes for msg.sender
 
         require(DAORepository.vote(_proposalID, msg.sender, votes));
 
@@ -203,7 +202,7 @@ contract DAOPM is Ownable {
             p.proposalPassed = false;
         }
 
-        DAORepository.delProposal(ProposalIndex[_proposalID]);
+        DAORepository.delProposalActive(_proposalID);
 
         // Fire Events
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);
