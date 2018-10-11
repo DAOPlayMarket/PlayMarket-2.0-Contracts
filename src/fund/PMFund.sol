@@ -27,9 +27,9 @@ contract PMFund is Agent, SafeMath {
 
   DAORepositoryI public DAORepository;
     
-  mapping (address => mapping (address => uint)) private fund; // fund[token][user] = balance
-  mapping (address => mapping (address => uint)) private withdrawn;
-  uint private multiplier = 100;
+  mapping (address => mapping (address => uint)) private fund;      // fund[token][user] = balance of app tokens
+  mapping (address => mapping (address => uint)) private withdrawn; // withdrawn[token][user] = balance of already withdrawn tokens
+  uint private multiplier = 100000; // precision to ten thousandth percent (0.001%)
   
   /**
    * @dev Constructor sets default parameters
@@ -61,17 +61,17 @@ contract PMFund is Agent, SafeMath {
     require (limit <= Tokens.length);
     require (offset < limit);
     uint _value = 0;
-    uint _balance = DAORepository.getBalance(msg.sender);
-    uint k = offset;
-    for (k ; k < limit; k++) {
-      _value = safeSub(_balance, withdrawn[Tokens[k].token][msg.sender]);      // get User balance in DAO Repository
+    uint _balance = DAORepository.getBalance(msg.sender); // get User balance in DAO Repository
+    uint k = 0;
+    for (k = offset; k < limit; k++) {
+      _value = safeSub(_balance, withdrawn[Tokens[k].token][msg.sender]); // calc difference between current balance and already withdrawn
       if (_value > 0) {
-        withdrawn[Tokens[k].token][msg.sender] = _balance;
-        _value = safeMul(_value,100);
-        _value = safeMul(_value,multiplier);
-        _value = safeDiv(safeMul(_value, 100), TotalPMT); // calc the percentage of the total PMT
+        withdrawn[Tokens[k].token][msg.sender] = _balance;        
+        _value = safeMul(_value, multiplier);
+        _value = safeDiv(safeMul(_value, 100), TotalPMT); // calc the percentage of the total PMT (from 100%)
+
         _value = safePerc(Tokens[k].total, _value);
-        _value = safeDiv(_value, multiplier);
+        _value = safeDiv(_value, safeDiv(multiplier, 100));  // safeDiv(multiplier, 100) - convert to hundredths
         // transfer balances
         fund[Tokens[k].token][address(this)] = safeSub(fund[Tokens[k].token][address(this)], _value);
         fund[Tokens[k].token][msg.sender] = safeAdd(fund[Tokens[k].token][msg.sender], _value);
