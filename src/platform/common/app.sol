@@ -96,7 +96,7 @@ contract App is Agent, SafeMath, Base {
    * @param _txIndex identifier for the answer
    */
   function feedbackRating(uint _app, uint _vote, string _description, bytes32 _txIndex) external {
-    require( _vote > 0 && _vote <= 10);
+    require( _vote > 0 && _vote <= 5);
     LogStorage.feedbackRatingEvent(msg.sender, _app, _vote, _description, _txIndex, block.timestamp);
   }
 }
