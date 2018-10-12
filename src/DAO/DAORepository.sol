@@ -55,23 +55,24 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
     }
   }  
 
-  function delProposal(uint _propID) external onlyOwner {
+  function delProposal(uint _propID) external onlyOwner returns (bool){
     uint k = 0;
     while (k < Proposals.length){
       if(Proposals[k].propID == _propID){
-        require(Proposals[k].endTime < now + guardInterval);
+        require(Proposals[k].endTime < (now - guardInterval));
         Proposals[k] = Proposals[Proposals.length-1];
         Proposals.length = Proposals.length-1;   
       }else{
         k++;
       }
     }
+    return true;
   }
 
   function cleanProposal() external onlyAgent {
     uint k = 0;
     while (k < Proposals.length){
-      if(Proposals[k].endTime < now + guardInterval){
+      if(Proposals[k].endTime < (now - guardInterval)){
         Proposals[k] = Proposals[Proposals.length-1];
         Proposals.length = Proposals.length-1;   
       }else{
@@ -109,7 +110,7 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
   function getNotLockedBalance(address _owner) public view returns (uint) {
     uint lock = 0;
     for (uint k = 0; k < Proposals.length; k++) {
-      if (Proposals[k].endTime > now - guardInterval) {
+      if (Proposals[k].endTime > (now - guardInterval)) {
         if (lock < voted[Proposals[k].propID][_owner]) {
           lock = voted[Proposals[k].propID][_owner];
         }

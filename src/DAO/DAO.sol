@@ -13,7 +13,7 @@ contract DAOPM is Ownable, SafeMath {
     DAORepositoryI public DAORepository;
 
     uint TotalPMT = 30000000000; // total count PMT tokens (decimals 4)
-
+    uint minBalance = 20000000; //minimum balance for adding proposal
     // minimum quorum - number of votes must be more than minimum quorum
     uint public minimumQuorum;
     // debating period duration
@@ -105,8 +105,8 @@ contract DAOPM is Ownable, SafeMath {
      * @param _transactionByteCode bytecode of transaction
      */
     function addProposal(address _recipient, uint _amount, string _desc, string _fullDescHash, bytes _transactionByteCode) onlyMembers public returns (uint) {
-
-        Proposals.push(_Proposal({      
+      require(DAORepository.getBalance(msg.sender) > minBalance);
+      Proposals.push(_Proposal({      
             endTimeOfVoting: now + debatingPeriodDuration * 1 minutes,
             executed: false,
             proposalPassed: false,
@@ -157,7 +157,7 @@ contract DAOPM is Ownable, SafeMath {
         require(now <= p.endTimeOfVoting);
 
         uint votes = safeSub(DAORepository.getBalance(msg.sender), DAORepository.getVoted(_proposalID,msg.sender));// get numbers of votes for msg.sender
-
+        
         require(DAORepository.vote(_proposalID, msg.sender, votes));
 
         p.numberOfVotes = p.numberOfVotes + votes;                      // Increase the number of votes
@@ -187,23 +187,18 @@ contract DAOPM is Ownable, SafeMath {
             && !p.executed                                                                                    // and it has not already been executed
             && p.transactionHash == keccak256(abi.encodePacked(p.recipient, p.amount, _transactionByteCode))  // and the supplied code matches the proposal
             && p.numberOfVotes >= minimumQuorum);                                                             // and a minimum quorum has been reached
-
         // then execute result
-        
         if (p.votesSupport > requisiteMajority) {
             // Proposal passed; execute the transaction
-
             p.executed = true; // Avoid recursive calling
             require(p.recipient.call.value(p.amount)(_transactionByteCode));
-
             p.proposalPassed = true;
         } else {
             // Proposal failed
             p.proposalPassed = false;
         }
 
-        DAORepository.delProposal(_proposalID);
-
+        require(DAORepository.delProposal(_proposalID));
         // Fire Events
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);
     }
@@ -238,5 +233,13 @@ contract DAOPM is Ownable, SafeMath {
     function setTotalPMT(uint _value) public onlyOwner {
         assert(_value > 0);
         TotalPMT = _value;
+    }
+    
+    /**
+     * Set minimum balance for adding proposal
+     */
+    function setMinBalance(uint _minBalance) public onlyOwner {
+        assert(_minBalance > 0);
+        minBalance = _minBalance;
     }
 }

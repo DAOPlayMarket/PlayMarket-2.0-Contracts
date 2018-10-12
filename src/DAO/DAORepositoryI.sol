@@ -7,7 +7,7 @@ interface DAORepositoryI {
 
   function addProposal(uint _propID, uint _endTime) external;
   function changeProposal(uint _propID, uint _endTime) external;
-  function delProposal(uint _id) external;
+  function delProposal(uint _id) external returns (bool);
   function cleanProposal() external;
 
   function vote(uint _propID, address _voter, uint _numberOfVotes) external returns (bool);
