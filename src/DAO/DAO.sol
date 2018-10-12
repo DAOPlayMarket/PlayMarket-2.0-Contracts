@@ -190,15 +190,14 @@ contract DAOPM is Ownable, SafeMath {
         // then execute result
         if (p.votesSupport > requisiteMajority) {
             // Proposal passed; execute the transaction
-            p.executed = true; // Avoid recursive calling
             require(p.recipient.call.value(p.amount)(_transactionByteCode));
             p.proposalPassed = true;
         } else {
             // Proposal failed
             p.proposalPassed = false;
         }
-
         require(DAORepository.delProposal(_proposalID));
+        p.executed = true;
         // Fire Events
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);
     }
