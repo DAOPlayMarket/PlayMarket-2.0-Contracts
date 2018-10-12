@@ -202,7 +202,7 @@ contract DAOPM is Ownable, SafeMath {
             p.proposalPassed = false;
         }
 
-        DAORepository.delProposalActive(_proposalID);
+        DAORepository.delProposal(_proposalID);
 
         // Fire Events
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);

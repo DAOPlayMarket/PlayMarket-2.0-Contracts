@@ -19,9 +19,8 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
     uint endTime;         // end time of voting
   }
   
-  _Proposal[] public Proposals;                             // contains all proposals
-  _Proposal[] public ProposalsActive;                       // contains active proposals
-  
+  _Proposal[] public Proposals;                             // contains active proposals
+
   mapping (address => uint) public repository;              // contains PMT balances
   mapping (uint => mapping (address => uint)) public voted; // contains voted PMT on proposals
 
@@ -44,43 +43,37 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
       propID: _propID,
       endTime: _endTime
     }));
-    
-    ProposalsActive.push(_Proposal({
-      propID: _propID,
-      endTime: _endTime
-    }));
+
   }
 
   function changeProposal(uint _propID, uint _endTime) external onlyOwner {
-    Proposals[_propID].endTime = _endTime;
     uint k = 0;
-    for(k; k < ProposalsActive.length; k++){
-      if(ProposalsActive[k].propID == _propID){
-        ProposalsActive[k].endTime = _endTime;
+    for(k; k < Proposals.length; k++){
+      if(Proposals[k].propID == _propID){
+        Proposals[k].endTime = _endTime;
       }
     }
   }  
 
-  function delProposalActive(uint _propID) external onlyOwner {
-    assert(_propID >= 0 && _propID < Proposals.length);
+  function delProposal(uint _propID) external onlyOwner {
     uint k = 0;
-    while (k < ProposalsActive.length){
-      if(ProposalsActive[k].propID == _propID){
-        require(ProposalsActive[k].endTime < now + guardInterval);
-        ProposalsActive[k] = ProposalsActive[ProposalsActive.length-1];
-        ProposalsActive.length = ProposalsActive.length-1;   
+    while (k < Proposals.length){
+      if(Proposals[k].propID == _propID){
+        require(Proposals[k].endTime < now + guardInterval);
+        Proposals[k] = Proposals[Proposals.length-1];
+        Proposals.length = Proposals.length-1;   
       }else{
         k++;
       }
     }
   }
 
-  function cleanProposalActive() external onlyAgent {
+  function cleanProposal() external onlyAgent {
     uint k = 0;
-    while (k < ProposalsActive.length){
-      if(ProposalsActive[k].endTime < now + guardInterval){
-        ProposalsActive[k] = ProposalsActive[ProposalsActive.length-1];
-        ProposalsActive.length = ProposalsActive.length-1;   
+    while (k < Proposals.length){
+      if(Proposals[k].endTime < now + guardInterval){
+        Proposals[k] = Proposals[Proposals.length-1];
+        Proposals.length = Proposals.length-1;   
       }else{
         k++;
       }
@@ -115,10 +108,10 @@ contract DAORepository is DAORepositoryI, Agent, SafeMath {
 
   function getNotLockedBalance(address _owner) public view returns (uint) {
     uint lock = 0;
-    for (uint k = 0; k < ProposalsActive.length; k++) {
-      if (ProposalsActive[k].endTime > now - guardInterval) {
-        if (lock < voted[ProposalsActive[k].propID][_owner]) {
-          lock = voted[ProposalsActive[k].propID][_owner];
+    for (uint k = 0; k < Proposals.length; k++) {
+      if (Proposals[k].endTime > now - guardInterval) {
+        if (lock < voted[Proposals[k].propID][_owner]) {
+          lock = voted[Proposals[k].propID][_owner];
         }
       }
     }
