@@ -67,7 +67,7 @@ contract LogStorage is LogStorageI, AgentStorage {
   }
   
   function setPriceEvent(uint _app, uint _obj, uint _price) external onlyAgentStorage() {
-    emit SetPriceEvent(Agents[msg.sender].store, _obj, _app, _price);
+    emit SetPriceEvent(Agents[msg.sender].store, _app, _obj, _price);
   }
   
   function buyAppEvent(address _user, address _dev, uint _app, uint _obj, address _node, uint _price) external onlyAgentStorage() {
