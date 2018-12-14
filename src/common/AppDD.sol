@@ -8,10 +8,24 @@ import './ERC20.03.sol';
  */
 contract AppDD is ERC20, Ownable {
 
+  address source; // contract application
+  bytes code;     // profit interface
+
   uint256[] public dividends;
   mapping (address => uint256) public ownersbal;  
   mapping (uint256 => mapping (address => bool)) public AlreadyReceived;
   uint private multiplier = 100000; // precision to ten thousandth percent (0.001%)
+
+  // Take profit for dividends from source contract
+  function TakeProfit() external {
+    require(source.call.value(0)(code));
+  }
+
+  // Link to source contract
+  function Link(address _contract, bytes _code) external onlyOwner {
+    source = _contract;
+    code = _code;
+  }  
 
   // PayDividends to owners
   function PayDividends(uint offset, uint limit) external {  

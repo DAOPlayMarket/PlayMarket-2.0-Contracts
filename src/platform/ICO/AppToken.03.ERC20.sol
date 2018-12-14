@@ -51,7 +51,7 @@ contract AppToken is AppDD {
     ChangeOverPeriod[_dev][1] = int256(balances[_dev]);
 
     // change owner
-    owner = _CrowdSale;
+    owner = address(this);
   } 
 
   /**
