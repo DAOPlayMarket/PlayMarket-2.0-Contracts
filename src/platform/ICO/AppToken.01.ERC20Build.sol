@@ -1,12 +1,12 @@
 pragma solidity ^0.4.24;
 
 import '../../common/Ownable.sol';
-import './AppTokenERC223.sol';
+import './AppToken.01.ERC20.sol';
 
 /**
  * @title AppToken build contract (for apps ICO)
  */
-contract AppTokenERC223Build is Ownable {
+contract AppTokenERC20Build is Ownable {
   
   constructor () public {}
 
