@@ -15,8 +15,8 @@ Personal freedom is impossible without economic security and independence. There
 * ICO: 0x7727c886fbdefe9524fd3ab4fd7a48517b865182
 * RateContract: 0x92f0cA508d2cCb2E25bF4fF96EFdA26DCA7D5997
 * DEcentralized Exchange: 0xcc152ba543a3942a07e488a29702ca1cb40ea7e6
-* Fundation: 0xb04A05905Dc94345DCAD4846664001d4818E16D2
-* Repositiry: 0xe789578025fC8DFEa42C6Cecb4D42C65fa5B4826
+* Foundation: 0xb04A05905Dc94345DCAD4846664001d4818E16D2
+* Repository: 0xe789578025fC8DFEa42C6Cecb4D42C65fa5B4826
 ```
 ## Specification
 
