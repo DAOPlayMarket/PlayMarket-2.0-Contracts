@@ -28,7 +28,7 @@ contract AppDD is ERC20, Ownable {
   }  
 
   // PayDividends to owners
-  function PayDividends(uint offset, uint limit) external {  
+  function PayDividends(uint offset, uint limit) external {
     require (address(this).balance > 0);
     require (limit <= owners.length);
     require (offset < limit);

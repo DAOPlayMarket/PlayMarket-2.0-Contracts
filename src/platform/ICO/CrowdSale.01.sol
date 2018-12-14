@@ -4,7 +4,6 @@ import '../../common/Ownable.sol';
 import '../../common/SafeMath.sol';
 import './AppTokenI.sol';
 import '../../common/RateContractI.sol';
-import '../../exchange/PEXI.sol';
 
 /**
  * @title CrowdSale management contract 
