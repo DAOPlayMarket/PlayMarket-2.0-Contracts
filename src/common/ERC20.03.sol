@@ -14,12 +14,12 @@ contract ERC20 is ERC20I, SafeMath {
   mapping (address => uint256) balances;
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  uint256 start = 0;         // Must be equal to the date of issue tokens
-  uint256 period = 30 days;  // By default, the dividend accrual period is 30 days
+  uint256 public start = 0;         // Must be equal to the date of issue tokens
+  uint256 public period = 30 days;  // By default, the dividend accrual period is 30 days
   mapping (address => mapping (uint256 => int256)) public ChangeOverPeriod;
 
   address[] public owners;
-  mapping (address => uint256) public ownersIndex;
+  mapping (address => bool) public ownersIndex;
 
   /** 
    * @dev Total Supply
@@ -70,8 +70,8 @@ contract ERC20 is ERC20I, SafeMath {
     require(_to != address(0));
     require(balances[msg.sender] >= _value);
 
-    if (balances[_to] == 0 && _value > 0) {
-      ownersIndex[_to] = owners.length;
+    if (ownersIndex[_to] == false && _value > 0) {
+      ownersIndex[_to] = true;
       owners.push(_to);
     }
     
@@ -108,8 +108,8 @@ contract ERC20 is ERC20I, SafeMath {
     require(balances[_from] >= _value);
     require(allowed[_from][msg.sender] >= _value);
 
-    if (balances[_to] == 0 && _value > 0) {
-      ownersIndex[_to] = owners.length;
+    if (ownersIndex[_to] == false && _value > 0) {
+      ownersIndex[_to] = true;
       owners.push(_to);
     }
     
@@ -142,15 +142,19 @@ contract ERC20 is ERC20I, SafeMath {
   /** 
    * @dev Trim owners with zero balance
    */
-  function trim(uint offset, uint limit) external {
-    uint k = 0;
-    for (k = offset; k < limit; k++) {
+  function trim(uint offset, uint limit) external returns (bool) { 
+    uint k = offset;
+    uint ln = limit;
+    while (k < ln){
       if (balances[owners[k]] == 0) {
+        ownersIndex[owners[k]] =  false;
         owners[k] = owners[owners.length-1];
         owners.length = owners.length-1;
-
-        if (balances[owners[k]] == 0) { k--; }
+        ln--;
+      }else{
+        k++;
       }
     }
+    return true;
   }
 }
