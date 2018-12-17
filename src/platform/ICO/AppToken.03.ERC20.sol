@@ -5,7 +5,7 @@ import '../../common/AppDAO.sol';
 /**
  * @title Application Token based on ERC20, AppDAO, AppDD
  */
-contract AppToken is AppDD {
+contract AppToken is AppDAO {
 	
   bytes32 public version = "ERC20 1.0.0";
 
@@ -26,7 +26,7 @@ contract AppToken is AppDD {
     symbol = _symbol;
 
     start = block.timestamp;
-    period = 30 days;
+    period = 15 minutes;
 
     totalSupply_ = initialSupply*10**decimals;
     // creating initial tokens
@@ -47,8 +47,11 @@ contract AppToken is AppDD {
     emit Transfer(_CrowdSale, _dev, balances[_dev]);  
 
     ChangeOverPeriod[_CrowdSale][1] = int256(balances[_CrowdSale]);
-    ChangeOverPeriod[_PMFund][1] = int256(balances[_PMFund]);    
+    owners.push(_CrowdSale);
+    ChangeOverPeriod[_PMFund][1] = int256(balances[_PMFund]);
+    owners.push(_PMFund);
     ChangeOverPeriod[_dev][1] = int256(balances[_dev]);
+    owners.push(_dev);
 
     // change owner
     owner = address(this);

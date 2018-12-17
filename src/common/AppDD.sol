@@ -11,11 +11,13 @@ contract AppDD is ERC20, Ownable {
   address source; // contract application
   bytes code;     // profit interface
 
-  uint256[] public dividends;
+  mapping (uint256 => uint256) public dividends;
   mapping (address => uint256) public ownersbal;  
   mapping (uint256 => mapping (address => bool)) public AlreadyReceived;
-  uint private multiplier = 100000; // precision to ten thousandth percent (0.001%)
+  uint public multiplier = 100000; // precision to ten thousandth percent (0.001%)
 
+  event Payment(address indexed sender, uint amount);
+   
   // Take profit for dividends from source contract
   function TakeProfit() external {
     require(source.call.value(0)(code));
@@ -27,6 +29,10 @@ contract AppDD is ERC20, Ownable {
     code = _code;
   }  
 
+  function () public payable {
+      emit Payment(msg.sender, msg.value);
+  }
+  
   // PayDividends to owners
   function PayDividends(uint offset, uint limit) external {
     require (address(this).balance > 0);
@@ -34,7 +40,7 @@ contract AppDD is ERC20, Ownable {
     require (offset < limit);
 
     uint256 N = (block.timestamp - start) / period; // current - 1
-    uint256 date = N * period - 1;
+    uint256 date = start + N * period - 1;
 
     if (dividends[N] == 0) {
       dividends[N] = address(this).balance;
@@ -51,6 +57,7 @@ contract AppDD is ERC20, Ownable {
         share = safeDiv(share, safeDiv(multiplier, 100));  // safeDiv(multiplier, 100) - convert to hundredths
         
         ownersbal[owners[k]] = safeAdd(ownersbal[owners[k]], share);
+        AlreadyReceived[N][owners[k]] = true;
       }
     }
   }
@@ -60,7 +67,7 @@ contract AppDD is ERC20, Ownable {
     require (address(this).balance > 0);
 
     uint256 N = (block.timestamp - start) / period; // current - 1
-    uint256 date = N * period - 1;
+    uint256 date = start + N * period - 1;
 
     if (dividends[N] == 0) {
       dividends[N] = address(this).balance;
@@ -74,6 +81,7 @@ contract AppDD is ERC20, Ownable {
       share = safeDiv(share, safeDiv(multiplier, 100));  // safeDiv(multiplier, 100) - convert to hundredths
         
       ownersbal[msg.sender] = safeAdd(ownersbal[msg.sender], share);
+      AlreadyReceived[N][msg.sender] = true;
     }
   }
 
