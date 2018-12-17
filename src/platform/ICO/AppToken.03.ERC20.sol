@@ -26,7 +26,7 @@ contract AppToken is AppDAO {
     symbol = _symbol;
 
     start = block.timestamp;
-    period = 15 minutes;
+    period = 30 days;
 
     totalSupply_ = initialSupply*10**decimals;
     // creating initial tokens
