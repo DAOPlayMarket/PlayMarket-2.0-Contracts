@@ -3,12 +3,17 @@ pragma solidity ^0.4.25;
 import './Ownable.sol';
 import './ERC20.03.sol';
 
+interface CryptoDuelI {
+    function withdraw(int _referrerID, uint N) external returns (bool);
+    function getReward(address _referrer, uint N) external view returns (uint256);
+}
+
 /**
  * @title Dividend Distribution Contract for AppDAO
  */
 contract AppDD is ERC20, Ownable {
 
-  address source; // contract application
+  CryptoDuelI source; // contract application
   bytes code;     // profit interface
 
   mapping (uint256 => uint256) public dividends;
@@ -20,12 +25,17 @@ contract AppDD is ERC20, Ownable {
    
   // Take profit for dividends from source contract
   function TakeProfit() external {
-    require(source.call.value(0)(code));
+    uint256 N = (block.timestamp - start) / period;
+    uint256 sum = source.getReward(address(this), N);
+    if(sum > 0) {
+        require(source.withdraw(0, N));
+        dividends[N] = sum;
+    }
   }
 
   // Link to source contract
-  function Link(address _contract, bytes _code) external onlyOwner {
-    source = _contract;
+  function Link(address _contract, bytes _code) external {
+    source = CryptoDuelI(_contract);
     code = _code;
   }  
 
@@ -41,10 +51,11 @@ contract AppDD is ERC20, Ownable {
 
     uint256 N = (block.timestamp - start) / period; // current - 1
     uint256 date = start + N * period - 1;
-
-    if (dividends[N] == 0) {
-      dividends[N] = address(this).balance;
-    }
+    
+    require(dividends[N] > 0);
+    //if (dividends[N] == 0) {
+    //  dividends[N] = address(this).balance;
+    //}
 
     uint share = 0;
     uint k = 0;
@@ -69,9 +80,10 @@ contract AppDD is ERC20, Ownable {
     uint256 N = (block.timestamp - start) / period; // current - 1
     uint256 date = start + N * period - 1;
 
-    if (dividends[N] == 0) {
-      dividends[N] = address(this).balance;
-    }
+    require(dividends[N] > 0);
+    //if (dividends[N] == 0) {
+    //  dividends[N] = address(this).balance;
+    //}
     
     if (!AlreadyReceived[N][msg.sender]) {      
       uint share = safeMul(balanceOf(msg.sender, date), multiplier);
