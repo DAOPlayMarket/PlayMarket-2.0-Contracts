@@ -3,18 +3,14 @@ pragma solidity ^0.4.25;
 import './Ownable.sol';
 import './ERC20.03.sol';
 
-interface CryptoDuelI {
-    function withdraw(int _referrerID, uint N) external returns (bool);
-    function getReward(address _referrer, uint N) external view returns (uint256);
-}
-
 /**
  * @title Dividend Distribution Contract for AppDAO
  */
 contract AppDD is ERC20, Ownable {
 
-  CryptoDuelI source; // contract application
+  address source; // contract application
   bytes code;     // profit interface
+
 
   mapping (uint256 => uint256) public dividends;
   mapping (address => uint256) public ownersbal;  
@@ -26,16 +22,12 @@ contract AppDD is ERC20, Ownable {
   // Take profit for dividends from source contract
   function TakeProfit() external {
     uint256 N = (block.timestamp - start) / period;
-    uint256 sum = source.getReward(address(this), N);
-    if(sum > 0) {
-        require(source.withdraw(0, N));
-        dividends[N] = sum;
-    }
+    require(source.call.value(0)(code));
   }
 
   // Link to source contract
-  function Link(address _contract, bytes _code) external {
-    source = CryptoDuelI(_contract);
+  function Link(address _contract, bytes _code) external onlyOwner {
+    source = _contract;
     code = _code;
   }  
 
