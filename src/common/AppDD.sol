@@ -11,6 +11,7 @@ contract AppDD is ERC20, Ownable {
   address source; // contract application
   bytes code;     // profit interface
 
+
   mapping (uint256 => uint256) public dividends;
   mapping (address => uint256) public ownersbal;  
   mapping (uint256 => mapping (address => bool)) public AlreadyReceived;
@@ -20,6 +21,7 @@ contract AppDD is ERC20, Ownable {
    
   // Take profit for dividends from source contract
   function TakeProfit() external {
+    uint256 N = (block.timestamp - start) / period;
     require(source.call.value(0)(code));
   }
 
@@ -41,10 +43,11 @@ contract AppDD is ERC20, Ownable {
 
     uint256 N = (block.timestamp - start) / period; // current - 1
     uint256 date = start + N * period - 1;
-
-    if (dividends[N] == 0) {
-      dividends[N] = address(this).balance;
-    }
+    
+    require(dividends[N] > 0);
+    //if (dividends[N] == 0) {
+    //  dividends[N] = address(this).balance;
+    //}
 
     uint share = 0;
     uint k = 0;
@@ -69,9 +72,10 @@ contract AppDD is ERC20, Ownable {
     uint256 N = (block.timestamp - start) / period; // current - 1
     uint256 date = start + N * period - 1;
 
-    if (dividends[N] == 0) {
-      dividends[N] = address(this).balance;
-    }
+    require(dividends[N] > 0);
+    //if (dividends[N] == 0) {
+    //  dividends[N] = address(this).balance;
+    //}
     
     if (!AlreadyReceived[N][msg.sender]) {      
       uint share = safeMul(balanceOf(msg.sender, date), multiplier);
