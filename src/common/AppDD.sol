@@ -20,9 +20,20 @@ contract AppDD is ERC20, Ownable {
   event Payment(address indexed sender, uint amount);
    
   // Take profit for dividends from source contract
-  function TakeProfit() external {
+  function TakeProfit() external returns (uint256){
     uint256 N = (block.timestamp - start) / period;
-    require(source.call.value(0)(code));
+    if(dividends[N] > 0 ) {
+        return dividends[N];
+    } else {
+        uint currentBalance = address(this).balance; 
+        require(source.call.value(0)(code));
+        uint modifiedBalance = address(this).balance;
+        uint profit = safeSub(modifiedBalance, currentBalance);
+        if(profit > 0) {
+            dividends[N] = profit;
+        }
+        return dividends[N];
+    }
   }
 
   // Link to source contract
