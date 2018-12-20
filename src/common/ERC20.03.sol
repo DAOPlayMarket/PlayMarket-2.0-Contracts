@@ -14,12 +14,22 @@ contract ERC20 is ERC20I, SafeMath {
   mapping (address => uint256) balances;
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  uint256 public start = 0;         // Must be equal to the date of issue tokens
-  uint256 public period;  // By default, the dividend accrual period is 30 days
+  uint256 public start = 0;          // Must be equal to the date of issue tokens
+  uint256 public period = 30;        // By default, the dividend accrual period is 30 days
   mapping (address => mapping (uint256 => int256)) public ChangeOverPeriod;
 
   address[] public owners;
   mapping (address => bool) public ownersIndex;
+
+  struct _Prop {
+    uint propID;          // proposal ID in DAO    
+    uint endTime;         // end time of voting
+  }
+  
+  _Prop[] public ActiveProposals;  // contains active proposals
+
+  // contains voted Tokens on proposals
+  mapping (uint => mapping (address => uint)) public voted;
 
   /** 
    * @dev Total Supply
@@ -68,7 +78,17 @@ contract ERC20 is ERC20I, SafeMath {
    */
   function transfer(address _to, uint256 _value) public returns (bool success) {
     require(_to != address(0));
-    require(balances[msg.sender] >= _value);
+
+    uint lock = 0;
+    for (uint k = 0; k < ActiveProposals.length; k++) {
+      if (ActiveProposals[k].endTime > now) {
+        if (lock < voted[ActiveProposals[k].propID][msg.sender]) {
+          lock = voted[ActiveProposals[k].propID][msg.sender];
+        }
+      }
+    }
+
+    require(safeSub(balances[msg.sender], lock) >= _value);
 
     if (ownersIndex[_to] == false && _value > 0) {
       ownersIndex[_to] = true;
@@ -105,7 +125,18 @@ contract ERC20 is ERC20I, SafeMath {
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
     require(_to != address(0));
-    require(balances[_from] >= _value);
+
+    uint lock = 0;
+    for (uint k = 0; k < ActiveProposals.length; k++) {
+      if (ActiveProposals[k].endTime > now) {
+        if (lock < voted[ActiveProposals[k].propID][_from]) {
+          lock = voted[ActiveProposals[k].propID][_from];
+        }
+      }
+    }
+    
+    require(safeSub(balances[_from], lock) >= _value);
+    
     require(allowed[_from][msg.sender] >= _value);
 
     if (ownersIndex[_to] == false && _value > 0) {
@@ -145,16 +176,45 @@ contract ERC20 is ERC20I, SafeMath {
   function trim(uint offset, uint limit) external returns (bool) { 
     uint k = offset;
     uint ln = limit;
-    while (k < ln){
+    while (k < ln) {
       if (balances[owners[k]] == 0) {
         ownersIndex[owners[k]] =  false;
         owners[k] = owners[owners.length-1];
         owners.length = owners.length-1;
         ln--;
-      }else{
+      } else {
         k++;
       }
     }
     return true;
   }
+
+  // current number of shareholders (owners)
+  function getOwnersCount() external view returns (uint256 count) {
+    return owners.length;
+  }
+
+  function addProposal(uint _propID, uint _endTime) internal {
+    ActiveProposals.push(_Prop({
+      propID: _propID,
+      endTime: _endTime
+    }));
+  }
+
+  function delProposal(uint _propID) internal {
+    uint k = 0;
+    while (k < ActiveProposals.length){
+      if (ActiveProposals[k].propID == _propID) {
+        require(ActiveProposals[k].endTime < now);
+        ActiveProposals[k] = ActiveProposals[ActiveProposals.length-1];
+        ActiveProposals.length = ActiveProposals.length-1;   
+      } else {
+        k++;
+      }
+    }    
+  }
+
+  function getVoted(uint _propID, address _voter) external view returns (uint) {
+    return voted[_propID][_voter];
+  }  
 }

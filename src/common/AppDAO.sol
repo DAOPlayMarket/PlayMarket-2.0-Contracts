@@ -24,8 +24,6 @@ contract AppDAO is AppDD {
     uint public debatingPeriodDuration;
     // requisite majority of votes (by the system a simple majority)
     uint public requisiteMajority;
-    // contains voted Tokens on proposals
-    mapping (uint => mapping (address => uint)) public voted; 
 
     struct _Proposal {
         // proposal may execute only after voting ended
@@ -102,8 +100,8 @@ contract AppDAO is AppDD {
      * @param _transactionByteCode bytecode of transaction
      */
     function addProposal(address _recipient, uint _amount, string _desc, string _fullDescHash, bytes _transactionByteCode) onlyMembers public returns (uint) {
-      require(balances[msg.sender] > minBalance);
-      Proposals.push(_Proposal({      
+        require(balances[msg.sender] > minBalance);
+        Proposals.push(_Proposal({      
             endTimeOfVoting: now + debatingPeriodDuration * 1 minutes,
             executed: false,
             proposalPassed: false,
@@ -117,6 +115,9 @@ contract AppDAO is AppDD {
             fullDescHash: _fullDescHash
         }));
         
+        // add proposal in ERC20 base contract for block transfer
+        super.addProposal(Proposals.length-1, Proposals[Proposals.length-1].endTimeOfVoting);
+
         emit ProposalAdded(Proposals.length-1, _recipient, _amount, _desc, _fullDescHash);
 
         return Proposals.length-1;
@@ -196,6 +197,10 @@ contract AppDAO is AppDD {
             p.proposalPassed = false;
         }
         p.executed = true;
+
+        // delete proposal from active list
+        super.delProposal(_proposalID);
+       
         // Fire Events
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);
     }

@@ -108,6 +108,7 @@ contract CrowdSale is Ownable, SafeMath {
     if (price[currentPeriod] == 0) {
       // recalc price of tokens
       price[currentPeriod] = safeDiv(safeMul(safeMul(AppToken.TakeProfit(), ROIM), multiplier), totalSupply);
+      require(price[currentPeriod] > 0);
     }
     
     // Calculating the number of tokens

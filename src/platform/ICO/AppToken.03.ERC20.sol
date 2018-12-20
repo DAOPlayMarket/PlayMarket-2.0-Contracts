@@ -53,6 +53,11 @@ contract AppToken is AppDAO {
     ChangeOverPeriod[_dev][1] = int256(balances[_dev]);
     owners.push(_dev);
 
+    // _minimumQuorum = safePerc(totalSupply_, 5000)
+    // _requisiteMajority = safePerc(totalSupply_, 2500)
+    // _debatingPeriodDuration = 60 minutes
+    changeVotingRules(safePerc(totalSupply_, 5000), 60, safePerc(totalSupply_, 2500));
+    
     // change owner
     owner = address(this);
   } 
