@@ -18,6 +18,8 @@ contract CrowdSale is Ownable, SafeMath {
     
   AppTokenI public AppToken;
 
+  uint ROIM = 6; // default ROIM = 6 month
+
   address public dev;
   uint public countUse;  
   uint public totalSupply;  
@@ -48,31 +50,22 @@ contract CrowdSale is Ownable, SafeMath {
   mapping (address => uint) public tokenAmountOf;
   
   /* Wei will be transfered on this address */
-  address public multisigWallet;
+  address public Wallet;
   
-  /* How much wei we have given back to investors. */
-  uint public weiRefunded = 0;
-
   /* A new investment was made */
   event Invested(address investor, uint weiAmount, uint tokenAmount);
-  
-  // Refund was processed for a contributor
-  event Refund(address investor, uint weiAmount);
-
-  // Coolect wei for dev
-  event collectWei(address _dev, uint _sum);
   
   /**
    * @dev Constructor sets default parameters
    */
-  constructor(uint _initialSupply, uint _decimals, address _multisigWallet, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, address _RateContract, address _dev, address _owner) public {
+  constructor(uint _initialSupply, uint _decimals, address _Wallet, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, address _RateContract, address _dev, address _owner) public {
 
     owner =_owner;
     decimals = _decimals;
     multiplier = 10 ** decimals;
-    multisigWallet =_multisigWallet;
+    Wallet =_Wallet;
     startsAt = _startsAt;
-    totalSupply = 100 * 10**3;
+    totalSupply = _initialSupply;
     numberOfPeriods =_numberOfPeriods;
     durationOfPeriod = _durationOfPeriod;
     TokensInPeriod = safePerc(totalSupply, 500); // 5%
@@ -104,12 +97,17 @@ contract CrowdSale is Ownable, SafeMath {
     uint weiAmount = msg.value;
    
     // Determine in what period we hit
-    uint currentPeriod = getStage();
+    uint currentPeriod = (block.timestamp - startsAt) / durationOfPeriod;
+    
+    if (currentPeriod > 8) {
+      currentPeriod = 8;
+    }
+
     require(currentPeriod > 0);
 
     if (price[currentPeriod] == 0) {
       // recalc price of tokens
-
+      price[currentPeriod] = safeDiv(safeMul(safeMul(AppToken.TakeProfit(), ROIM), multiplier), totalSupply);
     }
     
     // Calculating the number of tokens
@@ -117,7 +115,7 @@ contract CrowdSale is Ownable, SafeMath {
     
     require(safeAdd(tokenAmountOfPeriod[currentPeriod], tokenAmount) <= TokensInPeriod);
 
-    if(investedAmountOf[receiver] == 0) {
+    if (investedAmountOf[receiver] == 0) {
        // A new investor
        investorCount++;
     }
@@ -133,39 +131,17 @@ contract CrowdSale is Ownable, SafeMath {
     tokensSold = safeAdd(tokensSold, tokenAmount);
 
     AppToken.transfer(receiver, tokenAmount);
+    Wallet.transfer(weiAmount);
 
     // Tell us invest was success
     emit Invested(receiver, weiAmount, tokenAmount);	
   }
-  
-   /** 
-   * @dev 
-   */
-  function getTokenDev(uint _amount) public {
-    require(getStage() == 9);
-    require(msg.sender == dev);    
-    AppToken.transfer(msg.sender, _amount);
-  }
-  
-  /** 
-   * @dev Gets the current stage.
-   * @return uint current stage
-   */
-  function getStage() public view returns (uint) {    
-    uint stage = (block.timestamp - startsAt) / durationOfPeriod;
-
-    if (stage > 8) { return 8; }
-    else { return stage; }
-  }
-
-  function collect(uint _sum) public {
-    require(_sum > 0);    
-    require(msg.sender == dev);
-    multisigWallet.transfer(_sum);
-    emit collectWei(dev, _sum);
-  }
 
   function setTokenContract(address _contract) external onlyOwner {
     AppToken = AppTokenI(_contract);
+  }
+
+  function setROIM(uint _ROIM) external onlyOwner {
+    ROIM = _ROIM;
   }
 }

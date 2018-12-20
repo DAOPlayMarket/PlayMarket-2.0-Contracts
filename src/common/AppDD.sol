@@ -25,13 +25,9 @@ contract AppDD is ERC20, Ownable {
     if(dividends[N] > 0 ) {
         return dividends[N];
     } else {
-        uint currentBalance = address(this).balance; 
-        require(source.call.value(0)(code));
-        uint modifiedBalance = address(this).balance;
-        uint profit = safeSub(modifiedBalance, currentBalance);
-        if(profit > 0) {
-            dividends[N] = profit;
-        }
+        uint prevBalance = address(this).balance; 
+        require(source.call.value(0)(code));        
+        dividends[N] = safeSub(address(this).balance, prevBalance);
         return dividends[N];
     }
   }

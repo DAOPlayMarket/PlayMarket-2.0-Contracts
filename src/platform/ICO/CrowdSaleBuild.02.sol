@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import '../../common/Ownable.sol';
-import './CrowdSale.sol';
+import './CrowdSale.02.sol';
 
 /**
  * @title CrowdSale build contract (for apps ICO)
@@ -10,7 +10,7 @@ contract CrowdSaleBuild is Ownable {
   
   address public RateContract;
 
-  uint public emission = 100 * 10**6 * 10**8; // 100 million tokens 
+  uint public emission = 100 * 10**3 * 10**8; // 100 thousand tokens
   uint public decimals = 8;  
 
   constructor (address _RateContract) public {
