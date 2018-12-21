@@ -114,4 +114,13 @@ contract AppDD is ERC20, Ownable {
   function getMultiplier() external view returns (uint ) {
     return multiplier;
   }  
+  
+  /**
+   * Owner can change start one time
+   */
+  function setStart(uint _start) external onlyOwner {
+    require(start == 0);
+    start = _start;
+    owner = address(this);
+  }
 }

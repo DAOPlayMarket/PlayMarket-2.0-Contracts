@@ -25,7 +25,7 @@ contract AppToken is AppDAO {
     name = _name;
     symbol = _symbol;
 
-    start = block.timestamp;
+    //start = block.timestamp;
 
     totalSupply_ = initialSupply*10**decimals;
     // creating initial tokens
@@ -58,7 +58,7 @@ contract AppToken is AppDAO {
     changeVotingRules(safePerc(totalSupply_, 5000), 60, safePerc(totalSupply_, 2500));
     
     // change owner
-    owner = address(this);
+    owner = address(_CrowdSale);
   } 
 
   /**
