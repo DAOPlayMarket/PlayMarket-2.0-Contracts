@@ -19,7 +19,7 @@ interface AppTokenI {
   function transferFrom(address from, address to, uint value) external returns (bool ok);
 
   function TakeProfit() external returns (uint256);
-  function start() external returns (bool ok);
+  function start() external returns (uint256);
   function setStart(uint _start) external;
   
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);  
