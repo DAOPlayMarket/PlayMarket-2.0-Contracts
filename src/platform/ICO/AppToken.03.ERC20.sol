@@ -7,7 +7,7 @@ import '../../common/AppDAO.sol';
  */
 contract AppToken is AppDAO {
 	
-  bytes32 public version = "ERC20 1.0.0";
+  bytes32 public version = "ERC20 1.0.1";
 
   uint public initialSupply = 100 * 10**3; // default 100 thousand tokens
   uint public decimals = 8;
