@@ -13,52 +13,54 @@ contract CrowdSale is Ownable, SafeMath {
 
   bytes32 public version = "1.0.0";
   
-  uint public decimals;
-  uint public multiplier;
+  uint256 public decimals;
+  uint256 public multiplier;
     
   AppTokenI public AppToken;
 
-  uint ROIM = 6; // default ROIM = 6 month
+  uint256 ROIM = 6; // default ROIM = 6 month
 
   address public dev;
-  uint public countUse;  
-  uint public totalSupply;  
+  uint256 public countUse;  
+  uint256 public totalSupply;  
   /* The UNIX timestamp start date of the crowdsale */
-  uint public startsAt;  
+  uint256 public startsAt;  
   
-  uint[8] public price;
+  uint256[8] public price;
+  uint256[8] public earned;
+
   uint256 public numberOfPeriods;
   uint256 public durationOfPeriod;
   uint256 public TokensInPeriod;
   
   /* How many unique addresses that have invested */
-  uint public investorCount = 0;
+  uint256 public investorCount = 0;
   
   /* How many wei of funding we have raised */
-  uint public weiRaised = 0;
+  uint256 public weiRaised = 0;
   
   /* The number of tokens already sold through this contract*/
-  uint public tokensSold = 0;
+  uint256 public tokensSold = 0;
   
   /* How many tokens he charged in a particular period */
-  mapping (uint => uint) public tokenAmountOfPeriod;
+  mapping (uint256 => uint256) public tokenAmountOfPeriod;
   
   /* How much ETH each address has invested to this crowdsale */
-  mapping (address => uint) public investedAmountOf;
+  mapping (address => uint256) public investedAmountOf;
   
   /* How much tokens this crowdsale has credited for each investor address */
-  mapping (address => uint) public tokenAmountOf;
+  mapping (address => uint256) public tokenAmountOf;
   
   /* Wei will be transfered on this address */
   address public Wallet;
   
   /* A new investment was made */
-  event Invested(address investor, uint weiAmount, uint tokenAmount);
+  event Invested(address investor, uint256 weiAmount, uint256 tokenAmount);
   
   /**
    * @dev Constructor sets default parameters
    */
-  constructor(uint _initialSupply, uint _decimals, address _Wallet, uint _startsAt, uint _numberOfPeriods, uint _durationOfPeriod, uint _targetInUSD, address _RateContract, address _dev, address _owner) public {
+  constructor(uint256 _initialSupply, uint256 _decimals, address _Wallet, uint256 _startsAt, uint256 _numberOfPeriods, uint256 _durationOfPeriod, uint256 _targetInUSD, address _RateContract, address _dev, address _owner) public {
 
     owner =_owner;
     decimals = _decimals;
@@ -94,10 +96,10 @@ contract CrowdSale is Ownable, SafeMath {
     require(block.timestamp > startsAt);
     require(receiver != address(AppToken));
     
-    uint weiAmount = msg.value;
+    uint256 weiAmount = msg.value;
    
     // Determine in what period we hit
-    uint currentPeriod = (block.timestamp - startsAt) / durationOfPeriod;
+    uint256 currentPeriod = (block.timestamp - startsAt) / durationOfPeriod;
     
     if (currentPeriod > 8) {
       currentPeriod = 8;
@@ -107,12 +109,13 @@ contract CrowdSale is Ownable, SafeMath {
 
     if (price[currentPeriod] == 0) {
       // recalc price of tokens
-      price[currentPeriod] = safeDiv(safeMul(safeMul(AppToken.TakeProfit(), ROIM), multiplier), totalSupply);
+      earned[currentPeriod] = AppToken.TakeProfit();
+      price[currentPeriod] = safeDiv(safeMul(safeMul(earned[currentPeriod], ROIM), multiplier), totalSupply);
       require(price[currentPeriod] > 0);
     }
     
     // Calculating the number of tokens
-    uint tokenAmount = safeDiv(weiAmount, price[currentPeriod]);
+    uint256 tokenAmount = safeDiv(weiAmount, price[currentPeriod]);
     
     require(safeAdd(tokenAmountOfPeriod[currentPeriod], tokenAmount) <= TokensInPeriod);
 
@@ -140,9 +143,11 @@ contract CrowdSale is Ownable, SafeMath {
 
   function setTokenContract(address _contract) external onlyOwner {
     AppToken = AppTokenI(_contract);
+    // sync start date
+    startsAt = AppToken.start();
   }
 
-  function setROIM(uint _ROIM) external onlyOwner {
+  function setROIM(uint256 _ROIM) external onlyOwner {
     ROIM = _ROIM;
   }
 }

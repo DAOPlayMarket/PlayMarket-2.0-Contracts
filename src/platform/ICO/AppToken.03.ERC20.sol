@@ -26,7 +26,6 @@ contract AppToken is AppDAO {
     symbol = _symbol;
 
     start = block.timestamp;
-    period = 20 minutes;
 
     totalSupply_ = initialSupply*10**decimals;
     // creating initial tokens
@@ -84,5 +83,5 @@ contract AppToken is AppDAO {
   function setPeriod(uint _period) public onlyOwner {
     period = _period;
     emit UpdatedPeriod(_period);
-  }  
+  }
 }

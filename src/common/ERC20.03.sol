@@ -14,8 +14,8 @@ contract ERC20 is ERC20I, SafeMath {
   mapping (address => uint256) balances;
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  uint256 public start = 0;          // Must be equal to the date of issue tokens
-  uint256 public period = 30;        // By default, the dividend accrual period is 30 days
+  uint256 public start = 0;               // Must be equal to the date of issue tokens
+  uint256 public period = 30 days;        // By default, the dividend accrual period is 30 days
   mapping (address => mapping (uint256 => int256)) public ChangeOverPeriod;
 
   address[] public owners;
@@ -194,6 +194,11 @@ contract ERC20 is ERC20I, SafeMath {
     return owners.length;
   }
 
+  // current period
+  function getCurrentPeriod() external view returns (uint256 N) {
+    return (block.timestamp - start) / period;
+  }
+
   function addProposal(uint _propID, uint _endTime) internal {
     ActiveProposals.push(_Prop({
       propID: _propID,
@@ -216,5 +221,5 @@ contract ERC20 is ERC20I, SafeMath {
 
   function getVoted(uint _propID, address _voter) external view returns (uint) {
     return voted[_propID][_voter];
-  }  
+  }
 }

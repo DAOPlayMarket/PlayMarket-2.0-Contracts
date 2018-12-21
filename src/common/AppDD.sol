@@ -8,34 +8,37 @@ import './ERC20.03.sol';
  */
 contract AppDD is ERC20, Ownable {
 
-  address source; // contract application
-  bytes code;     // profit interface
-
-
   mapping (uint256 => uint256) public dividends;
   mapping (address => uint256) public ownersbal;  
   mapping (uint256 => mapping (address => bool)) public AlreadyReceived;
   uint public multiplier = 100000; // precision to ten thousandth percent (0.001%)
 
+  address public source; // contract application
+  bytes public code;     // profit interface
+
   event Payment(address indexed sender, uint amount);
    
   // Take profit for dividends from source contract
-  function TakeProfit() external returns (uint256){
+  function TakeProfit() external returns (uint256) {
     uint256 N = (block.timestamp - start) / period;
     if(dividends[N] > 0 ) {
         return dividends[N];
     } else {
-        uint prevBalance = address(this).balance; 
-        require(source.call.value(0)(code));        
+        uint prevBalance = address(this).balance;
+        require(source.call.value(0)(code));
         dividends[N] = safeSub(address(this).balance, prevBalance);
         return dividends[N];
     }
   }
 
-  // Link to source contract
+  // Link to source contract and setting the start date STO
+  // in linking contract must be function setStart(uint256)
   function Link(address _contract, bytes _code) external onlyOwner {
     source = _contract;
     code = _code;
+
+    require(address(source).call.value(0)(abi.encodeWithSignature("acceptOwnership()")));
+    require(address(source).call.value(0)(abi.encodeWithSignature("setStart(uint256)", start)));
   }  
 
   function () public payable {

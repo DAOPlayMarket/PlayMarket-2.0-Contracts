@@ -205,6 +205,12 @@ contract AppDAO is AppDD {
         emit ProposalTallied(_proposalID, p.votesSupport, p.votesAgainst, p.numberOfVotes, p.proposalPassed);
     }
 
+    // function is needed if execution transactionByteCode in Proposal failed
+    function delActiveProposal(uint _proposalID) public onlyOwner {
+        // delete proposal from active list
+        super.delProposal(_proposalID);   
+    }
+
     /**
     * @dev Allows the DAO to transfer control of the _contract to a _newOwner.
     * @param _newOwner The address to transfer ownership to.
