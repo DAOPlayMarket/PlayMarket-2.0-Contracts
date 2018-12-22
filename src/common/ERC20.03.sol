@@ -58,7 +58,7 @@ contract ERC20 is ERC20I, SafeMath {
     uint256 N1 = (_date - start) / period + 1;    
 
     uint256 N2 = 1;
-    if (block.timestamp > startsAt) {
+    if (block.timestamp > start) {
       N2 = (block.timestamp - start) / period + 1;
     }
 
@@ -104,7 +104,7 @@ contract ERC20 is ERC20I, SafeMath {
     balances[_to] = safeAdd(balances[_to], _value);
 
     uint256 N = 1;
-    if (block.timestamp > startsAt) {
+    if (block.timestamp > start) {
       N = (block.timestamp - start) / period + 1;
     }
 
@@ -158,7 +158,7 @@ contract ERC20 is ERC20I, SafeMath {
     allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _value);
     
     uint256 N = 1;
-    if (block.timestamp > startsAt) {
+    if (block.timestamp > start) {
       N = (block.timestamp - start) / period + 1;
     }
 

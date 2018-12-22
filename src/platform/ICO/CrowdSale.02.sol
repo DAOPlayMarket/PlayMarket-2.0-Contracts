@@ -122,7 +122,7 @@ contract CrowdSale is Ownable, SafeMath {
     }
     
     // Calculating the number of tokens
-    uint256 tokenAmount = safeDiv(weiAmount, price[currentPeriod]);
+    uint256 tokenAmount = safeDiv(safeMul(weiAmount, multiplier), price[currentPeriod]);
     
     require(safeAdd(tokenAmountOfPeriod[currentPeriod], tokenAmount) <= TokensInPeriod);
 
