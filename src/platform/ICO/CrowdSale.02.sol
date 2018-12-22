@@ -18,7 +18,7 @@ contract CrowdSale is Ownable, SafeMath {
     
   AppTokenI public AppToken;
 
-  uint256 ROIM = 6; // default ROIM = 6 month
+  uint256 public ROIM = 6; // default ROIM = 6 month
 
   address public dev;
   uint256 public countUse;  

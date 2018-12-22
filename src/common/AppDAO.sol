@@ -99,10 +99,15 @@ contract AppDAO is AppDD {
      * @param _fullDescHash Hash of full description of job
      * @param _transactionByteCode bytecode of transaction
      */
-    function addProposal(address _recipient, uint _amount, string _desc, string _fullDescHash, bytes _transactionByteCode) onlyMembers public returns (uint) {
+    function addProposal(address _recipient, uint _amount, string _desc, string _fullDescHash, bytes _transactionByteCode, uint _debatingPeriodDuration) onlyMembers public returns (uint) {
         require(balances[msg.sender] > minBalance);
+
+        if (_debatingPeriodDuration == 0) {
+            _debatingPeriodDuration = debatingPeriodDuration;
+        }
+
         Proposals.push(_Proposal({      
-            endTimeOfVoting: now + debatingPeriodDuration * 1 minutes,
+            endTimeOfVoting: now + _debatingPeriodDuration * 1 minutes,
             executed: false,
             proposalPassed: false,
             numberOfVotes: 0,
