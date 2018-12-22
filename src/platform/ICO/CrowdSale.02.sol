@@ -97,7 +97,7 @@ contract CrowdSale is Ownable, SafeMath {
 
     if (receiver == address(AppToken)) {
       dev.transfer(msg.value);
-      break;
+      return;
     }
     
     uint256 weiAmount = msg.value;
