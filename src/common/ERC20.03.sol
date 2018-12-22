@@ -55,8 +55,13 @@ contract ERC20 is ERC20I, SafeMath {
    */
   function balanceOf(address _owner, uint _date) public view returns (uint256) {
     require(_date >= start);
-    uint256 N1 = (_date - start) / period + 1;
-    uint256 N2 = (block.timestamp - start) / period + 1;
+    uint256 N1 = (_date - start) / period + 1;    
+
+    uint256 N2 = 1;
+    if (block.timestamp > startsAt) {
+      N2 = (block.timestamp - start) / period + 1;
+    }
+
     require(N2 >= N1);
 
     int256 B = int256(balances[_owner]);
@@ -98,7 +103,11 @@ contract ERC20 is ERC20I, SafeMath {
     balances[msg.sender] = safeSub(balances[msg.sender], _value);
     balances[_to] = safeAdd(balances[_to], _value);
 
-    uint256 N = (block.timestamp - start) / period + 1;
+    uint256 N = 1;
+    if (block.timestamp > startsAt) {
+      N = (block.timestamp - start) / period + 1;
+    }
+
     ChangeOverPeriod[msg.sender][N] = ChangeOverPeriod[msg.sender][N] - int256(_value);
     ChangeOverPeriod[_to][N] = ChangeOverPeriod[_to][N] + int256(_value);
    
@@ -147,8 +156,12 @@ contract ERC20 is ERC20I, SafeMath {
     balances[_from] = safeSub(balances[_from], _value);
     balances[_to] = safeAdd(balances[_to], _value);
     allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _value);
+    
+    uint256 N = 1;
+    if (block.timestamp > startsAt) {
+      N = (block.timestamp - start) / period + 1;
+    }
 
-    uint256 N = (block.timestamp - start) / period + 1;
     ChangeOverPeriod[_from][N] = ChangeOverPeriod[_from][N] - int256(_value);
     ChangeOverPeriod[_to][N] = ChangeOverPeriod[_to][N] + int256(_value);
 
@@ -196,7 +209,11 @@ contract ERC20 is ERC20I, SafeMath {
 
   // current period
   function getCurrentPeriod() external view returns (uint256 N) {
-    return (block.timestamp - start) / period;
+    if (block.timestamp > start) {
+      return (block.timestamp - start) / period;
+    } else {
+      return 0;
+    }
   }
 
   function addProposal(uint _propID, uint _endTime) internal {

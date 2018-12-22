@@ -39,6 +39,7 @@ contract AppDD is ERC20, Ownable {
 
     require(address(source).call.value(0)(abi.encodeWithSignature("acceptOwnership()")));
     require(address(source).call.value(0)(abi.encodeWithSignature("setStart(uint256)", start)));
+    require(address(source).call.value(0)(abi.encodeWithSignature("setPeriod(uint256)", period)));
   }  
 
   function () public payable {
@@ -55,9 +56,6 @@ contract AppDD is ERC20, Ownable {
     uint256 date = start + N * period - 1;
     
     require(dividends[N] > 0);
-    //if (dividends[N] == 0) {
-    //  dividends[N] = address(this).balance;
-    //}
 
     uint share = 0;
     uint k = 0;

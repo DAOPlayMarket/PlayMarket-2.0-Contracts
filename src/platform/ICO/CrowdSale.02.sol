@@ -94,12 +94,19 @@ contract CrowdSale is Ownable, SafeMath {
   function investInternal(address receiver) private {
     require(msg.value > 0);
     require(block.timestamp > startsAt);
-    require(receiver != address(AppToken));
+
+    if (receiver == address(AppToken)) {
+      dev.transfer(msg.value);
+      break;
+    }
     
     uint256 weiAmount = msg.value;
    
     // Determine in what period we hit
-    uint256 currentPeriod = (block.timestamp - startsAt) / durationOfPeriod;
+    uint256 currentPeriod = 0;
+    if (block.timestamp > startsAt) {
+      currentPeriod = (block.timestamp - startsAt) / durationOfPeriod;
+    }
     
     if (currentPeriod > 8) {
       currentPeriod = 8;
@@ -147,9 +154,16 @@ contract CrowdSale is Ownable, SafeMath {
     AppToken.setStart(startsAt);
     // sync duration of period
     AppToken.setPeriod(durationOfPeriod);
+    // set owner to AppDAO
+    owner = address(AppToken);
   }
 
   function setROIM(uint256 _ROIM) external onlyOwner {
     ROIM = _ROIM;
   }
+
+  // withdraw dividends during STO to dev address
+  function withdraw(uint256 _value) external {
+    AppToken.withdraw(_value);
+  }  
 }
