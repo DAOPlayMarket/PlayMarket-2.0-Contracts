@@ -3,6 +3,13 @@ pragma solidity ^0.4.24;
 import '../../common/AppDAO.sol';
 
 /**
+ * @title CrowdSale interface to get wallet address
+ */
+interface CrowdSaleI {
+    function Wallet() external returns (address);
+}
+
+/**
  * @title Application Token based on ERC20, AppDAO, AppDD
  */
 contract AppToken is AppDAO {
@@ -15,6 +22,8 @@ contract AppToken is AppDAO {
   string public name;
   string public symbol;
 
+  address public Wallet;
+
   /** Name and symbol were updated. */
   event UpdatedTokenInformation(string _name, string _symbol);
 
@@ -24,8 +33,6 @@ contract AppToken is AppDAO {
   constructor(string _name, string _symbol, address _CrowdSale, address _PMFund, address _dev) public {
     name = _name;
     symbol = _symbol;
-
-    //start = block.timestamp;
 
     totalSupply_ = initialSupply*10**decimals;
     // creating initial tokens
@@ -39,18 +46,21 @@ contract AppToken is AppDAO {
 
     emit Transfer(_CrowdSale, _PMFund, balances[_PMFund]);  
 
+    Wallet = CrowdSaleI(_CrowdSale).Wallet();
+    require(Wallet != address(0));
+
     // send 55% - to developer for the organization AirDrop/Bounty etc.
     value = safePerc(totalSupply_,5500);
     balances[_CrowdSale] = safeSub(balances[_CrowdSale], value);
-    balances[_dev] = value;
-    emit Transfer(_CrowdSale, _dev, balances[_dev]);  
+    balances[Wallet] = value;
+    emit Transfer(_CrowdSale, Wallet, balances[Wallet]);  
 
     ChangeOverPeriod[_CrowdSale][1] = int256(balances[_CrowdSale]);
     owners.push(_CrowdSale);
     ChangeOverPeriod[_PMFund][1] = int256(balances[_PMFund]);
     owners.push(_PMFund);
-    ChangeOverPeriod[_dev][1] = int256(balances[_dev]);
-    owners.push(_dev);
+    ChangeOverPeriod[Wallet][1] = int256(balances[Wallet]);
+    owners.push(Wallet);
 
     // _minimumQuorum = safePerc(totalSupply_, 5000)
     // _requisiteMajority = safePerc(totalSupply_, 2500)
@@ -76,6 +86,15 @@ contract AppToken is AppDAO {
     emit UpdatedTokenInformation(_name, _symbol);
   }
 
+
+  /**
+   * Owner can change start one time
+   */
+  function setStart(uint _start) external onlyOwner {
+    require(start == 0);
+    start = _start;    
+  }
+
   /**
   * Owner can change period
   *
@@ -83,5 +102,6 @@ contract AppToken is AppDAO {
   function setPeriod(uint _period) public onlyOwner {
     period = _period;
     emit UpdatedPeriod(_period);
+    owner = address(this);
   }
 }

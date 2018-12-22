@@ -144,7 +144,9 @@ contract CrowdSale is Ownable, SafeMath {
   function setTokenContract(address _contract) external onlyOwner {
     AppToken = AppTokenI(_contract);
     // sync start date
-   AppToken.setStart(startsAt);
+    AppToken.setStart(startsAt);
+    // sync duration of period
+    AppToken.setPeriod(durationOfPeriod);
   }
 
   function setROIM(uint256 _ROIM) external onlyOwner {

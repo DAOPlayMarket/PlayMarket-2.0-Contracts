@@ -17,10 +17,10 @@ interface AppTokenI {
   function transfer(address to, uint value, bytes data) external returns (bool ok);
   function transfer(address to, uint value, bytes data, string custom_fallback) external returns (bool ok);
   function transferFrom(address from, address to, uint value) external returns (bool ok);
-
-  function TakeProfit() external returns (uint256);
-  function start() external returns (uint256);
+  
   function setStart(uint _start) external;
+  function setPeriod(uint _period) external;
+  function TakeProfit() external returns (uint256);
   
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);  
 }
