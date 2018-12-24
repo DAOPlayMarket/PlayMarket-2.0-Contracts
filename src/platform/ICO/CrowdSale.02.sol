@@ -11,7 +11,7 @@ import '../../exchange/PEXI.sol';
  */
 contract CrowdSale is Ownable, SafeMath {
 
-  bytes32 public version = "1.0.0";
+  bytes32 public version = "2.0.0";
   
   uint256 public decimals;
   uint256 public multiplier;
@@ -95,11 +95,6 @@ contract CrowdSale is Ownable, SafeMath {
     require(msg.value > 0);
     require(block.timestamp > startsAt);
 
-    if (receiver == address(AppToken)) {
-      dev.transfer(msg.value);
-      return;
-    }
-    
     uint256 weiAmount = msg.value;
    
     // Determine in what period we hit
@@ -164,6 +159,6 @@ contract CrowdSale is Ownable, SafeMath {
 
   // withdraw dividends during STO to dev address
   function withdraw(uint256 _value) external {
-    AppToken.withdraw(_value);
+    AppToken.withdraw(_value, dev);
   }  
 }

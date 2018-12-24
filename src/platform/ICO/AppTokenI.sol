@@ -22,7 +22,7 @@ interface AppTokenI {
   function setPeriod(uint _period) external;
   function TakeProfit() external returns (uint256);
 
-  function withdraw(uint256 _value) external;
+  function withdraw(uint256 _value, address _receiver) external;
   
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);  
 }

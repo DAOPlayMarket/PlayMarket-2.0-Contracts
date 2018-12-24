@@ -103,6 +103,13 @@ contract AppDD is ERC20, Ownable {
     ownersbal[msg.sender] = safeSub(ownersbal[msg.sender], _value);
     msg.sender.transfer(_value);
   }
+  
+  // withdraw dividends to address
+  function withdraw(uint _value, address _receiver) external {    
+    require(ownersbal[msg.sender] >= _value);
+    ownersbal[msg.sender] = safeSub(ownersbal[msg.sender], _value);
+    _receiver.transfer(_value);
+  }
 
   function setMultiplier(uint _value) external onlyOwner {
     require(_value > 0);
