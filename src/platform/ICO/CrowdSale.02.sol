@@ -105,7 +105,7 @@ contract CrowdSale is Ownable, SafeMath {
     
     if (currentPeriod > 8) {
       currentPeriod = 8;
-      TokensInPeriod = saveDiv(safePerc(totalSupply, 4000), tokensSold);
+      TokensInPeriod = safeDiv(safePerc(totalSupply, 4000), tokensSold);
     }
 
     require(currentPeriod > 0);
