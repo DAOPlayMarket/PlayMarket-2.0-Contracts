@@ -106,7 +106,6 @@ contract CrowdSale is Ownable, SafeMath {
     bool endPeriod = false; 
     if (currentPeriod > 8) {
       currentPeriod = 8;
-      //TokensInPeriod = safeSub(safePerc(totalSupply, 4000), tokensSold);
       endPeriod = true;
     }
 
