@@ -26,8 +26,8 @@ contract CrowdSale is Ownable, SafeMath {
   /* The UNIX timestamp start date of the crowdsale */
   uint256 public startsAt;  
   
-  uint256[8] public price;
-  uint256[8] public earned;
+  uint256[9] public price;
+  uint256[9] public earned;
 
   uint256 public numberOfPeriods;
   uint256 public durationOfPeriod;
@@ -103,9 +103,11 @@ contract CrowdSale is Ownable, SafeMath {
       currentPeriod = (block.timestamp - startsAt) / durationOfPeriod;
     }
     
+    bool endPeriod = false; 
     if (currentPeriod > 8) {
       currentPeriod = 8;
-      TokensInPeriod = safeDiv(safePerc(totalSupply, 4000), tokensSold);
+      //TokensInPeriod = safeSub(safePerc(totalSupply, 4000), tokensSold);
+      endPeriod = true;
     }
 
     require(currentPeriod > 0);
@@ -120,7 +122,12 @@ contract CrowdSale is Ownable, SafeMath {
     // Calculating the number of tokens
     uint256 tokenAmount = safeDiv(safeMul(weiAmount, multiplier), price[currentPeriod]);
     
-    require(safeAdd(tokenAmountOfPeriod[currentPeriod], tokenAmount) <= TokensInPeriod);
+    if(endPeriod){
+      require(safeAdd(tokensSold, tokenAmount) <= safePerc(totalSupply, 4000));    
+    } else {
+      require(safeAdd(tokenAmountOfPeriod[currentPeriod], tokenAmount) <= TokensInPeriod);
+    }
+    
 
     if (investedAmountOf[receiver] == 0) {
        // A new investor
