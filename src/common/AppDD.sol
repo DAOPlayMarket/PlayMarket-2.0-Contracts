@@ -81,9 +81,6 @@ contract AppDD is ERC20, Ownable {
     uint256 date = start + N * period - 1;
 
     require(dividends[N] > 0);
-    //if (dividends[N] == 0) {
-    //  dividends[N] = address(this).balance;
-    //}
     
     if (!AlreadyReceived[N][msg.sender]) {      
       uint share = safeMul(balanceOf(msg.sender, date), multiplier);
