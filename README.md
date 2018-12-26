@@ -17,6 +17,8 @@ Personal freedom is impossible without economic security and independence. There
 * DEcentralized Exchange: 0xcc152ba543a3942a07e488a29702ca1cb40ea7e6
 * Foundation: 0xb04A05905Dc94345DCAD4846664001d4818E16D2
 * Repository: 0xe789578025fC8DFEa42C6Cecb4D42C65fa5B4826
+* DAO: 0x550cbf0d9c62dbb7ff0ac8be1ad9fba4cb2ce49d
+
 ```
 ## Specification
 
