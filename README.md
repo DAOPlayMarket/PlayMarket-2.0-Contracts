@@ -3,7 +3,7 @@
 
 ![PlayMarket 2.0](https://github.com/CryptonStudio/PlayMarket-2.0-Contracts/blob/master/docs/pm_logo.png)
 
-DAO PlayMarket 2.0 is a decentralized Android App Store that accepts payments in cryptocurrency and is combined with an ICO platform for developers.
+[DAO PlayMarket 2.0](https://playmarket.io/) is a decentralized Android App Store that accepts payments in cryptocurrency and is combined with an STO (Security Token Offering) platform for developers.
 
 
 Personal freedom is impossible without economic security and independence. Therefore, we created an open, censorship-resistant marketplace using blockchain and smart contracts.
@@ -20,6 +20,24 @@ Personal freedom is impossible without economic security and independence. There
 * DAO: 0x550cbf0d9c62dbb7ff0ac8be1ad9fba4cb2ce49d
 
 ```
-## Specification
+#### ABI specification
+* [Proxy contract](ABI/Proxy.abi)
+* [PlayMarket](ABI/PlayMarket.abi)
+* [ICO](ABI/ICO.abi)
+* [RateContract](ABI/RateContract.abi)
+* [DEcentralized Exchange](ABI/PEX.abi)
+* [Foundation](ABI/PMFund.abi)
+* [Repository](ABI/DAORepository.abi)
+* [DAO](ABI/DAOPM.abi)
 
-## Methods for the application
+#### Documentation
+Documentation available at [WIKI pages](https://github.com/CryptonStudio/PlayMarket-2.0-Contracts/wiki)
+
+#### Android application
+[You can download the application from this link](https://playmarket.io/detail/0)
+
+[Source code](https://github.com/CryptonStudio/PlayMarket-2.0-App)
+
+#### Disclaimer
+By using DAO PlayMarket 2.0 code fully or partially, API, Nodes, Mobile Application, Smart Contracts or any other service on your website or app for commerce or non-profit activities, you hereby grant permission and allow us to use your business name and/or trademark in our marketing or advertising.
+
