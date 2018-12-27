@@ -31,7 +31,7 @@ Personal freedom is impossible without economic security and independence. There
 * [DAO](ABI/DAOPM.abi)
 
 #### Documentation
-Documentation available at [WIKI pages](https://github.com/CryptonStudio/PlayMarket-2.0-Contracts/wiki)
+Documentation available at [WIKI pages](https://github.com/CryptonStudio/PlayMarket-2.0-Contracts/wiki/Documentation)
 
 #### Android application
 [You can download the application from this link](https://playmarket.io/detail/0)
